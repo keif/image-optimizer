@@ -5,7 +5,8 @@ An API-first image optimization service built with Go and Fiber. Designed for lo
 ## Features
 
 - **Image Optimization**: Resize, convert, and compress images
-- **Advanced Compression Options**: Format-specific controls (JPEG progressive, PNG compression levels, WebP lossless)
+- **Modern Format Support**: AVIF, WebP, JPEG, PNG, and GIF with format-specific controls
+- **Advanced Compression Options**: JPEG progressive encoding, PNG compression levels, WebP lossless, and more
 - **Interactive Before/After Comparison**: Visual slider to compare original vs optimized images
 - **Privacy First**: No server storage, in-memory processing only, zero tracking
 - **RESTful API**: Clean HTTP endpoints for easy integration
@@ -187,7 +188,7 @@ imgopt [options] <file1> [file2] [file3] ...
 - `-quality <int>`: Quality level from 1-100 (default: 80)
 - `-width <int>`: Target width in pixels (default: 0 = no resize)
 - `-height <int>`: Target height in pixels (default: 0 = no resize)
-- `-format <string>`: Output format (jpeg, png, webp, gif)
+- `-format <string>`: Output format (jpeg, png, webp, avif, gif)
 - `-output <path>`: Output directory (default: same as input)
 - `-api <url>`: API endpoint URL (default: http://localhost:8080/optimize)
 - `-v, -version`: Show version information
@@ -273,7 +274,7 @@ GET /health
 ### Optimize Image
 
 ```bash
-POST /optimize?quality={1-100}&width={pixels}&height={pixels}&format={jpeg|png|webp|gif}&returnImage={true|false}
+POST /optimize?quality={1-100}&width={pixels}&height={pixels}&format={jpeg|png|webp|avif|gif}&returnImage={true|false}
 Content-Type: multipart/form-data
 ```
 
@@ -291,7 +292,7 @@ Content-Type: multipart/form-data
   - Set to 0 or omit to maintain original height
   - Aspect ratio is preserved when resizing
 - `format` (string): Target output format (default: original)
-  - Supported: `jpeg`, `jpg`, `png`, `webp`, `gif`
+  - Supported: `jpeg`, `jpg`, `png`, `webp`, `avif`, `gif`
 - `returnImage` (boolean): Return the optimized image file instead of JSON metadata (default: false)
   - `true`: Returns the optimized image with appropriate Content-Type header
   - `false`: Returns JSON metadata about the optimization
@@ -317,6 +318,7 @@ Content-Type: multipart/form-data
 - JPEG/JPG
 - PNG
 - WebP
+- AVIF
 - GIF
 
 **Examples:**
@@ -375,6 +377,12 @@ curl -X POST "http://localhost:8080/optimize?format=png&compression=9&palette=tr
 ```bash
 curl -X POST "http://localhost:8080/optimize?format=webp&lossless=true&effort=6" \
   -F "image=@graphic.png"
+```
+
+**10. Convert to AVIF for best compression (20-30% smaller than WebP):**
+```bash
+curl -X POST "http://localhost:8080/optimize?format=avif&quality=80" \
+  -F "image=@photo.jpg"
 ```
 
 **Response (when returnImage=false or omitted):**
@@ -608,7 +616,7 @@ View the workflow at `.github/workflows/test.yml`
 ### Phase 2: Core Functionality ✅ COMPLETED
 - [x] Implement real image optimization using `bimg` (libvips)
 - [x] Add support for custom dimensions and quality settings
-- [x] Add support for format conversion (JPEG, PNG, WebP, GIF)
+- [x] Add support for format conversion (JPEG, PNG, WebP, AVIF, GIF)
 - [x] Implement URL-based image fetching with security controls
 - [x] Return optimized image file (not just metadata)
 - [ ] Add batch processing endpoint
@@ -663,12 +671,13 @@ View the workflow at `.github/workflows/test.yml`
 
 ### Real-time Image Optimization
 - **libvips-powered**: Uses libvips through bimg for blazing-fast image processing
-- **Format conversion**: Convert between JPEG, PNG, WebP, and GIF
+- **Format conversion**: Convert between JPEG, PNG, WebP, AVIF, and GIF
 - **Quality control**: Adjustable compression quality (1-100)
 - **Advanced compression**: Format-specific options for fine-tuned optimization
   - **JPEG**: Progressive encoding, Huffman optimization, chroma subsampling, smoothing
   - **PNG**: Compression levels (0-9), interlacing, palette mode (256 colors)
   - **WebP**: Lossless mode, compression effort (0-6), encoding method (0-6)
+  - **AVIF**: Next-generation format with 20-30% better compression than WebP
 - **Smart resizing**: Maintains aspect ratio while resizing
 - **Metadata stripping**: Removes EXIF data to reduce file size
 - **Color space management**: sRGB conversion for maximum compatibility
@@ -734,7 +743,7 @@ The API includes comprehensive security controls to protect against abuse and un
 
 6. **Input Validation**
    - URL format validation
-   - File type validation (JPEG, PNG, WebP, GIF only)
+   - File type validation (JPEG, PNG, WebP, AVIF, GIF only)
    - Parameter range checking (quality 1-100, dimensions > 0)
    - Strict content-type validation
 

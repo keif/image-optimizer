@@ -8,7 +8,7 @@ interface OptimizationControlsProps {
   options: OptimizationOptions;
   onChange: (options: OptimizationOptions) => void;
   disabled?: boolean;
-  originalFormat?: 'jpeg' | 'png' | 'webp' | 'gif';
+  originalFormat?: 'jpeg' | 'png' | 'webp' | 'gif' | 'avif';
 }
 
 export default function OptimizationControls({
@@ -78,6 +78,7 @@ export default function OptimizationControls({
           <option value="jpeg">JPEG</option>
           <option value="png">PNG</option>
           <option value="webp">WebP</option>
+          <option value="avif">AVIF</option>
           <option value="gif">GIF</option>
         </select>
       </div>

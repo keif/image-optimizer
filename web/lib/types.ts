@@ -18,7 +18,7 @@ export interface OptimizationOptions {
   quality?: number;
   width?: number;
   height?: number;
-  format?: 'jpeg' | 'png' | 'webp' | 'gif';
+  format?: 'jpeg' | 'png' | 'webp' | 'gif' | 'avif';
   returnImage?: boolean;
   forceSRGB?: boolean;
 

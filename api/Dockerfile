@@ -6,7 +6,8 @@ RUN apk add --no-cache \
     gcc \
     g++ \
     make \
-    vips-dev
+    vips-dev \
+    libheif-dev
 
 WORKDIR /app
 
@@ -26,6 +27,7 @@ FROM alpine:latest
 # Install runtime dependencies
 RUN apk add --no-cache \
     vips \
+    libheif \
     ca-certificates
 
 WORKDIR /app

@@ -198,6 +198,8 @@ func getFormatName(imgType string) string {
 		return "webp"
 	case "gif":
 		return "gif"
+	case "avif":
+		return "avif"
 	case "svg":
 		return "svg"
 	case "pdf":

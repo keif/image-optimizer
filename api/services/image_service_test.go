@@ -84,6 +84,8 @@ func TestOptimizeImage_FormatConversion(t *testing.T) {
 		{"JPEG to WebP", "test-100x100.jpg", bimg.WEBP, "webp"},
 		{"PNG to JPEG", "test-200x150.png", bimg.JPEG, "jpeg"},
 		{"WebP to PNG", "test-50x50.webp", bimg.PNG, "png"},
+		{"PNG to AVIF", "test-200x150.png", bimg.AVIF, "avif"},
+		{"JPEG to AVIF", "test-100x100.jpg", bimg.AVIF, "avif"},
 	}
 
 	for _, tt := range tests {
@@ -279,5 +281,74 @@ func TestOptimizeImage_SavingsCalculation(t *testing.T) {
 	// Verify savings is in percentage format
 	if len(result.Savings) < 3 || result.Savings[len(result.Savings)-1] != '%' {
 		t.Errorf("Expected Savings to be in percentage format, got %s", result.Savings)
+	}
+}
+
+func TestOptimizeImage_AVIFDecoding(t *testing.T) {
+	// Test decoding AVIF files and converting to other formats
+	tests := []struct {
+		name           string
+		targetFormat   bimg.ImageType
+		expectedFormat string
+	}{
+		{"AVIF to JPEG", bimg.JPEG, "jpeg"},
+		{"AVIF to PNG", bimg.PNG, "png"},
+		{"AVIF to WebP", bimg.WEBP, "webp"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Load AVIF test fixture
+			imageData := loadTestFixture(t, "test-200x150.avif")
+
+			options := OptimizeOptions{
+				Quality: 80,
+				Format:  tt.targetFormat,
+			}
+
+			result, err := OptimizeImage(imageData, options)
+			if err != nil {
+				t.Fatalf("AVIF decoding failed: %v", err)
+			}
+
+			if result.Format != tt.expectedFormat {
+				t.Errorf("Expected format %s, got %s", tt.expectedFormat, result.Format)
+			}
+
+			// Verify the image is actually in the target format
+			metadata, err := bimg.NewImage(result.OptimizedImage).Metadata()
+			if err != nil {
+				t.Fatalf("Failed to read optimized image metadata: %v", err)
+			}
+
+			if metadata.Type != tt.expectedFormat {
+				t.Errorf("Optimized image is not in expected format. Expected %s, got %s", tt.expectedFormat, metadata.Type)
+			}
+		})
+	}
+}
+
+func TestOptimizeImage_AVIFOptimization(t *testing.T) {
+	// Test optimizing an AVIF file (quality reduction)
+	imageData := loadTestFixture(t, "test-200x150.avif")
+
+	options := OptimizeOptions{
+		Quality: 50, // Lower quality for optimization
+	}
+
+	result, err := OptimizeImage(imageData, options)
+	if err != nil {
+		t.Fatalf("AVIF optimization failed: %v", err)
+	}
+
+	// Verify result fields
+	if result.OriginalSize == 0 {
+		t.Error("Expected OriginalSize to be greater than 0")
+	}
+	if result.OptimizedImage == nil {
+		t.Error("Expected OptimizedImage to be set")
+	}
+	if result.Format != "avif" {
+		t.Errorf("Expected format avif, got %s", result.Format)
 	}
 }

@@ -78,11 +78,11 @@ func RegisterOptimizeRoutes(app *fiber.App) {
 // @Description Optimize an image file or URL with custom quality, dimensions, and format
 // @Tags optimization
 // @Accept multipart/form-data
-// @Produce json,image/jpeg,image/png,image/webp,image/gif
+// @Produce json,image/jpeg,image/png,image/webp,image/gif,image/avif
 // @Param quality query int false "Quality level (1-100)" default(80) minimum(1) maximum(100)
 // @Param width query int false "Target width in pixels (0 = no resize)" default(0) minimum(0)
 // @Param height query int false "Target height in pixels (0 = no resize)" default(0) minimum(0)
-// @Param format query string false "Target format" Enums(jpeg,png,webp,gif)
+// @Param format query string false "Target format" Enums(jpeg,png,webp,gif,avif)
 // @Param returnImage query bool false "Return optimized image file instead of JSON metadata" default(false)
 // @Param image formData file false "Image file to optimize (multipart upload)"
 // @Param url formData string false "Image URL to fetch and optimize (alternative to file upload)"
@@ -147,9 +147,11 @@ func handleOptimize(c *fiber.Ctx) error {
 			options.Format = bimg.WEBP
 		case "gif":
 			options.Format = bimg.GIF
+		case "avif":
+			options.Format = bimg.AVIF
 		default:
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Invalid format parameter. Supported formats: jpeg, png, webp, gif",
+				"error": "Invalid format parameter. Supported formats: jpeg, png, webp, gif, avif",
 			})
 		}
 	}
@@ -228,11 +230,12 @@ func handleOptimize(c *fiber.Ctx) error {
 			"image/png":  true,
 			"image/webp": true,
 			"image/gif":  true,
+			"image/avif": true,
 		}
 
 		if !validTypes[contentType] {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Invalid file type. Supported types: jpeg, jpg, png, webp, gif",
+				"error": "Invalid file type. Supported types: jpeg, jpg, png, webp, gif, avif",
 			})
 		}
 
@@ -350,6 +353,9 @@ func handleOptimize(c *fiber.Ctx) error {
 			case bimg.WEBP:
 				contentType = "image/webp"
 				formatName = "webp"
+			case bimg.AVIF:
+				contentType = "image/avif"
+				formatName = "avif"
 			}
 		} else {
 			// Use the result format if no specific format was requested
