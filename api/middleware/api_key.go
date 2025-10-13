@@ -23,6 +23,7 @@ func GetAPIKeyConfig() APIKeyConfig {
 			"/health",
 			"/swagger",
 			"/api/keys", // Allow API key creation without auth (bootstrap)
+			"/optimize",  // Allow public image optimization via web UI
 		},
 	}
 
