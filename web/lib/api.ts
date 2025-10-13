@@ -14,6 +14,7 @@ class ApiClient {
 
     // Load runtime config on client side
     if (typeof window !== 'undefined') {
+      console.log('[ApiClient] Constructor - Initial baseUrl:', this.baseUrl);
       this.loadConfig();
     }
   }
@@ -22,14 +23,20 @@ class ApiClient {
     if (this.configLoaded) return;
 
     try {
+      console.log('[ApiClient] Loading config from /api/config...');
       const response = await fetch('/api/config');
       const config = await response.json();
+      console.log('[ApiClient] Config loaded:', config);
       if (config.apiUrl) {
         this.baseUrl = config.apiUrl;
         this.configLoaded = true;
+        console.log('[ApiClient] Updated baseUrl to:', this.baseUrl);
+      } else {
+        console.warn('[ApiClient] No apiUrl in config, using default');
       }
     } catch (error) {
-      console.warn('Failed to load runtime config, using default API URL');
+      console.error('[ApiClient] Failed to load runtime config:', error);
+      console.warn('[ApiClient] Using default API URL:', this.baseUrl);
     }
   }
 
@@ -80,6 +87,7 @@ class ApiClient {
     }
 
     const url = `${this.baseUrl}/optimize${params.toString() ? '?' + params.toString() : ''}`;
+    console.log('[ApiClient] optimizeImage - Calling URL:', url);
 
     const response = await fetch(url, {
       method: 'POST',
