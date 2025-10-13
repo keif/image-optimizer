@@ -1,15 +1,23 @@
-version: '3.8'
-
 services:
   api:
     build:
-      context: .
+      context: ./api
       dockerfile: Dockerfile
     container_name: image-optimizer-api
     ports:
       - "8080:8080"
     environment:
       - PORT=8080
+      - DB_PATH=/app/data/api_keys.db
+      - RATE_LIMIT_ENABLED=true
+      - RATE_LIMIT_MAX=100
+      - RATE_LIMIT_WINDOW=1m
+      - API_KEY_AUTH_ENABLED=false
+      - ALLOWED_DOMAINS=cloudinary.com,imgur.com,unsplash.com,pexels.com,localhost
+    volumes:
+      - api-data:/app/data
+    networks:
+      - app-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
@@ -17,3 +25,28 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: image-optimizer-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NODE_ENV=production
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  api-data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

@@ -13,7 +13,7 @@
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-dropzone": "^14.2.0",
-    "lucide-react": "^0.index414.0"
+    "lucide-react": "^0.414.0"
   },
   "devDependencies": {
     "@types/node": "^20",

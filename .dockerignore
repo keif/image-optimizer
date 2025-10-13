@@ -1,0 +1,25 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+end-session-*.md
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Claude
+.claude/
+
+# Environment
+.env
+.env.local
+.env*.local
+
+# OS
+.DS_Store

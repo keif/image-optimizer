@@ -1,0 +1,52 @@
+# Tilt ignore file
+# Files and directories that Tilt should not watch for changes
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+end-session-*.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+**/node_modules/
+**/vendor/
+
+# Build artifacts
+**/dist/
+**/build/
+**/.next/
+**/out/
+**/coverage/
+**/*.test
+**/*.exe
+
+# Data and logs
+**/data/
+**/*.log
+**/*.db
+
+# Test coverage
+**/coverage.out
+**/coverage.html
+
+# Environment
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# Claude
+.claude/

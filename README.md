@@ -21,15 +21,23 @@ image-optimizer/
 ├── api/
 │   ├── main.go              # Application entry point
 │   ├── routes/
-│   │   └── optimize.go      # Optimization endpoints
+│   │   ├── optimize.go      # Optimization endpoints
+│   │   └── api_keys.go      # API key management
 │   ├── services/
 │   │   └── image_service.go # Image processing logic
+│   ├── middleware/          # Rate limiting & auth
+│   ├── db/                  # Database operations
+│   ├── docs/                # Swagger documentation
 │   ├── utils/               # Utility functions
 │   └── tests/               # Test files
 ├── cli/
 │   ├── imgopt.go            # CLI client
 │   └── go.mod
-├── web/                     # Next.js frontend (future)
+├── web/                     # Next.js frontend
+│   ├── app/                 # Next.js app router
+│   ├── components/          # React components
+│   ├── lib/                 # API client & types
+│   └── Dockerfile
 ├── Dockerfile
 ├── docker-compose.yml
 └── README.md
@@ -48,6 +56,7 @@ image-optimizer/
 
 **For Docker Deployment:**
 - Docker and Docker Compose (all dependencies included in container)
+- Optional: Tilt for enhanced development experience (https://tilt.dev)
 
 ### Running Locally with Go
 
@@ -66,16 +75,69 @@ The API will be available at `http://localhost:8080`
 
 ### Running with Docker
 
+The easiest way to run the entire stack (API + Web Frontend) is with Docker Compose:
+
 ```bash
-# Build and start the container
+# Build and start both services (API + Web)
 docker-compose up --build
 
 # Run in detached mode
 docker-compose up -d
 
-# Stop the container
+# View logs
+docker-compose logs -f
+
+# Stop all services
 docker-compose down
+
+# Stop and remove volumes (resets database)
+docker-compose down -v
 ```
+
+**Access the application:**
+- Web Interface: http://localhost:3000
+- API Server: http://localhost:8080
+- API Documentation: http://localhost:8080/swagger/index.html
+
+**Note:** API key authentication is disabled by default in Docker for easy testing. To enable it, set `API_KEY_AUTH_ENABLED=true` in `docker-compose.yml` and create an API key using the `/api/keys` endpoint.
+
+### Running with Tilt (Recommended for Development)
+
+[Tilt](https://tilt.dev) provides an enhanced development experience with live reload, better observability, and streamlined workflows.
+
+**Prerequisites:**
+- Install Tilt: https://docs.tilt.dev/install.html
+- Docker Desktop or compatible container runtime
+
+**Start development environment:**
+```bash
+# Start Tilt (opens UI in browser automatically)
+tilt up
+
+# View logs in terminal instead
+tilt up --stream
+
+# Stop all services
+tilt down
+```
+
+**Features:**
+- **Live Reload**: Code changes automatically rebuild and reload services
+- **Visual Dashboard**: Monitor all services at http://localhost:10350
+- **One-Command Setup**: Starts both API and web services with dependencies
+- **Manual Commands**: Run tests, linting, and coverage from the UI
+- **Health Checks**: Automatic dependency management and health monitoring
+
+**Available Actions** (via Tilt UI):
+- `api-tests`: Run all API tests
+- `api-lint`: Run Go vet linter
+- `api-coverage`: Generate test coverage report
+
+**Access the application:**
+- Tilt UI: http://localhost:10350
+- Web Interface: http://localhost:3000
+- API Server: http://localhost:8080
+- API Documentation: http://localhost:8080/swagger/index.html
 
 ## CLI Tool
 
@@ -510,10 +572,14 @@ View the workflow at `.github/workflows/test.yml`
 - [x] Rate limiting
 - [ ] Usage metrics and analytics (deferred to Phase 5.1)
 
-### Phase 6: Web Interface
-- [ ] Next.js frontend for drag-and-drop optimization
-- [ ] User dashboard
-- [ ] Optimization history
+### Phase 6: Web Interface ✅ COMPLETED
+- [x] Next.js frontend for drag-and-drop optimization
+- [x] TypeScript API client with full type safety
+- [x] Responsive UI with dark mode
+- [x] Real-time optimization preview
+- [x] Docker support for full-stack deployment
+- [ ] User dashboard (deferred to Phase 6.1)
+- [ ] Optimization history (deferred to Phase 6.1)
 
 ### Phase 7: SaaS Features
 - [ ] User authentication and authorization
@@ -524,9 +590,11 @@ View the workflow at `.github/workflows/test.yml`
 ## Tech Stack
 
 - **Backend**: Go 1.23, Fiber v2
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
 - **Image Processing**: bimg (libvips wrapper), libvips 8.17+
+- **Database**: SQLite (with migration path to PostgreSQL)
 - **Containerization**: Docker, Docker Compose
-- **Future**: Next.js, PostgreSQL, Redis
+- **Future**: PostgreSQL, Redis, User authentication
 
 ## Features in Detail
 
