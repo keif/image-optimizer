@@ -1,0 +1,44 @@
+services:
+  # API Service (Go + libvips)
+  - type: web
+    name: image-optimizer-api
+    runtime: docker
+    dockerfilePath: ./api/Dockerfile
+    dockerContext: ./api
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: DB_PATH
+        value: /opt/render/project/data/api_keys.db
+      - key: RATE_LIMIT_ENABLED
+        value: true
+      - key: RATE_LIMIT_MAX
+        value: 100
+      - key: RATE_LIMIT_WINDOW
+        value: 1m
+      - key: API_KEY_AUTH_ENABLED
+        value: true
+      - key: ALLOWED_DOMAINS
+        value: cloudinary.com,imgur.com,unsplash.com,pexels.com
+    healthCheckPath: /health
+    disk:
+      name: api-data
+      mountPath: /opt/render/project/data
+      sizeGB: 1
+    plan: starter
+
+  # Web Service (Next.js)
+  - type: web
+    name: image-optimizer-web
+    runtime: docker
+    dockerfilePath: ./web/Dockerfile
+    dockerContext: ./web
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: image-optimizer-api
+          envVarKey: RENDER_EXTERNAL_URL
+    plan: starter
