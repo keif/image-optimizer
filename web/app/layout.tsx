@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SupportBanner from "@/components/SupportBanner";
 
 export const metadata: Metadata = {
   title: "Image Optimizer - Compress & Convert Images",
@@ -23,13 +24,29 @@ export default function RootLayout({
                     Image Optimizer
                   </h1>
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Powered by libvips
+                <div className="flex items-center gap-4">
+                  <a
+                    href="https://github.com/keif/image-optimizer"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                  >
+                    ⭐ Star on GitHub
+                  </a>
+                  <a
+                    href="https://buymeacoffee.com/keif"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1.5 rounded-md hover:from-purple-600 hover:to-pink-600 transition-all"
+                  >
+                    ☕ Support
+                  </a>
                 </div>
               </div>
             </div>
           </nav>
           <main>{children}</main>
+          <SupportBanner />
         </div>
       </body>
     </html>

@@ -14,6 +14,26 @@ An API-first image optimization service built with Go and Fiber. Designed for lo
 - **Performance**: Built with Go and Fiber for high throughput
 - **Developer-Friendly**: Simple API design with JSON responses
 
+## Support This Project
+
+If you find this tool useful, consider supporting its development and hosting costs! This is a free service that costs money to run. Your support helps keep it available for everyone.
+
+**Ways to Support:**
+
+- ☕ **[Buy Me a Coffee](https://buymeacoffee.com/keif)** - One-time donation
+- 💖 **[GitHub Sponsors](https://github.com/sponsors/keif)** - Monthly support
+- 🎉 **[Ko-fi](https://ko-fi.com/keif)** - One-time or monthly
+- 💰 **[PayPal](https://paypal.me/keif)** - Direct donation
+
+**Other Ways to Help:**
+- ⭐ Star this repository
+- 🐛 Report bugs and suggest features
+- 📝 Improve documentation
+- 🔀 Submit pull requests
+- 📢 Share with others who might find it useful
+
+Every contribution, no matter how small, is greatly appreciated and helps keep this project alive! 🙏
+
 ## Project Structure
 
 ```
