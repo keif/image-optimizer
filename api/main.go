@@ -44,7 +44,11 @@ func main() {
 
 	// Middleware
 	app.Use(logger.New())
-	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:3000,http://localhost:8080",
+		AllowHeaders: "Origin,Content-Type,Accept,Authorization",
+		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+	}))
 	app.Use(middleware.NewRateLimiter())
 	app.Use(middleware.RequireAPIKey())
 
