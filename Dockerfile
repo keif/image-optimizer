@@ -1,8 +1,14 @@
 # Build stage
 FROM golang:1.23-alpine AS builder
 
-# Install build dependencies
-RUN apk add --no-cache git
+# Install build dependencies including libvips
+RUN apk add --no-cache \
+    git \
+    gcc \
+    g++ \
+    make \
+    musl-dev \
+    vips-dev
 
 WORKDIR /app
 
@@ -15,13 +21,16 @@ RUN go mod download
 # Copy source code
 COPY api/ ./
 
-# Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+# Build the application with CGO enabled (required for libvips)
+RUN CGO_ENABLED=1 GOOS=linux go build -a -o main .
 
 # Runtime stage
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates
+# Install runtime dependencies for libvips
+RUN apk --no-cache add \
+    ca-certificates \
+    vips
 
 WORKDIR /root/
 

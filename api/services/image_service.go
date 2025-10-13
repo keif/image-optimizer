@@ -2,7 +2,11 @@ package services
 
 import (
 	"fmt"
+	"io"
 	"mime/multipart"
+	"time"
+
+	"github.com/h2non/bimg"
 )
 
 // OptimizeResult represents the result of an image optimization
@@ -14,24 +18,113 @@ type OptimizeResult struct {
 	Height         int    `json:"height"`
 	Savings        string `json:"savings"`
 	ProcessingTime string `json:"processingTime"`
+	OptimizedImage []byte `json:"-"` // Not included in JSON response
 }
 
-// OptimizeImage processes and optimizes an uploaded image
-// This is a placeholder implementation that returns mock data
-func OptimizeImage(file *multipart.FileHeader) (*OptimizeResult, error) {
-	// Mock data for now - will be replaced with actual image processing
-	originalSize := file.Size
-	optimizedSize := int64(float64(originalSize) * 0.65) // Simulate 35% compression
+// OptimizeOptions contains parameters for image optimization
+type OptimizeOptions struct {
+	Quality int           // 1-100, higher is better quality
+	Width   int           // Target width (0 = maintain aspect ratio)
+	Height  int           // Target height (0 = maintain aspect ratio)
+	Format  bimg.ImageType // Target format (JPEG, PNG, WEBP, etc.)
+}
 
+// OptimizeImage processes and optimizes an uploaded image using libvips
+func OptimizeImage(file *multipart.FileHeader, options OptimizeOptions) (*OptimizeResult, error) {
+	startTime := time.Now()
+
+	// Open and read the uploaded file
+	src, err := file.Open()
+	if err != nil {
+		return nil, fmt.Errorf("failed to open file: %w", err)
+	}
+	defer src.Close()
+
+	// Read file contents into buffer
+	buffer, err := io.ReadAll(src)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file: %w", err)
+	}
+
+	originalSize := int64(len(buffer))
+
+	// Set default quality if not specified
+	if options.Quality == 0 {
+		options.Quality = 80 // Default quality
+	}
+
+	// Prepare bimg options
+	bimgOptions := bimg.Options{
+		Quality:      options.Quality,
+		Compression:  6, // PNG compression level
+		StripMetadata: true, // Remove EXIF data to reduce size
+	}
+
+	// Handle resizing if dimensions are specified
+	if options.Width > 0 || options.Height > 0 {
+		bimgOptions.Width = options.Width
+		bimgOptions.Height = options.Height
+		bimgOptions.Embed = true // Preserve aspect ratio
+	}
+
+	// Handle format conversion
+	if options.Format != 0 {
+		bimgOptions.Type = options.Format
+	}
+
+	// Process the image
+	optimizedBuffer, err := bimg.NewImage(buffer).Process(bimgOptions)
+	if err != nil {
+		return nil, fmt.Errorf("failed to process image: %w", err)
+	}
+
+	optimizedSize := int64(len(optimizedBuffer))
+
+	// Get optimized image metadata
+	optimizedMetadata, err := bimg.NewImage(optimizedBuffer).Metadata()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read optimized image metadata: %w", err)
+	}
+
+	// Calculate savings
 	savingsPercent := float64(originalSize-optimizedSize) / float64(originalSize) * 100
+	if savingsPercent < 0 {
+		savingsPercent = 0 // Handle cases where optimization increased size
+	}
+
+	// Get format name
+	formatName := getFormatName(optimizedMetadata.Type)
+
+	processingTime := time.Since(startTime)
 
 	return &OptimizeResult{
 		OriginalSize:   originalSize,
 		OptimizedSize:  optimizedSize,
-		Format:         "jpeg",
-		Width:          1920,
-		Height:         1080,
+		Format:         formatName,
+		Width:          optimizedMetadata.Size.Width,
+		Height:         optimizedMetadata.Size.Height,
 		Savings:        fmt.Sprintf("%.2f%%", savingsPercent),
-		ProcessingTime: "42ms",
+		ProcessingTime: fmt.Sprintf("%dms", processingTime.Milliseconds()),
+		OptimizedImage: optimizedBuffer,
 	}, nil
+}
+
+// getFormatName converts bimg image type to string format name
+func getFormatName(imgType string) string {
+	switch imgType {
+	case "jpeg":
+		return "jpeg"
+	case "png":
+		return "png"
+	case "webp":
+		return "webp"
+	case "gif":
+		return "gif"
+	case "svg":
+		return "svg"
+	case "pdf":
+		return "pdf"
+	default:
+		return imgType
+	}
 }

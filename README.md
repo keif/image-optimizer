@@ -33,8 +33,15 @@ image-optimizer/
 
 ### Prerequisites
 
-- Go 1.23+ (for local development)
-- Docker and Docker Compose (for containerized deployment)
+**For Local Development:**
+- Go 1.23+
+- libvips 8.17+ (image processing library)
+  - macOS: `brew install vips`
+  - Ubuntu/Debian: `apt-get install libvips-dev`
+  - Alpine Linux: `apk add vips-dev`
+
+**For Docker Deployment:**
+- Docker and Docker Compose (all dependencies included in container)
 
 ### Running Locally with Go
 
@@ -82,23 +89,55 @@ GET /health
 ### Optimize Image
 
 ```bash
-POST /optimize
+POST /optimize?quality={1-100}&width={pixels}&height={pixels}&format={jpeg|png|webp|gif}
 Content-Type: multipart/form-data
 ```
 
-**Parameters:**
-- `image` (file): The image file to optimize
+**Form Parameters:**
+- `image` (file, required): The image file to optimize
 
-**Supported Formats:**
+**Query Parameters (all optional):**
+- `quality` (integer): Compression quality from 1-100 (default: 80)
+  - Higher values = better quality, larger file size
+  - Lower values = lower quality, smaller file size
+- `width` (integer): Target width in pixels (default: original)
+  - Set to 0 or omit to maintain original width
+- `height` (integer): Target height in pixels (default: original)
+  - Set to 0 or omit to maintain original height
+  - Aspect ratio is preserved when resizing
+- `format` (string): Target output format (default: original)
+  - Supported: `jpeg`, `jpg`, `png`, `webp`, `gif`
+
+**Supported Input Formats:**
 - JPEG/JPG
 - PNG
 - WebP
 - GIF
 
-**Example using curl:**
+**Examples:**
+
+**Basic optimization (default quality 80):**
 ```bash
 curl -X POST http://localhost:8080/optimize \
   -F "image=@/path/to/your/image.jpg"
+```
+
+**High-quality JPEG conversion:**
+```bash
+curl -X POST "http://localhost:8080/optimize?format=jpeg&quality=95" \
+  -F "image=@/path/to/your/image.png"
+```
+
+**Resize and convert to WebP:**
+```bash
+curl -X POST "http://localhost:8080/optimize?width=800&height=600&format=webp&quality=85" \
+  -F "image=@/path/to/your/image.jpg"
+```
+
+**Compress PNG with maximum quality:**
+```bash
+curl -X POST "http://localhost:8080/optimize?quality=100" \
+  -F "image=@/path/to/your/image.png"
 ```
 
 **Response:**
@@ -133,11 +172,13 @@ go test ./...
 
 ## Roadmap
 
-### Phase 2: Core Functionality
-- [ ] Implement real image optimization using `bimg` (libvips)
-- [ ] Add support for custom dimensions and quality settings
+### Phase 2: Core Functionality ✅ COMPLETED
+- [x] Implement real image optimization using `bimg` (libvips)
+- [x] Add support for custom dimensions and quality settings
+- [x] Add support for format conversion (JPEG, PNG, WebP, GIF)
 - [ ] Implement URL-based image fetching
 - [ ] Add batch processing endpoint
+- [ ] Return optimized image file (not just metadata)
 
 ### Phase 3: CLI & Tools
 - [ ] Build CLI client (`imgopt`) for local image optimization
@@ -164,9 +205,19 @@ go test ./...
 ## Tech Stack
 
 - **Backend**: Go 1.23, Fiber v2
-- **Image Processing**: bimg/libvips (planned)
+- **Image Processing**: bimg (libvips wrapper), libvips 8.17+
 - **Containerization**: Docker, Docker Compose
 - **Future**: Next.js, PostgreSQL, Redis
+
+## Features in Detail
+
+### Real-time Image Optimization
+- **libvips-powered**: Uses libvips through bimg for blazing-fast image processing
+- **Format conversion**: Convert between JPEG, PNG, WebP, and GIF
+- **Quality control**: Adjustable compression quality (1-100)
+- **Smart resizing**: Maintains aspect ratio while resizing
+- **Metadata stripping**: Removes EXIF data to reduce file size
+- **Real-time metrics**: Get instant feedback on file size savings
 
 ## License
 
