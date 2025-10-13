@@ -6,6 +6,7 @@ An API-first image optimization service built with Go and Fiber. Designed for lo
 
 - **Image Optimization**: Resize, convert, and compress images
 - **RESTful API**: Clean HTTP endpoints for easy integration
+- **CLI Tool**: Command-line interface for batch processing and automation
 - **Containerized**: Docker-ready for consistent deployment
 - **Performance**: Built with Go and Fiber for high throughput
 - **Developer-Friendly**: Simple API design with JSON responses
@@ -22,7 +23,9 @@ image-optimizer/
 │   │   └── image_service.go # Image processing logic
 │   ├── utils/               # Utility functions
 │   └── tests/               # Test files
-├── cli/                     # CLI client (future)
+├── cli/
+│   ├── imgopt.go            # CLI client
+│   └── go.mod
 ├── web/                     # Next.js frontend (future)
 ├── Dockerfile
 ├── docker-compose.yml
@@ -69,6 +72,90 @@ docker-compose up -d
 
 # Stop the container
 docker-compose down
+```
+
+## CLI Tool
+
+The `imgopt` CLI provides a convenient command-line interface for optimizing images locally. It calls the local API server, so make sure the API is running first.
+
+### Building the CLI
+
+```bash
+cd cli
+go build -o imgopt imgopt.go
+
+# Optionally, install globally
+sudo mv imgopt /usr/local/bin/
+```
+
+### CLI Usage
+
+```bash
+imgopt [options] <file1> [file2] [file3] ...
+```
+
+**Options:**
+- `-quality <int>`: Quality level from 1-100 (default: 80)
+- `-width <int>`: Target width in pixels (default: 0 = no resize)
+- `-height <int>`: Target height in pixels (default: 0 = no resize)
+- `-format <string>`: Output format (jpeg, png, webp, gif)
+- `-output <path>`: Output directory (default: same as input)
+- `-api <url>`: API endpoint URL (default: http://localhost:8080/optimize)
+- `-v, -version`: Show version information
+- `-h, -help`: Show help message
+
+**Examples:**
+
+```bash
+# Basic optimization
+imgopt photo.jpg
+
+# Convert to WebP with custom quality
+imgopt -quality=90 -format=webp photo.jpg
+
+# Resize and optimize
+imgopt -width=800 -height=600 photo.jpg
+
+# Batch process multiple files
+imgopt -format=webp *.jpg
+
+# Save to specific output directory
+imgopt -output=optimized/ photo1.jpg photo2.png photo3.gif
+
+# Resize all images in a directory
+imgopt -width=1920 -quality=85 ~/Photos/*.jpg
+```
+
+**Output:**
+
+The CLI creates optimized files with `-optimized` suffix in the filename:
+- `photo.jpg` → `photo-optimized.webp` (if format specified)
+- `image.png` → `image-optimized.png` (if no format change)
+
+Optimized images are saved to:
+- Same directory as the input file (default)
+- Specified output directory (with `-output` flag)
+
+**Example Output:**
+```
+Optimizing 3 file(s)...
+
+[1/3] Processing photo1.jpg... ✓ Saved 74.91% (74.91% reduction, 32ms)
+[2/3] Processing photo2.png... ✓ Saved 10.91% (10.91% reduction, 47ms)
+[3/3] Processing photo3.jpg... ✓ Saved 83.35% (83.35% reduction, 9ms)
+
+============================================================
+Optimization Summary
+============================================================
+Files processed: 3
+Successful: 3
+Failed: 0
+
+Total original size: 24.2 KB
+Total optimized size: 6.7 KB
+Total savings: 72.43%
+Total processing time: 88ms
+============================================================
 ```
 
 ## API Endpoints
@@ -201,10 +288,10 @@ go test ./...
 - [x] Return optimized image file (not just metadata)
 - [ ] Add batch processing endpoint
 
-### Phase 3: CLI & Tools
-- [ ] Build CLI client (`imgopt`) for local image optimization
-- [ ] Add configuration file support
-- [ ] Implement progress tracking for batch operations
+### Phase 3: CLI & Tools ✅ COMPLETED
+- [x] Build CLI client (`imgopt`) for local image optimization
+- [x] Implement progress tracking for batch operations
+- [ ] Add configuration file support (.imgoptrc)
 
 ### Phase 4: API Enhancement
 - [ ] OpenAPI/Swagger documentation
