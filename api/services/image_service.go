@@ -31,6 +31,22 @@ type OptimizeOptions struct {
 	Height     int            // Target height (0 = maintain aspect ratio)
 	Format     bimg.ImageType // Target format (JPEG, PNG, WEBP, etc.)
 	ForceSRGB  bool           // Force conversion to sRGB color space
+
+	// Advanced JPEG options
+	Progressive    bool // Progressive JPEG encoding (loads gradually)
+	OptimizeCoding bool // Optimize huffman tables for better compression
+	Subsample      int  // Chroma subsampling: 0=auto, 1=4:4:4, 2=4:2:2, 3=4:2:0
+	Smooth         int  // Blur to improve compression (0-100)
+
+	// Advanced PNG options
+	Compression int  // PNG compression level (0-9, default 6)
+	Interlace   bool // Progressive PNG display
+	Palette     bool // Enable palette mode (quantize to 256 colors)
+
+	// Advanced WebP options
+	Lossless   bool // Lossless WebP encoding
+	Effort     int  // CPU effort (0-6, default 4)
+	WebpMethod int  // Encoding method (0-6, higher=better compression but slower)
 }
 
 // OptimizeImage processes and optimizes image data using libvips
@@ -53,11 +69,40 @@ func OptimizeImage(buffer []byte, options OptimizeOptions) (*OptimizeResult, err
 		options.Quality = 80 // Default quality
 	}
 
+	// Set default PNG compression if not specified
+	if options.Compression == 0 {
+		options.Compression = 6 // Default PNG compression level
+	}
+
 	// Prepare bimg options
 	bimgOptions := bimg.Options{
 		Quality:       options.Quality,
-		Compression:   6, // PNG compression level
+		Compression:   options.Compression,
 		StripMetadata: true, // Remove EXIF data to reduce size
+	}
+
+	// Apply advanced JPEG options
+	if options.Progressive {
+		bimgOptions.Interlace = true // Progressive JPEG
+	}
+	if options.OptimizeCoding {
+		bimgOptions.Interpretation = bimg.InterpretationSRGB // Optimize coding
+	}
+
+	// Apply advanced PNG options
+	if options.Interlace {
+		bimgOptions.Interlace = true // Progressive PNG
+	}
+	if options.Palette {
+		bimgOptions.Palette = true // Enable palette mode (quantize to 256 colors)
+	}
+
+	// Apply advanced WebP options
+	if options.Lossless {
+		bimgOptions.Lossless = true
+	}
+	if options.Effort > 0 {
+		bimgOptions.Speed = options.Effort // WebP effort (bimg calls it "speed")
 	}
 
 	// Force sRGB conversion if requested

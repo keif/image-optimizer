@@ -87,6 +87,22 @@ class ApiClient {
     }
     if (options.forceSRGB) params.append('forceSRGB', 'true');
 
+    // Advanced JPEG options
+    if (options.progressive) params.append('progressive', 'true');
+    if (options.optimizeCoding) params.append('optimizeCoding', 'true');
+    if (options.subsample !== undefined) params.append('subsample', options.subsample.toString());
+    if (options.smooth !== undefined) params.append('smooth', options.smooth.toString());
+
+    // Advanced PNG options
+    if (options.compression !== undefined) params.append('compression', options.compression.toString());
+    if (options.interlace) params.append('interlace', 'true');
+    if (options.palette) params.append('palette', 'true');
+
+    // Advanced WebP options
+    if (options.lossless) params.append('lossless', 'true');
+    if (options.effort !== undefined) params.append('effort', options.effort.toString());
+    if (options.webpMethod !== undefined) params.append('webpMethod', options.webpMethod.toString());
+
     const url = `${this.baseUrl}/optimize${params.toString() ? '?' + params.toString() : ''}`;
     console.log('[ApiClient] optimizeImage - Calling URL:', url);
 
@@ -119,6 +135,23 @@ class ApiClient {
     if (options.height) params.append('height', options.height.toString());
     if (options.format) params.append('format', options.format);
     if (options.forceSRGB) params.append('forceSRGB', 'true');
+
+    // Advanced JPEG options
+    if (options.progressive) params.append('progressive', 'true');
+    if (options.optimizeCoding) params.append('optimizeCoding', 'true');
+    if (options.subsample !== undefined) params.append('subsample', options.subsample.toString());
+    if (options.smooth !== undefined) params.append('smooth', options.smooth.toString());
+
+    // Advanced PNG options
+    if (options.compression !== undefined) params.append('compression', options.compression.toString());
+    if (options.interlace) params.append('interlace', 'true');
+    if (options.palette) params.append('palette', 'true');
+
+    // Advanced WebP options
+    if (options.lossless) params.append('lossless', 'true');
+    if (options.effort !== undefined) params.append('effort', options.effort.toString());
+    if (options.webpMethod !== undefined) params.append('webpMethod', options.webpMethod.toString());
+
     params.append('returnImage', 'true');
 
     const url = `${this.baseUrl}/optimize?${params.toString()}`;

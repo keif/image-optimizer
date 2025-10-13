@@ -21,6 +21,22 @@ export interface OptimizationOptions {
   format?: 'jpeg' | 'png' | 'webp' | 'gif';
   returnImage?: boolean;
   forceSRGB?: boolean;
+
+  // Advanced JPEG options
+  progressive?: boolean;
+  optimizeCoding?: boolean;
+  subsample?: number;
+  smooth?: number;
+
+  // Advanced PNG options
+  compression?: number;
+  interlace?: boolean;
+  palette?: boolean;
+
+  // Advanced WebP options
+  lossless?: boolean;
+  effort?: number;
+  webpMethod?: number;
 }
 
 export interface APIKey {

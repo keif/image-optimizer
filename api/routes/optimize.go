@@ -157,6 +157,62 @@ func handleOptimize(c *fiber.Ctx) error {
 	// Parse forceSRGB
 	options.ForceSRGB = c.QueryBool("forceSRGB", false)
 
+	// Parse advanced JPEG options
+	options.Progressive = c.QueryBool("progressive", false)
+	options.OptimizeCoding = c.QueryBool("optimizeCoding", false)
+	if subsampleStr := c.Query("subsample"); subsampleStr != "" {
+		subsample, err := strconv.Atoi(subsampleStr)
+		if err != nil || subsample < 0 || subsample > 3 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid subsample parameter. Must be between 0 and 3.",
+			})
+		}
+		options.Subsample = subsample
+	}
+	if smoothStr := c.Query("smooth"); smoothStr != "" {
+		smooth, err := strconv.Atoi(smoothStr)
+		if err != nil || smooth < 0 || smooth > 100 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid smooth parameter. Must be between 0 and 100.",
+			})
+		}
+		options.Smooth = smooth
+	}
+
+	// Parse advanced PNG options
+	if compressionStr := c.Query("compression"); compressionStr != "" {
+		compression, err := strconv.Atoi(compressionStr)
+		if err != nil || compression < 0 || compression > 9 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid compression parameter. Must be between 0 and 9.",
+			})
+		}
+		options.Compression = compression
+	}
+	options.Interlace = c.QueryBool("interlace", false)
+	options.Palette = c.QueryBool("palette", false)
+
+	// Parse advanced WebP options
+	options.Lossless = c.QueryBool("lossless", false)
+	if effortStr := c.Query("effort"); effortStr != "" {
+		effort, err := strconv.Atoi(effortStr)
+		if err != nil || effort < 0 || effort > 6 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid effort parameter. Must be between 0 and 6.",
+			})
+		}
+		options.Effort = effort
+	}
+	if webpMethodStr := c.Query("webpMethod"); webpMethodStr != "" {
+		webpMethod, err := strconv.Atoi(webpMethodStr)
+		if err != nil || webpMethod < 0 || webpMethod > 6 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid webpMethod parameter. Must be between 0 and 6.",
+			})
+		}
+		options.WebpMethod = webpMethod
+	}
+
 	// Get image data - prefer uploaded file, fall back to URL fetch
 	var imgData []byte
 	var err error

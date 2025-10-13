@@ -5,6 +5,7 @@ An API-first image optimization service built with Go and Fiber. Designed for lo
 ## Features
 
 - **Image Optimization**: Resize, convert, and compress images
+- **Advanced Compression Options**: Format-specific controls (JPEG progressive, PNG compression levels, WebP lossless)
 - **Interactive Before/After Comparison**: Visual slider to compare original vs optimized images
 - **Privacy First**: No server storage, in-memory processing only, zero tracking
 - **RESTful API**: Clean HTTP endpoints for easy integration
@@ -294,6 +295,23 @@ Content-Type: multipart/form-data
 - `returnImage` (boolean): Return the optimized image file instead of JSON metadata (default: false)
   - `true`: Returns the optimized image with appropriate Content-Type header
   - `false`: Returns JSON metadata about the optimization
+- `forceSRGB` (boolean): Force conversion to sRGB color space (default: false)
+
+**Advanced JPEG Options:**
+- `progressive` (boolean): Enable progressive JPEG encoding (loads gradually)
+- `optimizeCoding` (boolean): Optimize Huffman tables for better compression
+- `subsample` (integer): Chroma subsampling mode (0=auto, 1=4:4:4, 2=4:2:2, 3=4:2:0)
+- `smooth` (integer): Smoothing factor 0-100 (blur to improve compression)
+
+**Advanced PNG Options:**
+- `compression` (integer): PNG compression level 0-9 (0=fastest, 9=best compression, default: 6)
+- `interlace` (boolean): Enable interlaced/progressive PNG encoding
+- `palette` (boolean): Enable palette mode (quantize to 256 colors for smaller files)
+
+**Advanced WebP Options:**
+- `lossless` (boolean): Use lossless WebP encoding (perfect quality, larger files)
+- `effort` (integer): Compression effort 0-6 (0=fastest, 6=best compression, default: 4)
+- `webpMethod` (integer): Encoding method 0-6 (higher=better compression but slower)
 
 **Supported Input Formats:**
 - JPEG/JPG
@@ -339,6 +357,24 @@ curl -X POST "http://localhost:8080/optimize?format=webp" \
 curl -X POST "http://localhost:8080/optimize?format=webp&returnImage=true" \
   -F "url=https://example.com/image.jpg" \
   --output optimized.webp
+```
+
+**7. Advanced JPEG optimization with progressive encoding and Huffman optimization:**
+```bash
+curl -X POST "http://localhost:8080/optimize?format=jpeg&quality=85&progressive=true&optimizeCoding=true" \
+  -F "image=@photo.png"
+```
+
+**8. Maximum PNG compression with palette mode:**
+```bash
+curl -X POST "http://localhost:8080/optimize?format=png&compression=9&palette=true" \
+  -F "image=@screenshot.png"
+```
+
+**9. Lossless WebP with maximum effort:**
+```bash
+curl -X POST "http://localhost:8080/optimize?format=webp&lossless=true&effort=6" \
+  -F "image=@graphic.png"
 ```
 
 **Response (when returnImage=false or omitted):**
@@ -629,8 +665,13 @@ View the workflow at `.github/workflows/test.yml`
 - **libvips-powered**: Uses libvips through bimg for blazing-fast image processing
 - **Format conversion**: Convert between JPEG, PNG, WebP, and GIF
 - **Quality control**: Adjustable compression quality (1-100)
+- **Advanced compression**: Format-specific options for fine-tuned optimization
+  - **JPEG**: Progressive encoding, Huffman optimization, chroma subsampling, smoothing
+  - **PNG**: Compression levels (0-9), interlacing, palette mode (256 colors)
+  - **WebP**: Lossless mode, compression effort (0-6), encoding method (0-6)
 - **Smart resizing**: Maintains aspect ratio while resizing
 - **Metadata stripping**: Removes EXIF data to reduce file size
+- **Color space management**: sRGB conversion for maximum compatibility
 - **Real-time metrics**: Get instant feedback on file size savings
 
 ### Interactive Before/After Comparison
