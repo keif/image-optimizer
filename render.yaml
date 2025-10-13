@@ -45,5 +45,5 @@ services:
         fromService:
           type: web
           name: image-optimizer-api
-          envVarKey: RENDER_EXTERNAL_URL
+          property: host
     plan: starter

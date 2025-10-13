@@ -1,16 +1,42 @@
 import { OptimizationOptions, OptimizationResult, APIKey, APIError } from './types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-
 class ApiClient {
   private baseUrl: string;
   private apiKey: string | null;
+  private configLoaded: boolean = false;
 
   constructor() {
-    this.baseUrl = API_BASE_URL;
+    // Start with default, will be updated by loadConfig
+    this.baseUrl = 'http://localhost:8080';
     this.apiKey = typeof window !== 'undefined'
       ? localStorage.getItem('apiKey')
       : null;
+
+    // Load runtime config on client side
+    if (typeof window !== 'undefined') {
+      this.loadConfig();
+    }
+  }
+
+  private async loadConfig() {
+    if (this.configLoaded) return;
+
+    try {
+      const response = await fetch('/api/config');
+      const config = await response.json();
+      if (config.apiUrl) {
+        this.baseUrl = config.apiUrl;
+        this.configLoaded = true;
+      }
+    } catch (error) {
+      console.warn('Failed to load runtime config, using default API URL');
+    }
+  }
+
+  private async ensureConfigLoaded() {
+    if (!this.configLoaded && typeof window !== 'undefined') {
+      await this.loadConfig();
+    }
   }
 
   setApiKey(key: string) {
@@ -39,6 +65,8 @@ class ApiClient {
     file: File,
     options: OptimizationOptions = {}
   ): Promise<OptimizationResult> {
+    await this.ensureConfigLoaded();
+
     const formData = new FormData();
     formData.append('image', file);
 
@@ -71,6 +99,8 @@ class ApiClient {
     file: File,
     options: OptimizationOptions = {}
   ): Promise<Blob> {
+    await this.ensureConfigLoaded();
+
     const formData = new FormData();
     formData.append('image', file);
 
@@ -103,6 +133,8 @@ class ApiClient {
   }
 
   async createApiKey(name: string): Promise<APIKey> {
+    await this.ensureConfigLoaded();
+
     const response = await fetch(`${this.baseUrl}/api/keys`, {
       method: 'POST',
       headers: {
@@ -121,6 +153,8 @@ class ApiClient {
   }
 
   async listApiKeys(): Promise<APIKey[]> {
+    await this.ensureConfigLoaded();
+
     const response = await fetch(`${this.baseUrl}/api/keys`, {
       headers: this.getHeaders(),
     });
@@ -134,6 +168,8 @@ class ApiClient {
   }
 
   async revokeApiKey(id: number): Promise<void> {
+    await this.ensureConfigLoaded();
+
     const response = await fetch(`${this.baseUrl}/api/keys/${id}`, {
       method: 'DELETE',
       headers: this.getHeaders(),
@@ -146,6 +182,8 @@ class ApiClient {
   }
 
   async checkHealth(): Promise<{ status: string }> {
+    await this.ensureConfigLoaded();
+
     const response = await fetch(`${this.baseUrl}/health`);
     if (!response.ok) {
       throw new Error('API health check failed');
