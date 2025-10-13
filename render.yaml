@@ -45,5 +45,5 @@ services:
         fromService:
           type: web
           name: image-optimizer-api
-          property: host
+          property: url
     plan: starter

@@ -51,9 +51,10 @@ func main() {
 		allowedOrigins = "http://localhost:3000,http://localhost:8080"
 	}
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: allowedOrigins,
-		AllowHeaders: "Origin,Content-Type,Accept,Authorization",
-		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+		AllowOrigins:     allowedOrigins,
+		AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
+		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
+		AllowCredentials: true,
 	}))
 	app.Use(middleware.NewRateLimiter())
 	app.Use(middleware.RequireAPIKey())
