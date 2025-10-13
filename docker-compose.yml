@@ -3,6 +3,7 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
+    image: image-optimizer-api
     container_name: image-optimizer-api
     ports:
       - "8080:8080"
@@ -30,6 +31,7 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+    image: image-optimizer-web
     container_name: image-optimizer-web
     ports:
       - "3000:3000"
