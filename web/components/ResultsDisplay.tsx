@@ -1,7 +1,9 @@
 'use client';
 
+import { useMemo } from 'react';
 import { OptimizationResult } from '@/lib/types';
-import { Download, CheckCircle, TrendingDown, Clock } from 'lucide-react';
+import { Download, CheckCircle, Share2 } from 'lucide-react';
+import BeforeAfterComparison from './BeforeAfterComparison';
 
 interface ResultsDisplayProps {
   result: OptimizationResult;
@@ -16,88 +18,72 @@ export default function ResultsDisplay({
   optimizedBlob,
   onDownload,
 }: ResultsDisplayProps) {
-  const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  const originalUrl = useMemo(() => URL.createObjectURL(originalFile), [originalFile]);
+  const optimizedUrl = useMemo(
+    () => (optimizedBlob ? URL.createObjectURL(optimizedBlob) : ''),
+    [optimizedBlob]
+  );
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'Image Optimization Results',
+      text: `I optimized my image and saved ${result.savings}! Original: ${(result.originalSize / 1024).toFixed(2)} KB → Optimized: ${(result.optimizedSize / 1024).toFixed(2)} KB`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(
+          `${shareData.text}\n\nTry it yourself at: ${shareData.url}`
+        );
+        alert('Results copied to clipboard!');
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
+    }
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-6">
-      <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-        <CheckCircle className="w-6 h-6" />
-        <h3 className="text-lg font-semibold">Optimization Complete!</h3>
+    <div className="space-y-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+            <CheckCircle className="w-6 h-6" />
+            <h3 className="text-lg font-semibold">Optimization Complete!</h3>
+          </div>
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+          >
+            <Share2 className="w-4 h-4" />
+            Share Results
+          </button>
+        </div>
+
+        {/* Before/After Comparison */}
+        {optimizedBlob && (
+          <BeforeAfterComparison
+            originalUrl={originalUrl}
+            optimizedUrl={optimizedUrl}
+            result={result}
+            originalFile={originalFile}
+          />
+        )}
+
+        {/* Download Button */}
+        {optimizedBlob && onDownload && (
+          <button
+            onClick={onDownload}
+            className="w-full mt-6 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-lg transition-all shadow-lg"
+          >
+            <Download className="w-5 h-5" />
+            Download Optimized Image
+          </button>
+        )}
       </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-            Original Size
-          </div>
-          <div className="text-xl font-semibold text-gray-900 dark:text-white">
-            {formatBytes(result.originalSize)}
-          </div>
-        </div>
-
-        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-            Optimized Size
-          </div>
-          <div className="text-xl font-semibold text-gray-900 dark:text-white">
-            {formatBytes(result.optimizedSize)}
-          </div>
-        </div>
-
-        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center gap-1">
-            <TrendingDown className="w-4 h-4" />
-            Savings
-          </div>
-          <div className="text-xl font-semibold text-green-600 dark:text-green-400">
-            {result.savings}
-          </div>
-        </div>
-
-        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-center gap-1">
-            <Clock className="w-4 h-4" />
-            Time
-          </div>
-          <div className="text-xl font-semibold text-gray-900 dark:text-white">
-            {result.processingTime}
-          </div>
-        </div>
-      </div>
-
-      {/* Image Details */}
-      <div className="grid grid-cols-2 gap-4 text-sm">
-        <div>
-          <span className="text-gray-600 dark:text-gray-400">Format:</span>
-          <span className="ml-2 font-medium text-gray-900 dark:text-white">
-            {result.format.toUpperCase()}
-          </span>
-        </div>
-        <div>
-          <span className="text-gray-600 dark:text-gray-400">Dimensions:</span>
-          <span className="ml-2 font-medium text-gray-900 dark:text-white">
-            {result.width} × {result.height}
-          </span>
-        </div>
-      </div>
-
-      {/* Download Button */}
-      {optimizedBlob && onDownload && (
-        <button
-          onClick={onDownload}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
-        >
-          <Download className="w-5 h-5" />
-          Download Optimized Image
-        </button>
-      )}
     </div>
   );
 }

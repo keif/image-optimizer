@@ -5,6 +5,7 @@ An API-first image optimization service built with Go and Fiber. Designed for lo
 ## Features
 
 - **Image Optimization**: Resize, convert, and compress images
+- **Interactive Before/After Comparison**: Visual slider to compare original vs optimized images
 - **RESTful API**: Clean HTTP endpoints for easy integration
 - **OpenAPI/Swagger**: Interactive API documentation at `/swagger`
 - **API Key Authentication**: Secure API access with SQLite-backed key management
@@ -13,6 +14,7 @@ An API-first image optimization service built with Go and Fiber. Designed for lo
 - **Containerized**: Docker-ready for consistent deployment
 - **Performance**: Built with Go and Fiber for high throughput
 - **Developer-Friendly**: Simple API design with JSON responses
+- **Web UI**: Modern Next.js interface with drag-and-drop support
 
 ## Support This Project
 
@@ -597,6 +599,10 @@ View the workflow at `.github/workflows/test.yml`
 - [x] TypeScript API client with full type safety
 - [x] Responsive UI with dark mode
 - [x] Real-time optimization preview
+- [x] Interactive before/after image comparison with slider
+- [x] Side-by-side comparison mode
+- [x] Zoom and pan functionality for detailed inspection
+- [x] Shareable results with Web Share API
 - [x] Docker support for full-stack deployment
 - [ ] User dashboard (deferred to Phase 6.1)
 - [ ] Optimization history (deferred to Phase 6.1)
@@ -625,6 +631,15 @@ View the workflow at `.github/workflows/test.yml`
 - **Smart resizing**: Maintains aspect ratio while resizing
 - **Metadata stripping**: Removes EXIF data to reduce file size
 - **Real-time metrics**: Get instant feedback on file size savings
+
+### Interactive Before/After Comparison
+- **Draggable Slider**: Drag a handle to reveal differences between original and optimized images
+- **Side-by-Side View**: Compare images in a split-screen layout
+- **Zoom & Pan**: Inspect images up to 4x magnification with pan support
+- **Metric Overlays**: Real-time display of savings, file sizes, and processing time
+- **Shareable Results**: Share optimization results via Web Share API or clipboard
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Dark Mode Support**: Automatic theme detection and manual toggle
 
 ### URL-Based Image Fetching
 - **Flexible input**: Fetch images from URLs or upload files
