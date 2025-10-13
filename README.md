@@ -273,10 +273,77 @@ go build -o image-optimizer
 
 ### Running Tests
 
+The project includes comprehensive unit and integration tests with high code coverage.
+
+**Run all tests:**
 ```bash
 cd api
-go test ./...
+go test -v ./...
 ```
+
+**Run tests with coverage:**
+```bash
+cd api
+go test -v -coverprofile=coverage.out ./...
+go tool cover -func=coverage.out
+```
+
+**Generate HTML coverage report:**
+```bash
+cd api
+go test -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out -o coverage.html
+# Open coverage.html in your browser
+```
+
+**Run tests with race detector:**
+```bash
+cd api
+go test -v -race ./...
+```
+
+**Test specific packages:**
+```bash
+# Test only services
+cd api
+go test -v ./services/
+
+# Test only routes
+cd api
+go test -v ./routes/
+```
+
+**Current Test Coverage:**
+- **Services**: 84.4% coverage
+- **Routes**: 69.8% coverage
+- **Total Tests**: 23 tests passing
+
+**Test Structure:**
+```
+api/
+├── services/
+│   └── image_service_test.go    # Unit tests for image processing
+├── routes/
+│   └── optimize_test.go          # Integration tests for API endpoints
+└── tests/
+    └── fixtures/                 # Test image fixtures
+        ├── test-100x100.jpg
+        ├── test-200x150.png
+        └── test-50x50.webp
+```
+
+### Continuous Integration
+
+The project uses GitHub Actions for automated testing on every push and pull request.
+
+**CI Pipeline includes:**
+- ✅ Unit and integration tests
+- ✅ Race condition detection
+- ✅ Test coverage reporting
+- ✅ Binary compilation (API + CLI)
+- ✅ Docker image building
+
+View the workflow at `.github/workflows/test.yml`
 
 ## Roadmap
 
@@ -293,18 +360,25 @@ go test ./...
 - [x] Implement progress tracking for batch operations
 - [ ] Add configuration file support (.imgoptrc)
 
-### Phase 4: API Enhancement
+### Phase 4: Testing & Quality ✅ COMPLETED
+- [x] Unit tests for image service (84.4% coverage)
+- [x] Integration tests for API endpoints (69.8% coverage)
+- [x] Test fixtures and sample images
+- [x] Test coverage reporting
+- [x] GitHub Actions CI/CD pipeline
+
+### Phase 5: API Enhancement
 - [ ] OpenAPI/Swagger documentation
 - [ ] API key authentication
 - [ ] Rate limiting
 - [ ] Usage metrics and analytics
 
-### Phase 5: Web Interface
+### Phase 6: Web Interface
 - [ ] Next.js frontend for drag-and-drop optimization
 - [ ] User dashboard
 - [ ] Optimization history
 
-### Phase 6: SaaS Features
+### Phase 7: SaaS Features
 - [ ] User authentication and authorization
 - [ ] Multi-tenant support
 - [ ] Subscription management
