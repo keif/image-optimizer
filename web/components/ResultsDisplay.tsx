@@ -83,6 +83,26 @@ export default function ResultsDisplay({
           </div>
         )}
 
+        {/* Wide Gamut Warning */}
+        {result.wideGamut && (
+          <div className="mb-6 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <div className="text-purple-600 dark:text-purple-400">🎨</div>
+              <div>
+                <h4 className="font-medium text-purple-900 dark:text-purple-200 mb-1">
+                  Wide Color Gamut Detected
+                </h4>
+                <p className="text-sm text-purple-700 dark:text-purple-300">
+                  This image contains colors beyond the standard sRGB range. It was originally in <strong>{result.originalColorSpace}</strong>.
+                </p>
+                <p className="text-sm text-purple-700 dark:text-purple-300 mt-2">
+                  ⚠️ <strong>Note:</strong> Some colors may not display correctly on all monitors. Enable "Force sRGB Conversion" for maximum compatibility.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Before/After Comparison */}
         {optimizedBlob && (
           <BeforeAfterComparison

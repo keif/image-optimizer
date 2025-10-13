@@ -9,6 +9,9 @@ export interface OptimizationResult {
   processingTime: string;
   alreadyOptimized?: boolean;
   message?: string;
+  colorSpace: string;
+  originalColorSpace: string;
+  wideGamut: boolean;
 }
 
 export interface OptimizationOptions {
@@ -17,6 +20,7 @@ export interface OptimizationOptions {
   height?: number;
   format?: 'jpeg' | 'png' | 'webp' | 'gif';
   returnImage?: boolean;
+  forceSRGB?: boolean;
 }
 
 export interface APIKey {

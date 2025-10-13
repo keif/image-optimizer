@@ -346,11 +346,17 @@ export default function BeforeAfterComparison({
       </div>
 
       {/* Technical Details */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
         <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
           <span className="text-gray-600 dark:text-gray-400">Format:</span>
           <span className="ml-2 font-semibold text-gray-900 dark:text-white">
             {result.format.toUpperCase()}
+          </span>
+        </div>
+        <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+          <span className="text-gray-600 dark:text-gray-400">Color Space:</span>
+          <span className={`ml-2 font-semibold ${result.wideGamut ? 'text-purple-600 dark:text-purple-400' : 'text-gray-900 dark:text-white'}`}>
+            {result.colorSpace}
           </span>
         </div>
         <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">

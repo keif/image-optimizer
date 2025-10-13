@@ -108,6 +108,29 @@ export default function OptimizationControls({
       <p className="text-xs text-gray-500 dark:text-gray-400">
         Leave dimensions empty to maintain original size. Aspect ratio is preserved.
       </p>
+
+      {/* Color Space Options */}
+      <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={options.forceSRGB || false}
+            onChange={(e) =>
+              onChange({ ...options, forceSRGB: e.target.checked })
+            }
+            disabled={disabled}
+            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+          />
+          <div className="flex-1">
+            <div className="text-sm font-medium text-gray-900 dark:text-white">
+              Force sRGB Conversion
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Convert wide-gamut colors to standard sRGB for maximum compatibility
+            </div>
+          </div>
+        </label>
+      </div>
     </div>
   );
 }

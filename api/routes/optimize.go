@@ -154,6 +154,9 @@ func handleOptimize(c *fiber.Ctx) error {
 		}
 	}
 
+	// Parse forceSRGB
+	options.ForceSRGB = c.QueryBool("forceSRGB", false)
+
 	// Get image data - prefer uploaded file, fall back to URL fetch
 	var imgData []byte
 	var err error

@@ -85,6 +85,7 @@ class ApiClient {
     if (options.returnImage !== undefined) {
       params.append('returnImage', options.returnImage.toString());
     }
+    if (options.forceSRGB) params.append('forceSRGB', 'true');
 
     const url = `${this.baseUrl}/optimize${params.toString() ? '?' + params.toString() : ''}`;
     console.log('[ApiClient] optimizeImage - Calling URL:', url);
@@ -117,6 +118,7 @@ class ApiClient {
     if (options.width) params.append('width', options.width.toString());
     if (options.height) params.append('height', options.height.toString());
     if (options.format) params.append('format', options.format);
+    if (options.forceSRGB) params.append('forceSRGB', 'true');
     params.append('returnImage', 'true');
 
     const url = `${this.baseUrl}/optimize?${params.toString()}`;
