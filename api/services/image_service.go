@@ -2,8 +2,6 @@ package services
 
 import (
 	"fmt"
-	"io"
-	"mime/multipart"
 	"time"
 
 	"github.com/h2non/bimg"
@@ -23,28 +21,15 @@ type OptimizeResult struct {
 
 // OptimizeOptions contains parameters for image optimization
 type OptimizeOptions struct {
-	Quality int           // 1-100, higher is better quality
-	Width   int           // Target width (0 = maintain aspect ratio)
-	Height  int           // Target height (0 = maintain aspect ratio)
+	Quality int            // 1-100, higher is better quality
+	Width   int            // Target width (0 = maintain aspect ratio)
+	Height  int            // Target height (0 = maintain aspect ratio)
 	Format  bimg.ImageType // Target format (JPEG, PNG, WEBP, etc.)
 }
 
-// OptimizeImage processes and optimizes an uploaded image using libvips
-func OptimizeImage(file *multipart.FileHeader, options OptimizeOptions) (*OptimizeResult, error) {
+// OptimizeImage processes and optimizes image data using libvips
+func OptimizeImage(buffer []byte, options OptimizeOptions) (*OptimizeResult, error) {
 	startTime := time.Now()
-
-	// Open and read the uploaded file
-	src, err := file.Open()
-	if err != nil {
-		return nil, fmt.Errorf("failed to open file: %w", err)
-	}
-	defer src.Close()
-
-	// Read file contents into buffer
-	buffer, err := io.ReadAll(src)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read file: %w", err)
-	}
 
 	originalSize := int64(len(buffer))
 
