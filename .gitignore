@@ -52,6 +52,12 @@ coverage.html
 tmp/
 temp/
 
+# Database files
+data/
+*.db
+*.db-shm
+*.db-wal
+
 # Docker volumes
 docker-volumes/
 

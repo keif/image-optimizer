@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -21,12 +22,31 @@ const (
 )
 
 // allowedDomains is a whitelist of domains allowed for URL-based image fetching
-// An empty list means all domains are allowed (use with caution in production)
+// Can be configured via ALLOWED_DOMAINS env var (comma-separated list)
+// Default includes common image hosting/CDN services
 var allowedDomains = []string{
-	// Add your allowed domains here, e.g.:
-	// "example.com",
-	// "cdn.yoursite.com",
-	// "images.unsplash.com",
+	"cloudinary.com",   // Cloudinary CDN
+	"imgur.com",        // Imgur image hosting
+	"unsplash.com",     // Unsplash stock photos
+	"pexels.com",       // Pexels stock photos
+	"localhost",        // Local development
+	"127.0.0.1",        // Local development
+}
+
+// InitializeConfig loads configuration from environment variables
+func InitializeConfig() {
+	// Load allowed domains from environment if set
+	if domainsEnv := os.Getenv("ALLOWED_DOMAINS"); domainsEnv != "" {
+		// Parse comma-separated list
+		domains := strings.Split(domainsEnv, ",")
+		allowedDomains = make([]string, 0, len(domains))
+		for _, domain := range domains {
+			domain = strings.TrimSpace(domain)
+			if domain != "" {
+				allowedDomains = append(allowedDomains, domain)
+			}
+		}
+	}
 }
 
 // isAllowedDomain checks whether the host is on the whitelist
@@ -47,19 +67,32 @@ func isAllowedDomain(u *url.URL) bool {
 
 // RegisterOptimizeRoutes registers the image optimization routes
 func RegisterOptimizeRoutes(app *fiber.App) {
+	// Initialize configuration from environment
+	InitializeConfig()
+
 	app.Post("/optimize", handleOptimize)
 }
 
 // handleOptimize handles POST /optimize requests
-// Query parameters:
-//   - quality: 1-100 (default: 80)
-//   - width: target width in pixels (default: 0 = no resize)
-//   - height: target height in pixels (default: 0 = no resize)
-//   - format: target format - jpeg, png, webp, gif (default: original format)
-//   - returnImage: true/false - return the optimized image file instead of JSON metadata (default: false)
-// Form parameters:
-//   - image: uploaded image file (multipart/form-data)
-//   - url: image URL to fetch and optimize (alternative to file upload)
+// @Summary Optimize an image
+// @Description Optimize an image file or URL with custom quality, dimensions, and format
+// @Tags optimization
+// @Accept multipart/form-data
+// @Produce json,image/jpeg,image/png,image/webp,image/gif
+// @Param quality query int false "Quality level (1-100)" default(80) minimum(1) maximum(100)
+// @Param width query int false "Target width in pixels (0 = no resize)" default(0) minimum(0)
+// @Param height query int false "Target height in pixels (0 = no resize)" default(0) minimum(0)
+// @Param format query string false "Target format" Enums(jpeg,png,webp,gif)
+// @Param returnImage query bool false "Return optimized image file instead of JSON metadata" default(false)
+// @Param image formData file false "Image file to optimize (multipart upload)"
+// @Param url formData string false "Image URL to fetch and optimize (alternative to file upload)"
+// @Success 200 {object} services.OptimizeResult "JSON metadata response (when returnImage=false)"
+// @Success 200 {file} binary "Optimized image file (when returnImage=true)"
+// @Failure 400 {object} map[string]string "Invalid parameters or file"
+// @Failure 403 {object} map[string]string "URL domain not allowed"
+// @Failure 413 {object} map[string]string "File too large (max 10MB)"
+// @Failure 500 {object} map[string]string "Image processing error"
+// @Router /optimize [post]
 func handleOptimize(c *fiber.Ctx) error {
 	// Parse returnImage parameter
 	returnImage := c.QueryBool("returnImage", false)

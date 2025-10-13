@@ -6,6 +6,9 @@ An API-first image optimization service built with Go and Fiber. Designed for lo
 
 - **Image Optimization**: Resize, convert, and compress images
 - **RESTful API**: Clean HTTP endpoints for easy integration
+- **OpenAPI/Swagger**: Interactive API documentation at `/swagger`
+- **API Key Authentication**: Secure API access with SQLite-backed key management
+- **Rate Limiting**: Configurable request limits to prevent abuse
 - **CLI Tool**: Command-line interface for batch processing and automation
 - **Containerized**: Docker-ready for consistent deployment
 - **Performance**: Built with Go and Fiber for high throughput
@@ -160,6 +163,14 @@ Total processing time: 88ms
 
 ## API Endpoints
 
+### Interactive API Documentation
+
+```bash
+GET /swagger/*
+```
+
+View interactive Swagger/OpenAPI documentation at `http://localhost:8080/swagger/index.html`
+
 ### Health Check
 
 ```bash
@@ -260,6 +271,132 @@ curl -X POST "http://localhost:8080/optimize?format=webp&returnImage=true" \
 
 **Response (when returnImage=true):**
 Returns the optimized image file with appropriate `Content-Type` header (e.g., `image/webp`, `image/jpeg`, etc.) and `Content-Disposition: inline` header.
+
+### API Key Management
+
+All API key management endpoints require authentication (except the initial key creation for bootstrapping).
+
+#### Create API Key
+
+```bash
+POST /api/keys
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "My API Key"
+}
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "key": "sk_abc123...",
+  "name": "My API Key",
+  "created_at": "2025-01-15T10:30:00Z"
+}
+```
+
+**Important:** Save the API key value immediately - it won't be shown again!
+
+#### List API Keys
+
+```bash
+GET /api/keys
+Authorization: Bearer sk_your_api_key
+```
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "name": "My API Key",
+    "created_at": "2025-01-15T10:30:00Z",
+    "revoked_at": null
+  },
+  {
+    "id": 2,
+    "name": "Production Key",
+    "created_at": "2025-01-15T11:00:00Z",
+    "revoked_at": "2025-01-16T09:00:00Z"
+  }
+]
+```
+
+Note: For security, the actual key values are not returned in list responses.
+
+#### Revoke API Key
+
+```bash
+DELETE /api/keys/:id
+Authorization: Bearer sk_your_api_key
+```
+
+**Response:**
+```json
+{
+  "message": "API key revoked successfully"
+}
+```
+
+### Using API Keys
+
+Include your API key in the `Authorization` header for all protected endpoints:
+
+```bash
+# Using Bearer token format (recommended)
+curl -X POST "http://localhost:8080/optimize?format=webp" \
+  -H "Authorization: Bearer sk_your_api_key_here" \
+  -F "image=@photo.jpg"
+
+# Direct key format (also supported)
+curl -X POST "http://localhost:8080/optimize?format=webp" \
+  -H "Authorization: sk_your_api_key_here" \
+  -F "image=@photo.jpg"
+```
+
+**Bypassed Endpoints** (no API key required):
+- `/health` - Health check
+- `/swagger/*` - API documentation
+- `/api/keys` - API key creation (for bootstrapping)
+
+## Configuration
+
+The service can be configured using environment variables. See `.env.example` for all available options.
+
+### Key Configuration Options
+
+**Server:**
+- `PORT`: Server port (default: 8080)
+
+**Database:**
+- `DB_PATH`: Path to SQLite database (default: ./data/api_keys.db)
+
+**Rate Limiting:**
+- `RATE_LIMIT_ENABLED`: Enable/disable rate limiting (default: true)
+- `RATE_LIMIT_MAX`: Maximum requests per window (default: 100)
+- `RATE_LIMIT_WINDOW`: Time window for rate limiting (default: 1m)
+
+**API Key Authentication:**
+- `API_KEY_AUTH_ENABLED`: Enable/disable API key auth (default: true)
+
+**URL Fetching:**
+- `ALLOWED_DOMAINS`: Comma-separated list of allowed domains for URL fetching
+  - Default includes: cloudinary.com, imgur.com, unsplash.com, pexels.com, localhost, 127.0.0.1
+  - Leave empty to allow all domains (not recommended for production)
+
+**Example .env file:**
+```bash
+PORT=8080
+RATE_LIMIT_MAX=100
+RATE_LIMIT_WINDOW=1m
+API_KEY_AUTH_ENABLED=true
+ALLOWED_DOMAINS=cloudinary.com,imgur.com,example.com
+```
 
 ## Development
 
@@ -367,11 +504,11 @@ View the workflow at `.github/workflows/test.yml`
 - [x] Test coverage reporting
 - [x] GitHub Actions CI/CD pipeline
 
-### Phase 5: API Enhancement
-- [ ] OpenAPI/Swagger documentation
-- [ ] API key authentication
-- [ ] Rate limiting
-- [ ] Usage metrics and analytics
+### Phase 5: API Enhancement ✅ COMPLETED
+- [x] OpenAPI/Swagger documentation
+- [x] API key authentication
+- [x] Rate limiting
+- [ ] Usage metrics and analytics (deferred to Phase 5.1)
 
 ### Phase 6: Web Interface
 - [ ] Next.js frontend for drag-and-drop optimization
@@ -409,52 +546,57 @@ View the workflow at `.github/workflows/test.yml`
 
 ## Security
 
-The API includes built-in security controls for URL-based image fetching:
-
-### Configuration (in `api/routes/optimize.go`)
-
-```go
-const (
-    maxImageSize = 10 << 20        // 10 MB
-    fetchTimeout = 10 * time.Second // 10 seconds
-)
-
-// Domain whitelist for URL fetching
-var allowedDomains = []string{
-    // Add your allowed domains here:
-    // "example.com",
-    // "cdn.yoursite.com",
-}
-```
+The API includes comprehensive security controls to protect against abuse and unauthorized access.
 
 ### Security Features
 
-1. **Domain Whitelist**: Control which domains can be fetched from
-   - Empty list = all domains allowed (development mode)
-   - Add specific domains to restrict access in production
+1. **API Key Authentication** ✅
+   - SQLite-backed key storage with secure random generation
+   - Bearer token support in Authorization header
+   - Revocable keys with audit trail (created_at, revoked_at)
+   - Configurable via `API_KEY_AUTH_ENABLED` environment variable
 
-2. **Size Limits**: Maximum 10MB for uploaded files and URL fetches
+2. **Rate Limiting** ✅
+   - In-memory sliding window rate limiter
+   - Default: 100 requests per minute per IP
+   - Configurable limits via environment variables
+   - Returns HTTP 429 when limits exceeded
+   - Disable for development with `RATE_LIMIT_ENABLED=false`
+
+3. **Domain Whitelist for URL Fetching** ✅
+   - Default safe list: cloudinary.com, imgur.com, unsplash.com, pexels.com, localhost
+   - Configurable via `ALLOWED_DOMAINS` environment variable
+   - Wildcard subdomain matching (e.g., "example.com" matches "cdn.example.com")
+   - Empty list allows all domains (development mode only)
+
+4. **Size Limits**
+   - Maximum 10MB for uploaded files and URL fetches
    - Prevents memory exhaustion attacks
-   - Configurable in source code
+   - Configurable in source code (`maxImageSize` constant)
 
-3. **Request Timeouts**: 10-second timeout for URL fetches
+5. **Request Timeouts**
+   - 10-second timeout for URL fetches
    - Prevents hanging connections
    - Protects against slow-loris style attacks
 
-4. **Input Validation**: Strict validation of all parameters
+6. **Input Validation**
    - URL format validation
-   - File type validation
-   - Parameter range checking
+   - File type validation (JPEG, PNG, WebP, GIF only)
+   - Parameter range checking (quality 1-100, dimensions > 0)
+   - Strict content-type validation
 
-### Production Recommendations
+### Production Security Checklist
 
-For production deployments, consider:
-- Enable domain whitelist by adding approved domains
-- Add rate limiting middleware (e.g., using Fiber middleware)
-- Implement API key authentication
-- Use HTTPS for all connections
-- Deploy behind a reverse proxy (nginx, Caddy)
-- Monitor resource usage and set appropriate limits
+For production deployments:
+
+- ✅ **Enable API key authentication** (`API_KEY_AUTH_ENABLED=true`)
+- ✅ **Configure rate limiting** (adjust `RATE_LIMIT_MAX` and `RATE_LIMIT_WINDOW`)
+- ✅ **Set domain whitelist** (specify allowed domains in `ALLOWED_DOMAINS`)
+- ⚠️ **Use HTTPS** (configure TLS or deploy behind reverse proxy)
+- ⚠️ **Deploy behind reverse proxy** (nginx, Caddy, Traefik for additional protection)
+- ⚠️ **Regular security audits** (review API keys, monitor rate limit violations)
+- ⚠️ **Database backups** (backup SQLite database regularly)
+- ⚠️ **Monitor logs** (track failed auth attempts, rate limit hits)
 
 ## License
 

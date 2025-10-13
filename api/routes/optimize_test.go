@@ -322,10 +322,10 @@ func TestOptimizeEndpoint_InvalidURL(t *testing.T) {
 	app := fiber.New()
 	RegisterOptimizeRoutes(app)
 
-	// Create request with invalid URL
+	// Create request with URL that's not in the whitelist
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	writer.WriteField("url", "not-a-valid-url")
+	writer.WriteField("url", "https://blocked-domain.com/image.jpg")
 	writer.Close()
 
 	req := httptest.NewRequest("POST", "/optimize", body)
@@ -336,8 +336,9 @@ func TestOptimizeEndpoint_InvalidURL(t *testing.T) {
 		t.Fatalf("Failed to send request: %v", err)
 	}
 
-	if resp.StatusCode != http.StatusBadRequest {
-		t.Errorf("Expected status 400, got %d", resp.StatusCode)
+	// Should get 403 Forbidden due to domain whitelist
+	if resp.StatusCode != http.StatusForbidden {
+		t.Errorf("Expected status 403 (domain not whitelisted), got %d", resp.StatusCode)
 	}
 }
 
