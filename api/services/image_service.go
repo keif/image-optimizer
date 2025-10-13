@@ -9,14 +9,16 @@ import (
 
 // OptimizeResult represents the result of an image optimization
 type OptimizeResult struct {
-	OriginalSize   int64  `json:"originalSize"`
-	OptimizedSize  int64  `json:"optimizedSize"`
-	Format         string `json:"format"`
-	Width          int    `json:"width"`
-	Height         int    `json:"height"`
-	Savings        string `json:"savings"`
-	ProcessingTime string `json:"processingTime"`
-	OptimizedImage []byte `json:"-"` // Not included in JSON response
+	OriginalSize     int64  `json:"originalSize"`
+	OptimizedSize    int64  `json:"optimizedSize"`
+	Format           string `json:"format"`
+	Width            int    `json:"width"`
+	Height           int    `json:"height"`
+	Savings          string `json:"savings"`
+	ProcessingTime   string `json:"processingTime"`
+	OptimizedImage   []byte `json:"-"` // Not included in JSON response
+	AlreadyOptimized bool   `json:"alreadyOptimized"` // True if original was returned due to better compression
+	Message          string `json:"message,omitempty"` // Optional message about optimization
 }
 
 // OptimizeOptions contains parameters for image optimization
@@ -65,30 +67,51 @@ func OptimizeImage(buffer []byte, options OptimizeOptions) (*OptimizeResult, err
 
 	optimizedSize := int64(len(optimizedBuffer))
 
-	// Get optimized image metadata
-	optimizedMetadata, err := bimg.NewImage(optimizedBuffer).Metadata()
-	if err != nil {
-		return nil, fmt.Errorf("failed to read optimized image metadata: %w", err)
+	// Check if optimization actually made the file larger
+	alreadyOptimized := false
+	message := ""
+	resultBuffer := optimizedBuffer
+	resultSize := optimizedSize
+
+	if optimizedSize > originalSize {
+		// Optimization made the file larger - return original instead
+		alreadyOptimized = true
+		message = "This image is already well-optimized. Returning original file to avoid quality loss."
+		resultBuffer = buffer
+		resultSize = originalSize
 	}
 
-	// Calculate savings
-	// Note: If optimization increases size, this will be negative
-	savingsPercent := float64(originalSize-optimizedSize) / float64(originalSize) * 100
+	// Get result image metadata (either optimized or original)
+	resultMetadata, err := bimg.NewImage(resultBuffer).Metadata()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read result image metadata: %w", err)
+	}
+
+	// Calculate savings based on what would have happened
+	// If we returned the original, show 0% savings
+	var savingsPercent float64
+	if alreadyOptimized {
+		savingsPercent = 0.0
+	} else {
+		savingsPercent = float64(originalSize-optimizedSize) / float64(originalSize) * 100
+	}
 
 	// Get format name
-	formatName := getFormatName(optimizedMetadata.Type)
+	formatName := getFormatName(resultMetadata.Type)
 
 	processingTime := time.Since(startTime)
 
 	return &OptimizeResult{
-		OriginalSize:   originalSize,
-		OptimizedSize:  optimizedSize,
-		Format:         formatName,
-		Width:          optimizedMetadata.Size.Width,
-		Height:         optimizedMetadata.Size.Height,
-		Savings:        fmt.Sprintf("%.2f%%", savingsPercent),
-		ProcessingTime: fmt.Sprintf("%dms", processingTime.Milliseconds()),
-		OptimizedImage: optimizedBuffer,
+		OriginalSize:     originalSize,
+		OptimizedSize:    resultSize,
+		Format:           formatName,
+		Width:            resultMetadata.Size.Width,
+		Height:           resultMetadata.Size.Height,
+		Savings:          fmt.Sprintf("%.2f%%", savingsPercent),
+		ProcessingTime:   fmt.Sprintf("%dms", processingTime.Milliseconds()),
+		OptimizedImage:   resultBuffer,
+		AlreadyOptimized: alreadyOptimized,
+		Message:          message,
 	}, nil
 }
 

@@ -63,6 +63,26 @@ export default function ResultsDisplay({
           </button>
         </div>
 
+        {/* Already Optimized Warning */}
+        {result.alreadyOptimized && result.message && (
+          <div className="mb-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <div className="text-yellow-600 dark:text-yellow-400">ℹ️</div>
+              <div>
+                <h4 className="font-medium text-yellow-900 dark:text-yellow-200 mb-1">
+                  Already Well-Optimized
+                </h4>
+                <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                  {result.message}
+                </p>
+                <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-2">
+                  💡 <strong>Tip:</strong> Try converting to WebP format for better compression, or lower the quality setting.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Before/After Comparison */}
         {optimizedBlob && (
           <BeforeAfterComparison

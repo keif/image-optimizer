@@ -7,6 +7,8 @@ export interface OptimizationResult {
   height: number;
   savings: string;
   processingTime: string;
+  alreadyOptimized?: boolean;
+  message?: string;
 }
 
 export interface OptimizationOptions {
