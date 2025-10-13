@@ -42,8 +42,5 @@ services:
       - key: NODE_ENV
         value: production
       - key: NEXT_PUBLIC_API_URL
-        fromService:
-          type: web
-          name: image-optimizer-api
-          property: url
+        value: https://image-optimizer-1t9i.onrender.com
     plan: starter
