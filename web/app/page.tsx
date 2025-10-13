@@ -26,6 +26,19 @@ export default function Home() {
     setError('');
   };
 
+  // Detect original file format from MIME type
+  const getOriginalFormat = (): 'jpeg' | 'png' | 'webp' | 'gif' | undefined => {
+    if (!selectedFile) return undefined;
+
+    const mimeType = selectedFile.type.toLowerCase();
+    if (mimeType === 'image/jpeg' || mimeType === 'image/jpg') return 'jpeg';
+    if (mimeType === 'image/png') return 'png';
+    if (mimeType === 'image/webp') return 'webp';
+    if (mimeType === 'image/gif') return 'gif';
+
+    return undefined;
+  };
+
   const handleOptimize = async () => {
     if (!selectedFile) return;
 
@@ -147,6 +160,7 @@ export default function Home() {
             options={options}
             onChange={setOptions}
             disabled={isProcessing || !selectedFile}
+            originalFormat={getOriginalFormat()}
           />
 
           {/* Action Buttons */}

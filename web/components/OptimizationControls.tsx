@@ -8,20 +8,27 @@ interface OptimizationControlsProps {
   options: OptimizationOptions;
   onChange: (options: OptimizationOptions) => void;
   disabled?: boolean;
+  originalFormat?: 'jpeg' | 'png' | 'webp' | 'gif';
 }
 
 export default function OptimizationControls({
   options,
   onChange,
   disabled,
+  originalFormat,
 }: OptimizationControlsProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // Determine which advanced controls to show based on selected format
-  const selectedFormat = options.format || 'original';
-  const showJpegOptions = selectedFormat === 'jpeg';
-  const showPngOptions = selectedFormat === 'png';
-  const showWebpOptions = selectedFormat === 'webp';
+  // Determine which format's advanced controls to show
+  // Priority: selected format > original format
+  const effectiveFormat = options.format || originalFormat;
+
+  const showJpegOptions = effectiveFormat === 'jpeg';
+  const showPngOptions = effectiveFormat === 'png';
+  const showWebpOptions = effectiveFormat === 'webp';
+
+  // Show advanced section if any format-specific options are available
+  const hasAdvancedOptions = showJpegOptions || showPngOptions || showWebpOptions;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-4">
@@ -143,7 +150,7 @@ export default function OptimizationControls({
       </div>
 
       {/* Advanced Options Section */}
-      {(showJpegOptions || showPngOptions || showWebpOptions) && (
+      {hasAdvancedOptions && (
         <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
           <button
             type="button"
