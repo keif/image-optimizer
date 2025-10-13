@@ -8,6 +8,11 @@ services:
     envVars:
       - key: PORT
         value: 8080
+      - key: CORS_ORIGINS
+        fromService:
+          type: web
+          name: image-optimizer-web
+          property: url
       - key: DB_PATH
         value: /opt/render/project/data/api_keys.db
       - key: RATE_LIMIT_ENABLED
