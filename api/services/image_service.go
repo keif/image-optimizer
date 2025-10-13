@@ -72,10 +72,8 @@ func OptimizeImage(buffer []byte, options OptimizeOptions) (*OptimizeResult, err
 	}
 
 	// Calculate savings
+	// Note: If optimization increases size, this will be negative
 	savingsPercent := float64(originalSize-optimizedSize) / float64(originalSize) * 100
-	if savingsPercent < 0 {
-		savingsPercent = 0 // Handle cases where optimization increased size
-	}
 
 	// Get format name
 	formatName := getFormatName(optimizedMetadata.Type)

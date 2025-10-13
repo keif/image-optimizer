@@ -39,19 +39,25 @@ export default function BeforeAfterComparison({
 
   const formatBytes = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
+    const absBytes = Math.abs(bytes);
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    const i = Math.floor(Math.log(absBytes) / Math.log(k));
+    const value = parseFloat((absBytes / Math.pow(k, i)).toFixed(2));
+    const sign = bytes < 0 ? '+' : '-'; // + means increase, - means decrease
+    return `${sign}${value} ${sizes[i]}`;
   };
 
+  const sizeDiff = result.originalSize - result.optimizedSize;
+  const isLarger = sizeDiff < 0;
   const savingsPercentage = parseFloat(result.savings.replace('%', ''));
-  const savingsColor =
-    savingsPercentage > 50
-      ? 'text-green-600 dark:text-green-400'
-      : savingsPercentage > 25
-      ? 'text-yellow-600 dark:text-yellow-400'
-      : 'text-orange-600 dark:text-orange-400';
+  const savingsColor = isLarger
+    ? 'text-red-600 dark:text-red-400'
+    : savingsPercentage > 50
+    ? 'text-green-600 dark:text-green-400'
+    : savingsPercentage > 25
+    ? 'text-yellow-600 dark:text-yellow-400'
+    : 'text-orange-600 dark:text-orange-400';
 
   return (
     <div className="space-y-4">
@@ -101,25 +107,29 @@ export default function BeforeAfterComparison({
       {showMetrics && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
           <div className="flex items-start gap-3">
-            <div className={`p-2 rounded-lg ${savingsColor} bg-green-100 dark:bg-green-900/20`}>
-              <TrendingDown className="w-5 h-5" />
+            <div className={`p-2 rounded-lg ${isLarger ? 'bg-red-100 dark:bg-red-900/20' : 'bg-green-100 dark:bg-green-900/20'}`}>
+              <TrendingDown className={`w-5 h-5 ${isLarger ? 'text-red-600 dark:text-red-400 rotate-180' : savingsColor}`} />
             </div>
             <div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Savings</div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">
+                {isLarger ? 'Size Increase' : 'Savings'}
+              </div>
               <div className={`text-lg font-bold ${savingsColor}`}>
-                {result.savings}
+                {isLarger ? `+${Math.abs(((result.optimizedSize - result.originalSize) / result.originalSize * 100)).toFixed(2)}%` : result.savings}
               </div>
             </div>
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/20">
-              <File className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className={`p-2 rounded-lg ${isLarger ? 'bg-red-100 dark:bg-red-900/20' : 'bg-blue-100 dark:bg-blue-900/20'}`}>
+              <File className={`w-5 h-5 ${isLarger ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'}`} />
             </div>
             <div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Size Reduction</div>
-              <div className="text-lg font-bold text-gray-900 dark:text-white">
-                {formatBytes(result.originalSize - result.optimizedSize)}
+              <div className="text-xs text-gray-600 dark:text-gray-400">
+                {isLarger ? 'Size Change' : 'Size Reduction'}
+              </div>
+              <div className={`text-lg font-bold ${isLarger ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
+                {formatBytes(sizeDiff)}
               </div>
             </div>
           </div>
