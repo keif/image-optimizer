@@ -6,6 +6,7 @@ An API-first image optimization service built with Go and Fiber. Designed for lo
 
 - **Image Optimization**: Resize, convert, and compress images
 - **Interactive Before/After Comparison**: Visual slider to compare original vs optimized images
+- **Privacy First**: No server storage, in-memory processing only, zero tracking
 - **RESTful API**: Clean HTTP endpoints for easy integration
 - **OpenAPI/Swagger**: Interactive API documentation at `/swagger`
 - **API Key Authentication**: Secure API access with SQLite-backed key management
@@ -646,6 +647,14 @@ View the workflow at `.github/workflows/test.yml`
 - **Security controls**: Built-in protection against abuse
 - **Timeout handling**: 10-second timeout for URL fetches
 - **Size limits**: 10MB maximum file size for both uploads and URL fetches
+
+### Privacy-First Architecture
+- **Zero Storage**: Images are processed entirely in-memory and never written to disk
+- **Ephemeral Processing**: Automatic cleanup after each request via Go's garbage collector
+- **No Tracking**: No analytics, cookies, or personal data collection
+- **No History**: Completely stateless - no optimization logs or user activity tracking
+- **GDPR Compliant**: No personal data retention means no compliance burden
+- **Open Source**: Full transparency - review the code to verify privacy claims
 
 ## Security
 
