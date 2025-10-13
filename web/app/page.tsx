@@ -189,6 +189,19 @@ export default function Home() {
               <li>• Download your optimized image</li>
             </ul>
           </div>
+
+          {/* Privacy Notice */}
+          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+            <h4 className="font-medium text-green-900 dark:text-green-200 mb-2">
+              🔒 Privacy First
+            </h4>
+            <ul className="text-sm text-green-700 dark:text-green-300 space-y-1">
+              <li>• No server storage - images processed in memory</li>
+              <li>• No tracking or personal data collection</li>
+              <li>• Images automatically deleted after processing</li>
+              <li>• Completely private and secure</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
