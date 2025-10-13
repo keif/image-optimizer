@@ -9,11 +9,6 @@ docker_build(
     'image-optimizer-api',
     './api',
     dockerfile='./api/Dockerfile',
-    only=[
-        './api/go.mod',
-        './api/go.sum',
-        './api/**/*.go',
-    ],
     live_update=[
         # Sync Go source files to container
         sync('./api', '/app'),
@@ -30,16 +25,6 @@ docker_build(
     'image-optimizer-web',
     './web',
     dockerfile='./web/Dockerfile',
-    only=[
-        './web/package.json',
-        './web/pnpm-lock.yaml',
-        './web/**/*.ts',
-        './web/**/*.tsx',
-        './web/**/*.js',
-        './web/**/*.jsx',
-        './web/**/*.css',
-        './web/**/*.mjs',
-    ],
     live_update=[
         # Full rebuild if dependencies change
         fall_back_on([
@@ -58,13 +43,11 @@ docker_build(
 # Configure resources from docker-compose
 dc_resource(
     'api',
-    port_forwards='8080:8080',
     labels=['backend'],
 )
 
 dc_resource(
     'web',
-    port_forwards='3000:3000',
     labels=['frontend'],
     resource_deps=['api'],  # Web depends on API being healthy
 )
@@ -118,6 +101,8 @@ print("""
 ║    • api-tests: Run all API tests                              ║
 ║    • api-lint: Run Go vet linter                               ║
 ║    • api-coverage: Generate test coverage report               ║
+║                                                                ║
+║  Note: Port forwarding configured in docker-compose.yml        ║
 ║                                                                ║
 ╚════════════════════════════════════════════════════════════════╝
 """)
