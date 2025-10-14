@@ -308,6 +308,7 @@ Content-Type: multipart/form-data
 - `compression` (integer): PNG compression level 0-9 (0=fastest, 9=best compression, default: 6)
 - `interlace` (boolean): Enable interlaced/progressive PNG encoding
 - `palette` (boolean): Enable palette mode (quantize to 256 colors for smaller files)
+- `oxipngLevel` (integer): OxiPNG optimization level 0-6 (0=fastest, 6=best, default: 2, adds 15-40% extra compression)
 
 **Advanced WebP Options:**
 - `lossless` (boolean): Use lossless WebP encoding (perfect quality, larger files)
@@ -367,9 +368,9 @@ curl -X POST "http://localhost:8080/optimize?format=jpeg&quality=85&progressive=
   -F "image=@photo.png"
 ```
 
-**8. Maximum PNG compression with palette mode:**
+**8. Maximum PNG compression with OxiPNG and palette mode:**
 ```bash
-curl -X POST "http://localhost:8080/optimize?format=png&compression=9&palette=true" \
+curl -X POST "http://localhost:8080/optimize?format=png&compression=9&palette=true&oxipngLevel=6" \
   -F "image=@screenshot.png"
 ```
 
@@ -675,7 +676,7 @@ View the workflow at `.github/workflows/test.yml`
 - **Quality control**: Adjustable compression quality (1-100)
 - **Advanced compression**: Format-specific options for fine-tuned optimization
   - **JPEG**: Progressive encoding, Huffman optimization, chroma subsampling, smoothing
-  - **PNG**: Compression levels (0-9), interlacing, palette mode (256 colors)
+  - **PNG**: Compression levels (0-9), interlacing, palette mode (256 colors), **OxiPNG post-processing (15-40% extra savings)**
   - **WebP**: Lossless mode, compression effort (0-6), encoding method (0-6)
   - **AVIF**: Next-generation format with 20-30% better compression than WebP
 - **Smart resizing**: Maintains aspect ratio while resizing

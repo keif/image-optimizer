@@ -37,6 +37,9 @@ export interface OptimizationOptions {
   lossless?: boolean;
   effort?: number;
   webpMethod?: number;
+
+  // Advanced PNG optimization with OxiPNG
+  oxipngLevel?: number;
 }
 
 export interface APIKey {

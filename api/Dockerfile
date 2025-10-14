@@ -28,6 +28,7 @@ FROM alpine:latest
 RUN apk add --no-cache \
     vips \
     libheif \
+    oxipng \
     ca-certificates
 
 WORKDIR /app

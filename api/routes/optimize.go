@@ -215,6 +215,17 @@ func handleOptimize(c *fiber.Ctx) error {
 		options.WebpMethod = webpMethod
 	}
 
+	// Parse advanced PNG optimization with OxiPNG
+	if oxipngLevelStr := c.Query("oxipngLevel"); oxipngLevelStr != "" {
+		oxipngLevel, err := strconv.Atoi(oxipngLevelStr)
+		if err != nil || oxipngLevel < 0 || oxipngLevel > 6 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid oxipngLevel parameter. Must be between 0 and 6.",
+			})
+		}
+		options.OxipngLevel = oxipngLevel
+	}
+
 	// Get image data - prefer uploaded file, fall back to URL fetch
 	var imgData []byte
 	var err error

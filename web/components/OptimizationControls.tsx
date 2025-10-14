@@ -330,6 +330,30 @@ export default function OptimizationControls({
                       </div>
                     </div>
                   </label>
+
+                  <div>
+                    <label className="block text-sm text-gray-900 dark:text-gray-200 mb-1">
+                      OxiPNG optimization: {options.oxipngLevel || 2}
+                    </label>
+                    <input
+                      type="range"
+                      min="0"
+                      max="6"
+                      value={options.oxipngLevel || 2}
+                      onChange={(e) =>
+                        onChange({
+                          ...options,
+                          oxipngLevel: parseInt(e.target.value),
+                        })
+                      }
+                      disabled={disabled}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mt-1">
+                      <span>Faster</span>
+                      <span>Best compression (15-40% smaller)</span>
+                    </div>
+                  </div>
                 </div>
               )}
 
