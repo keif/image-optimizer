@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import SupportBanner from "@/components/SupportBanner";
 
@@ -48,6 +49,12 @@ export default function RootLayout({
           <main>{children}</main>
           <SupportBanner />
         </div>
+        <Script
+          data-goatcounter="https://baker.goatcounter.com/count"
+          async
+          src="//gc.zgo.at/count.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
