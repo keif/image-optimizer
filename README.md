@@ -2,6 +2,14 @@
 
 An API-first image optimization service built with Go and Fiber. Designed for local development with future expansion to a multi-user SaaS platform.
 
+## Live Demo
+
+**Try it now:** [https://squish.baker.is](https://squish.baker.is)
+
+**API Endpoint:** `https://image-optimizer-1t9i.onrender.com`
+- [Health Check](https://image-optimizer-1t9i.onrender.com/health)
+- [API Documentation](https://image-optimizer-1t9i.onrender.com/swagger/index.html)
+
 ## Features
 
 - **Image Optimization**: Resize, convert, and compress images
@@ -73,7 +81,7 @@ image-optimizer/
 ### Prerequisites
 
 **For Local Development:**
-- Go 1.23+
+- Go 1.24+ (required for dependencies)
 - libvips 8.17+ (image processing library)
   - macOS: `brew install vips`
   - Ubuntu/Debian: `apt-get install libvips-dev`
@@ -661,11 +669,12 @@ View the workflow at `.github/workflows/test.yml`
 
 ## Tech Stack
 
-- **Backend**: Go 1.23, Fiber v2
+- **Backend**: Go 1.24, Fiber v2
 - **Frontend**: Next.js 14, TypeScript, Tailwind CSS
 - **Image Processing**: bimg (libvips wrapper), libvips 8.17+
 - **Database**: SQLite (with migration path to PostgreSQL)
 - **Containerization**: Docker, Docker Compose
+- **Deployment**: Render.com (API), GitHub Pages (Frontend)
 - **Future**: PostgreSQL, Redis, User authentication
 
 ## Features in Detail
