@@ -150,13 +150,19 @@ func OptimizeImage(buffer []byte, options OptimizeOptions) (*OptimizeResult, err
 	optimizedSize := int64(len(optimizedBuffer))
 
 	// Check if optimization actually made the file larger
+	// BUT: If format conversion was explicitly requested, always return the converted format
+	// (user may need it for compatibility even if larger)
 	alreadyOptimized := false
 	message := ""
 	resultBuffer := optimizedBuffer
 	resultSize := optimizedSize
 
-	if optimizedSize > originalSize {
-		// Optimization made the file larger - return original instead
+	originalFormat := getImageTypeFromString(originalMetadata.Type)
+	formatConversionRequested := options.Format != 0 && options.Format != originalFormat
+
+	if optimizedSize > originalSize && !formatConversionRequested {
+		// Optimization made the file larger and no format conversion was requested
+		// Return original instead to preserve quality
 		alreadyOptimized = true
 		message = "This image is already well-optimized. Returning original file to avoid quality loss."
 		resultBuffer = buffer
@@ -222,6 +228,28 @@ func getFormatName(imgType string) string {
 		return "pdf"
 	default:
 		return imgType
+	}
+}
+
+// getImageTypeFromString converts string format name to bimg.ImageType
+func getImageTypeFromString(format string) bimg.ImageType {
+	switch format {
+	case "jpeg":
+		return bimg.JPEG
+	case "png":
+		return bimg.PNG
+	case "webp":
+		return bimg.WEBP
+	case "gif":
+		return bimg.GIF
+	case "avif":
+		return bimg.AVIF
+	case "svg":
+		return bimg.SVG
+	case "pdf":
+		return bimg.PDF
+	default:
+		return bimg.UNKNOWN
 	}
 }
 
