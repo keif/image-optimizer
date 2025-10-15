@@ -13,8 +13,12 @@ definitions:
       revoked_at:
         type: string
     type: object
-  services.OptimizeResult:
+  routes.BatchImageResult:
     properties:
+      error:
+        type: string
+      filename:
+        type: string
       format:
         type: string
       height:
@@ -23,10 +27,66 @@ definitions:
         type: integer
       originalSize:
         type: integer
+      savings:
+        type: string
+      success:
+        type: boolean
+      width:
+        type: integer
+    type: object
+  routes.BatchOptimizeResponse:
+    properties:
+      results:
+        items:
+          $ref: '#/definitions/routes.BatchImageResult'
+        type: array
+      summary:
+        properties:
+          failed:
+            type: integer
+          processingTime:
+            type: string
+          successful:
+            type: integer
+          total:
+            type: integer
+          totalOptimizedSize:
+            type: integer
+          totalOriginalSize:
+            type: integer
+          totalSavings:
+            type: string
+        type: object
+    type: object
+  services.OptimizeResult:
+    properties:
+      alreadyOptimized:
+        description: True if original was returned due to better compression
+        type: boolean
+      colorSpace:
+        description: Color space of the result (srgb, p3, etc)
+        type: string
+      format:
+        type: string
+      height:
+        type: integer
+      message:
+        description: Optional message about optimization
+        type: string
+      optimizedSize:
+        type: integer
+      originalColorSpace:
+        description: Original image color space
+        type: string
+      originalSize:
+        type: integer
       processingTime:
         type: string
       savings:
         type: string
+      wideGamut:
+        description: True if image uses colors beyond sRGB
+        type: boolean
       width:
         type: integer
     type: object
@@ -147,6 +207,69 @@ paths:
       summary: Revoke an API key
       tags:
       - api-keys
+  /batch-optimize:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Optimize multiple image files with the same quality, dimensions,
+        and format settings
+      parameters:
+      - default: 80
+        description: Quality level (1-100)
+        in: query
+        maximum: 100
+        minimum: 1
+        name: quality
+        type: integer
+      - default: 0
+        description: Target width in pixels (0 = no resize)
+        in: query
+        minimum: 0
+        name: width
+        type: integer
+      - default: 0
+        description: Target height in pixels (0 = no resize)
+        in: query
+        minimum: 0
+        name: height
+        type: integer
+      - description: Target format
+        enum:
+        - jpeg
+        - png
+        - webp
+        - gif
+        - avif
+        in: query
+        name: format
+        type: string
+      - description: Image files to optimize (multiple files)
+        in: formData
+        name: images
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Batch optimization results
+          schema:
+            $ref: '#/definitions/routes.BatchOptimizeResponse'
+        "400":
+          description: Invalid parameters or no files provided
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Batch processing error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Optimize multiple images in a single request
+      tags:
+      - optimization
   /optimize:
     post:
       consumes:
@@ -179,6 +302,7 @@ paths:
         - png
         - webp
         - gif
+        - avif
         in: query
         name: format
         type: string
@@ -201,6 +325,7 @@ paths:
       - image/png
       - image/webp
       - image/gif
+      - image/avif
       responses:
         "200":
           description: Optimized image file (when returnImage=true)

@@ -377,3 +377,166 @@ func TestOptimizeEndpoint_CombinedParameters(t *testing.T) {
 		t.Errorf("Expected Content-Type image/webp or application/octet-stream, got %s", contentType)
 	}
 }
+
+// createBatchMultipartRequest creates a multipart form request with multiple image files
+func createBatchMultipartRequest(t *testing.T, images []struct{ data []byte; filename string; contentType string }) (*http.Request, string) {
+	t.Helper()
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	for _, img := range images {
+		h := make(map[string][]string)
+		h["Content-Disposition"] = []string{`form-data; name="images"; filename="` + img.filename + `"`}
+		h["Content-Type"] = []string{img.contentType}
+
+		part, err := writer.CreatePart(h)
+		if err != nil {
+			t.Fatalf("Failed to create multipart part: %v", err)
+		}
+
+		_, err = part.Write(img.data)
+		if err != nil {
+			t.Fatalf("Failed to write image data: %v", err)
+		}
+	}
+
+	writer.Close()
+
+	req := httptest.NewRequest("POST", "/batch-optimize", body)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	return req, writer.FormDataContentType()
+}
+
+func TestBatchOptimizeEndpoint_BasicOptimization(t *testing.T) {
+	app := fiber.New()
+	RegisterOptimizeRoutes(app)
+
+	images := []struct{ data []byte; filename string; contentType string }{
+		{loadTestFixture(t, "test-100x100.jpg"), "test1.jpg", "image/jpeg"},
+		{loadTestFixture(t, "test-200x150.png"), "test2.png", "image/png"},
+		{loadTestFixture(t, "test-50x50.webp"), "test3.webp", "image/webp"},
+	}
+
+	req, _ := createBatchMultipartRequest(t, images)
+
+	resp, err := app.Test(req, -1) // -1 = no timeout
+	if err != nil {
+		t.Fatalf("Failed to send request: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		t.Fatalf("Expected status 200, got %d. Body: %s", resp.StatusCode, string(body))
+	}
+
+	// Response should be JSON
+	contentType := resp.Header.Get("Content-Type")
+	if contentType != "application/json" {
+		t.Errorf("Expected Content-Type application/json, got %s", contentType)
+	}
+}
+
+func TestBatchOptimizeEndpoint_WithFormatConversion(t *testing.T) {
+	app := fiber.New()
+	RegisterOptimizeRoutes(app)
+
+	images := []struct{ data []byte; filename string; contentType string }{
+		{loadTestFixture(t, "test-100x100.jpg"), "test1.jpg", "image/jpeg"},
+		{loadTestFixture(t, "test-200x150.png"), "test2.png", "image/png"},
+	}
+
+	req, _ := createBatchMultipartRequest(t, images)
+	req.URL.RawQuery = "format=webp&quality=85"
+
+	resp, err := app.Test(req, -1)
+	if err != nil {
+		t.Fatalf("Failed to send request: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		t.Fatalf("Expected status 200, got %d. Body: %s", resp.StatusCode, string(body))
+	}
+}
+
+func TestBatchOptimizeEndpoint_NoImages(t *testing.T) {
+	app := fiber.New()
+	RegisterOptimizeRoutes(app)
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	writer.Close()
+
+	req := httptest.NewRequest("POST", "/batch-optimize", body)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("Failed to send request: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Errorf("Expected status 400, got %d", resp.StatusCode)
+	}
+}
+
+func TestBatchOptimizeEndpoint_InvalidQuality(t *testing.T) {
+	app := fiber.New()
+	RegisterOptimizeRoutes(app)
+
+	images := []struct{ data []byte; filename string; contentType string }{
+		{loadTestFixture(t, "test-100x100.jpg"), "test1.jpg", "image/jpeg"},
+	}
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	for _, img := range images {
+		h := make(map[string][]string)
+		h["Content-Disposition"] = []string{`form-data; name="images"; filename="` + img.filename + `"`}
+		h["Content-Type"] = []string{img.contentType}
+
+		part, _ := writer.CreatePart(h)
+		part.Write(img.data)
+	}
+	writer.Close()
+
+	req := httptest.NewRequest("POST", "/batch-optimize?quality=150", body) // Invalid quality > 100
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	resp, err := app.Test(req, -1)
+	if err != nil {
+		t.Fatalf("Failed to send request: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Errorf("Expected status 400, got %d", resp.StatusCode)
+	}
+}
+
+func TestBatchOptimizeEndpoint_MixedResults(t *testing.T) {
+	app := fiber.New()
+	RegisterOptimizeRoutes(app)
+
+	// Mix of valid and invalid files
+	images := []struct{ data []byte; filename string; contentType string }{
+		{loadTestFixture(t, "test-100x100.jpg"), "test1.jpg", "image/jpeg"},
+		{[]byte("invalid image data"), "test2.jpg", "image/jpeg"}, // Invalid image
+		{loadTestFixture(t, "test-200x150.png"), "test3.png", "image/png"},
+	}
+
+	req, _ := createBatchMultipartRequest(t, images)
+
+	resp, err := app.Test(req, -1)
+	if err != nil {
+		t.Fatalf("Failed to send request: %v", err)
+	}
+
+	// Should still return 200 even with some failures
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		t.Fatalf("Expected status 200, got %d. Body: %s", resp.StatusCode, string(body))
+	}
+}

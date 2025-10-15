@@ -15,6 +15,7 @@ An API-first image optimization service built with Go and Fiber. Designed for lo
 - **Image Optimization**: Resize, convert, and compress images
 - **Modern Format Support**: AVIF, WebP, JPEG, PNG, and GIF with format-specific controls
 - **Advanced Compression Options**: JPEG progressive encoding, PNG compression levels, WebP lossless, and more
+- **Batch Processing**: Optimize multiple images in a single API request
 - **Interactive Before/After Comparison**: Visual slider to compare original vs optimized images
 - **Privacy First**: No server storage, in-memory processing only, zero tracking
 - **RESTful API**: Clean HTTP endpoints for easy integration
@@ -410,6 +411,94 @@ curl -X POST "http://localhost:8080/optimize?format=avif&quality=80" \
 **Response (when returnImage=true):**
 Returns the optimized image file with appropriate `Content-Type` header (e.g., `image/webp`, `image/jpeg`, etc.) and `Content-Disposition: inline` header.
 
+### Batch Optimize Images
+
+```bash
+POST /batch-optimize?quality={1-100}&width={pixels}&height={pixels}&format={jpeg|png|webp|avif|gif}
+Content-Type: multipart/form-data
+```
+
+Optimize multiple images in a single request with the same settings. This endpoint is ideal for bulk processing workflows.
+
+**Form Parameters:**
+- `images` (files): Multiple image files to optimize (use the same field name for all files)
+
+**Query Parameters:**
+Same as the `/optimize` endpoint - all query parameters apply to every image in the batch.
+
+**Examples:**
+
+**1. Basic batch optimization:**
+```bash
+curl -X POST "http://localhost:8080/batch-optimize" \
+  -F "images=@photo1.jpg" \
+  -F "images=@photo2.png" \
+  -F "images=@photo3.webp"
+```
+
+**2. Batch convert to WebP with custom quality:**
+```bash
+curl -X POST "http://localhost:8080/batch-optimize?format=webp&quality=85" \
+  -F "images=@photo1.jpg" \
+  -F "images=@photo2.png" \
+  -F "images=@photo3.jpg"
+```
+
+**3. Batch resize and optimize:**
+```bash
+curl -X POST "http://localhost:8080/batch-optimize?width=800&height=600&quality=90" \
+  -F "images=@image1.jpg" \
+  -F "images=@image2.jpg"
+```
+
+**Response:**
+```json
+{
+  "results": [
+    {
+      "filename": "photo1.jpg",
+      "success": true,
+      "originalSize": 1024000,
+      "optimizedSize": 665600,
+      "format": "webp",
+      "width": 1920,
+      "height": 1080,
+      "savings": "35.00%"
+    },
+    {
+      "filename": "photo2.png",
+      "success": true,
+      "originalSize": 512000,
+      "optimizedSize": 384000,
+      "format": "webp",
+      "width": 1280,
+      "height": 720,
+      "savings": "25.00%"
+    },
+    {
+      "filename": "photo3.webp",
+      "success": false,
+      "error": "Invalid file type. Supported types: jpeg, jpg, png, webp, gif, avif"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "successful": 2,
+    "failed": 1,
+    "totalOriginalSize": 1536000,
+    "totalOptimizedSize": 1049600,
+    "totalSavings": "31.67%",
+    "processingTime": "156ms"
+  }
+}
+```
+
+**Key Features:**
+- **Graceful Failure Handling**: Individual image failures don't stop the batch
+- **Detailed Results**: Each image gets its own result object with success/failure status
+- **Summary Statistics**: Aggregate metrics for the entire batch
+- **Same Parameters**: All images processed with the same quality, format, and dimension settings
+
 ### API Key Management
 
 All API key management endpoints require authentication (except the initial key creation for bootstrapping).
@@ -591,7 +680,7 @@ go test -v ./routes/
 **Current Test Coverage:**
 - **Services**: 84.4% coverage
 - **Routes**: 69.8% coverage
-- **Total Tests**: 23 tests passing
+- **Total Tests**: 28 tests passing
 
 **Test Structure:**
 ```
@@ -628,7 +717,7 @@ View the workflow at `.github/workflows/test.yml`
 - [x] Add support for format conversion (JPEG, PNG, WebP, AVIF, GIF)
 - [x] Implement URL-based image fetching with security controls
 - [x] Return optimized image file (not just metadata)
-- [ ] Add batch processing endpoint
+- [x] Add batch processing endpoint
 
 ### Phase 3: CLI & Tools ✅ COMPLETED
 - [x] Build CLI client (`imgopt`) for local image optimization

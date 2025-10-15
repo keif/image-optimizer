@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -71,6 +72,7 @@ func RegisterOptimizeRoutes(app *fiber.App) {
 	InitializeConfig()
 
 	app.Post("/optimize", handleOptimize)
+	app.Post("/batch-optimize", handleBatchOptimize)
 }
 
 // handleOptimize handles POST /optimize requests
@@ -381,4 +383,299 @@ func handleOptimize(c *fiber.Ctx) error {
 
 	// Return JSON metadata
 	return c.JSON(result)
+}
+
+// BatchImageResult represents the result of optimizing a single image in a batch
+type BatchImageResult struct {
+	Filename      string `json:"filename"`
+	Success       bool   `json:"success"`
+	Error         string `json:"error,omitempty"`
+	OriginalSize  int64  `json:"originalSize,omitempty"`
+	OptimizedSize int64  `json:"optimizedSize,omitempty"`
+	Format        string `json:"format,omitempty"`
+	Width         int    `json:"width,omitempty"`
+	Height        int    `json:"height,omitempty"`
+	Savings       string `json:"savings,omitempty"`
+}
+
+// BatchOptimizeResponse represents the complete batch optimization response
+type BatchOptimizeResponse struct {
+	Results []BatchImageResult `json:"results"`
+	Summary struct {
+		Total             int    `json:"total"`
+		Successful        int    `json:"successful"`
+		Failed            int    `json:"failed"`
+		TotalOriginalSize int64  `json:"totalOriginalSize"`
+		TotalOptimizedSize int64  `json:"totalOptimizedSize"`
+		TotalSavings      string `json:"totalSavings"`
+		ProcessingTime    string `json:"processingTime"`
+	} `json:"summary"`
+}
+
+// handleBatchOptimize handles POST /batch-optimize requests
+// @Summary Optimize multiple images in a single request
+// @Description Optimize multiple image files with the same quality, dimensions, and format settings
+// @Tags optimization
+// @Accept multipart/form-data
+// @Produce json
+// @Param quality query int false "Quality level (1-100)" default(80) minimum(1) maximum(100)
+// @Param width query int false "Target width in pixels (0 = no resize)" default(0) minimum(0)
+// @Param height query int false "Target height in pixels (0 = no resize)" default(0) minimum(0)
+// @Param format query string false "Target format" Enums(jpeg,png,webp,gif,avif)
+// @Param images formData file true "Image files to optimize (multiple files)"
+// @Success 200 {object} BatchOptimizeResponse "Batch optimization results"
+// @Failure 400 {object} map[string]string "Invalid parameters or no files provided"
+// @Failure 500 {object} map[string]string "Batch processing error"
+// @Router /batch-optimize [post]
+func handleBatchOptimize(c *fiber.Ctx) error {
+	startTime := time.Now()
+
+	// Parse optimization options from query parameters (same as single optimize)
+	options := services.OptimizeOptions{
+		Quality: 80, // Default quality
+	}
+
+	// Parse quality
+	if qualityStr := c.Query("quality"); qualityStr != "" {
+		quality, err := strconv.Atoi(qualityStr)
+		if err != nil || quality < 1 || quality > 100 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid quality parameter. Must be between 1 and 100.",
+			})
+		}
+		options.Quality = quality
+	}
+
+	// Parse width
+	if widthStr := c.Query("width"); widthStr != "" {
+		width, err := strconv.Atoi(widthStr)
+		if err != nil || width < 0 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid width parameter. Must be a positive integer.",
+			})
+		}
+		options.Width = width
+	}
+
+	// Parse height
+	if heightStr := c.Query("height"); heightStr != "" {
+		height, err := strconv.Atoi(heightStr)
+		if err != nil || height < 0 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid height parameter. Must be a positive integer.",
+			})
+		}
+		options.Height = height
+	}
+
+	// Parse format
+	if formatStr := c.Query("format"); formatStr != "" {
+		formatStr = strings.ToLower(formatStr)
+		switch formatStr {
+		case "jpeg", "jpg":
+			options.Format = bimg.JPEG
+		case "png":
+			options.Format = bimg.PNG
+		case "webp":
+			options.Format = bimg.WEBP
+		case "gif":
+			options.Format = bimg.GIF
+		case "avif":
+			options.Format = bimg.AVIF
+		default:
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid format parameter. Supported formats: jpeg, png, webp, gif, avif",
+			})
+		}
+	}
+
+	// Parse advanced options (same as single optimize)
+	options.ForceSRGB = c.QueryBool("forceSRGB", false)
+	options.Progressive = c.QueryBool("progressive", false)
+	options.OptimizeCoding = c.QueryBool("optimizeCoding", false)
+
+	if subsampleStr := c.Query("subsample"); subsampleStr != "" {
+		subsample, err := strconv.Atoi(subsampleStr)
+		if err != nil || subsample < 0 || subsample > 3 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid subsample parameter. Must be between 0 and 3.",
+			})
+		}
+		options.Subsample = subsample
+	}
+
+	if smoothStr := c.Query("smooth"); smoothStr != "" {
+		smooth, err := strconv.Atoi(smoothStr)
+		if err != nil || smooth < 0 || smooth > 100 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid smooth parameter. Must be between 0 and 100.",
+			})
+		}
+		options.Smooth = smooth
+	}
+
+	if compressionStr := c.Query("compression"); compressionStr != "" {
+		compression, err := strconv.Atoi(compressionStr)
+		if err != nil || compression < 0 || compression > 9 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid compression parameter. Must be between 0 and 9.",
+			})
+		}
+		options.Compression = compression
+	}
+
+	options.Interlace = c.QueryBool("interlace", false)
+	options.Palette = c.QueryBool("palette", false)
+	options.Lossless = c.QueryBool("lossless", false)
+
+	if effortStr := c.Query("effort"); effortStr != "" {
+		effort, err := strconv.Atoi(effortStr)
+		if err != nil || effort < 0 || effort > 6 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid effort parameter. Must be between 0 and 6.",
+			})
+		}
+		options.Effort = effort
+	}
+
+	if webpMethodStr := c.Query("webpMethod"); webpMethodStr != "" {
+		webpMethod, err := strconv.Atoi(webpMethodStr)
+		if err != nil || webpMethod < 0 || webpMethod > 6 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid webpMethod parameter. Must be between 0 and 6.",
+			})
+		}
+		options.WebpMethod = webpMethod
+	}
+
+	if oxipngLevelStr := c.Query("oxipngLevel"); oxipngLevelStr != "" {
+		oxipngLevel, err := strconv.Atoi(oxipngLevelStr)
+		if err != nil || oxipngLevel < 0 || oxipngLevel > 6 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid oxipngLevel parameter. Must be between 0 and 6.",
+			})
+		}
+		options.OxipngLevel = oxipngLevel
+	}
+
+	// Get multipart form
+	form, err := c.MultipartForm()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Failed to parse multipart form.",
+		})
+	}
+
+	// Get all uploaded files
+	files := form.File["images"]
+	if len(files) == 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "No images provided. Use 'images' field name for file uploads.",
+		})
+	}
+
+	// Initialize response
+	response := BatchOptimizeResponse{
+		Results: make([]BatchImageResult, 0, len(files)),
+	}
+
+	var totalOriginalSize int64
+	var totalOptimizedSize int64
+
+	// Process each file
+	for _, file := range files {
+		result := BatchImageResult{
+			Filename: file.Filename,
+		}
+
+		// Validate file type
+		contentType := file.Header.Get("Content-Type")
+		validTypes := map[string]bool{
+			"image/jpeg": true,
+			"image/jpg":  true,
+			"image/png":  true,
+			"image/webp": true,
+			"image/gif":  true,
+			"image/avif": true,
+		}
+
+		if !validTypes[contentType] {
+			result.Success = false
+			result.Error = "Invalid file type. Supported types: jpeg, jpg, png, webp, gif, avif"
+			response.Results = append(response.Results, result)
+			response.Summary.Failed++
+			continue
+		}
+
+		// Read file contents
+		f, err := file.Open()
+		if err != nil {
+			result.Success = false
+			result.Error = "Failed to open file"
+			response.Results = append(response.Results, result)
+			response.Summary.Failed++
+			continue
+		}
+
+		imgData, err := io.ReadAll(io.LimitReader(f, maxImageSize))
+		f.Close()
+
+		if err != nil {
+			result.Success = false
+			result.Error = "Failed to read file"
+			response.Results = append(response.Results, result)
+			response.Summary.Failed++
+			continue
+		}
+
+		// Check size limit
+		if len(imgData) >= int(maxImageSize) {
+			result.Success = false
+			result.Error = "File exceeds maximum size of 10MB"
+			response.Results = append(response.Results, result)
+			response.Summary.Failed++
+			continue
+		}
+
+		// Process the image
+		optimizeResult, err := services.OptimizeImage(imgData, options)
+		if err != nil {
+			result.Success = false
+			result.Error = "Failed to process image: " + err.Error()
+			response.Results = append(response.Results, result)
+			response.Summary.Failed++
+			continue
+		}
+
+		// Success - populate result
+		result.Success = true
+		result.OriginalSize = optimizeResult.OriginalSize
+		result.OptimizedSize = optimizeResult.OptimizedSize
+		result.Format = optimizeResult.Format
+		result.Width = optimizeResult.Width
+		result.Height = optimizeResult.Height
+		result.Savings = optimizeResult.Savings
+
+		totalOriginalSize += optimizeResult.OriginalSize
+		totalOptimizedSize += optimizeResult.OptimizedSize
+
+		response.Results = append(response.Results, result)
+		response.Summary.Successful++
+	}
+
+	// Calculate summary statistics
+	response.Summary.Total = len(files)
+	response.Summary.TotalOriginalSize = totalOriginalSize
+	response.Summary.TotalOptimizedSize = totalOptimizedSize
+
+	if totalOriginalSize > 0 {
+		totalSavingsPercent := float64(totalOriginalSize-totalOptimizedSize) / float64(totalOriginalSize) * 100
+		response.Summary.TotalSavings = fmt.Sprintf("%.2f%%", totalSavingsPercent)
+	} else {
+		response.Summary.TotalSavings = "0.00%"
+	}
+
+	response.Summary.ProcessingTime = fmt.Sprintf("%dms", time.Since(startTime).Milliseconds())
+
+	return c.JSON(response)
 }
