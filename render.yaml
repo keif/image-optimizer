@@ -31,4 +31,4 @@ services:
 
   # Web Service (Next.js) - Now deployed to GitHub Pages
   # See .github/workflows/deploy-pages.yml for deployment configuration
-  # Live at: https://keif.github.io/image-optimizer
+  # Live at: https://squish.baker.is
