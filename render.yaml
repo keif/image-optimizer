@@ -9,10 +9,7 @@ services:
       - key: PORT
         value: 8080
       - key: CORS_ORIGINS
-        fromService:
-          type: web
-          name: image-optimizer-web
-          property: url
+        value: https://keif.github.io,https://squish.baker.is,https://image-optimizer.baker.is,http://localhost:3000
       - key: DB_PATH
         value: /opt/render/project/data/api_keys.db
       - key: RATE_LIMIT_ENABLED
@@ -32,15 +29,6 @@ services:
       sizeGB: 1
     plan: starter
 
-  # Web Service (Next.js)
-  - type: web
-    name: image-optimizer-web
-    runtime: docker
-    dockerfilePath: ./web/Dockerfile
-    dockerContext: ./web
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: NEXT_PUBLIC_API_URL
-        value: https://image-optimizer-1t9i.onrender.com
-    plan: starter
+  # Web Service (Next.js) - Now deployed to GitHub Pages
+  # See .github/workflows/deploy-pages.yml for deployment configuration
+  # Live at: https://keif.github.io/image-optimizer
