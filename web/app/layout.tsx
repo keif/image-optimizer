@@ -50,6 +50,17 @@ export default function RootLayout({
           <SupportBanner />
         </div>
         <Script
+          id="goatcounter-config"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.goatcounter = {
+                path: function(p) { return 'squish.baker.is' + p }
+              };
+            `
+          }}
+        />
+        <Script
           data-goatcounter="https://baker.goatcounter.com/count"
           async
           src="//gc.zgo.at/count.js"
