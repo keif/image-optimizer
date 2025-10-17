@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { Shield, Lock, Trash2, Clock, AlertCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - Image Optimizer",
-  description: "Learn how Image Optimizer protects your privacy - no storage, no tracking, images processed in memory only",
+  title: "Privacy Policy - Squish",
+  description: "Learn how Squish protects your privacy - no storage, no tracking, images processed in memory only",
 };
 
 export default function PrivacyPage() {
@@ -93,7 +93,7 @@ export default function PrivacyPage() {
           </h2>
           <div className="space-y-4 text-gray-700 dark:text-gray-300">
             <p>
-              Image Optimizer is designed with privacy as a core principle. Here's exactly what
+              Squish is designed with privacy as a core principle. Here's exactly what
               happens when you use our service:
             </p>
             <ol className="list-decimal list-inside space-y-2 ml-4">

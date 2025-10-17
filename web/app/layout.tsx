@@ -5,7 +5,7 @@ import "./globals.css";
 import SupportBanner from "@/components/SupportBanner";
 
 export const metadata: Metadata = {
-  title: "Image Optimizer - Compress & Convert Images",
+  title: "Squish - Image Optimizer",
   description: "High-performance image optimization with format conversion, resizing, and quality control",
 };
 
@@ -22,9 +22,14 @@ export default function RootLayout({
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between h-16 items-center">
                 <div className="flex items-center">
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    Image Optimizer
-                  </h1>
+                  <Link href="/" className="flex items-baseline gap-2 group">
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      Squish
+                    </h1>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                      Image Optimizer
+                    </span>
+                  </Link>
                 </div>
                 <div className="flex items-center gap-4">
                   <Link
