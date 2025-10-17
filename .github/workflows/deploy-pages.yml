@@ -58,7 +58,7 @@ jobs:
       - name: Build Next.js app
         working-directory: ./web
         env:
-          NEXT_PUBLIC_API_URL: https://image-optimizer-1t9i.onrender.com
+          NEXT_PUBLIC_API_URL: https://squish-api.baker.is
         run: pnpm run build
 
       - name: Upload artifact

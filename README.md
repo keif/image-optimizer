@@ -6,9 +6,9 @@ An API-first image optimization service built with Go and Fiber. Designed for lo
 
 **Try it now:** [https://squish.baker.is](https://squish.baker.is)
 
-**API Endpoint:** `https://image-optimizer-1t9i.onrender.com`
-- [Health Check](https://image-optimizer-1t9i.onrender.com/health)
-- [API Documentation](https://image-optimizer-1t9i.onrender.com/swagger/index.html)
+**API Endpoint:** `https://squish-api.baker.is`
+- [Health Check](https://squish-api.baker.is/health)
+- [API Documentation](https://squish-api.baker.is/swagger/index.html)
 
 ## Features
 

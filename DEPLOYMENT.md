@@ -42,7 +42,7 @@ TTL: 3600 (or Auto)
 
 ### Backend API: Render.com
 
-The API is hosted at: `https://image-optimizer-1t9i.onrender.com`
+The API is hosted at: `https://squish-api.baker.is`
 
 **CORS is configured to allow:**
 - `https://keif.github.io` (GitHub Pages default)
@@ -64,7 +64,7 @@ Automatic deployment via GitHub Actions (`.github/workflows/deploy-pages.yml`):
 **Manual deployment:**
 ```bash
 cd web
-NEXT_PUBLIC_API_URL=https://image-optimizer-1t9i.onrender.com pnpm run build
+NEXT_PUBLIC_API_URL=https://squish-api.baker.is pnpm run build
 # Output in: web/out/
 ```
 
@@ -88,7 +88,7 @@ Set in workflow file (`.github/workflows/deploy-pages.yml`):
 
 ```yaml
 env:
-  NEXT_PUBLIC_API_URL: https://image-optimizer-1t9i.onrender.com
+  NEXT_PUBLIC_API_URL: https://squish-api.baker.is
 ```
 
 ### Backend (Render.com)
@@ -130,7 +130,7 @@ curl -I https://squish.baker.is
 
 ### Test Backend
 ```bash
-curl https://image-optimizer-1t9i.onrender.com/health
+curl https://squish-api.baker.is/health
 # Should return: {"status":"ok"}
 ```
 
@@ -139,7 +139,7 @@ curl https://image-optimizer-1t9i.onrender.com/health
 curl -H "Origin: https://squish.baker.is" \
      -H "Access-Control-Request-Method: POST" \
      -X OPTIONS \
-     https://image-optimizer-1t9i.onrender.com/optimize
+     https://squish-api.baker.is/optimize
 # Should include: Access-Control-Allow-Origin header
 ```
 
