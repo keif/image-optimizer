@@ -1,0 +1,23 @@
+# Image Optimizer CLI Configuration File
+# Copy this file to .imgoptrc in your project directory or ~/.imgoptrc for global settings
+# CLI flags override these settings
+
+# Quality level from 1-100 (default: 80)
+# Higher values = better quality, larger file size
+quality: 80
+
+# Target dimensions in pixels (0 = no resize)
+width: 0
+height: 0
+
+# Output format (jpeg, png, webp, avif, gif)
+# Leave empty to keep original format
+format: ""
+
+# Output directory for optimized images
+# Leave empty to save in same directory as input
+output: ""
+
+# API endpoint URL
+# Default: http://localhost:8080/optimize
+api: "http://localhost:8080/optimize"

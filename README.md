@@ -200,8 +200,30 @@ imgopt [options] <file1> [file2] [file3] ...
 - `-format <string>`: Output format (jpeg, png, webp, avif, gif)
 - `-output <path>`: Output directory (default: same as input)
 - `-api <url>`: API endpoint URL (default: http://localhost:8080/optimize)
+- `-config <path>`: Path to config file (default: .imgoptrc or ~/.imgoptrc)
 - `-v, -version`: Show version information
 - `-h, -help`: Show help message
+
+### Configuration File
+
+Create a `.imgoptrc` file (YAML format) to set default values and reduce repetitive CLI flags:
+
+**Search Order:**
+1. Project directory (`./.imgoptrc`)
+2. Home directory (`~/.imgoptrc`)
+3. Custom path (via `-config` flag)
+
+**Precedence:** Defaults < Config File < CLI Flags
+
+**Example `.imgoptrc`:**
+```yaml
+quality: 85
+format: "webp"
+output: "optimized/"
+api: "http://localhost:8080/optimize"
+```
+
+See [`cli/.imgoptrc.example`](cli/.imgoptrc.example) for a complete configuration template.
 
 **Examples:**
 
@@ -223,6 +245,9 @@ imgopt -output=optimized/ photo1.jpg photo2.png photo3.gif
 
 # Resize all images in a directory
 imgopt -width=1920 -quality=85 ~/Photos/*.jpg
+
+# Use custom config file
+imgopt -config=project.imgoptrc *.jpg
 ```
 
 **Output:**
@@ -728,7 +753,7 @@ View the workflow at `.github/workflows/test.yml`
 ### Phase 3: CLI & Tools ✅ COMPLETED
 - [x] Build CLI client (`imgopt`) for local image optimization
 - [x] Implement progress tracking for batch operations
-- [ ] Add configuration file support (.imgoptrc)
+- [x] Add configuration file support (.imgoptrc)
 
 ### Phase 4: Testing & Quality ✅ COMPLETED
 - [x] Unit tests for image service (84.4% coverage)

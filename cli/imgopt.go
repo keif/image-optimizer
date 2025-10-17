@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -27,9 +29,20 @@ type Config struct {
 	Format       string
 	Output       string
 	APIEndpoint  string
+	ConfigPath   string
 	ShowVersion  bool
 	ShowHelp     bool
 	Files        []string
+}
+
+// FileConfig represents the structure of .imgoptrc config file
+type FileConfig struct {
+	Quality int    `yaml:"quality"`
+	Width   int    `yaml:"width"`
+	Height  int    `yaml:"height"`
+	Format  string `yaml:"format"`
+	Output  string `yaml:"output"`
+	API     string `yaml:"api"`
 }
 
 // OptimizeResult represents the optimization statistics
@@ -101,14 +114,70 @@ func main() {
 	printSummary(results)
 }
 
-// parseFlags parses command-line flags and returns configuration
-func parseFlags() Config {
-	config := Config{}
+// findConfigFile searches for config file in the following order:
+// 1. Custom path (if provided via -config flag)
+// 2. Current directory (.imgoptrc)
+// 3. User home directory (~/.imgoptrc)
+func findConfigFile(customPath string) string {
+	// If custom path is provided, use it
+	if customPath != "" {
+		if _, err := os.Stat(customPath); err == nil {
+			return customPath
+		}
+		return ""
+	}
 
+	// Check current directory
+	if _, err := os.Stat(".imgoptrc"); err == nil {
+		return ".imgoptrc"
+	}
+
+	// Check home directory
+	if homeDir, err := os.UserHomeDir(); err == nil {
+		homeConfig := filepath.Join(homeDir, ".imgoptrc")
+		if _, err := os.Stat(homeConfig); err == nil {
+			return homeConfig
+		}
+	}
+
+	return ""
+}
+
+// loadConfigFile loads and parses a config file
+func loadConfigFile(path string) (*FileConfig, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var config FileConfig
+	if err := yaml.Unmarshal(data, &config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+// parseFlags parses command-line flags and returns configuration
+// Config precedence: defaults < config file < CLI flags
+func parseFlags() Config {
+	// Set up defaults
+	config := Config{
+		Quality:     defaultQuality,
+		Width:       0,
+		Height:      0,
+		Format:      "",
+		Output:      "",
+		APIEndpoint: apiURL,
+	}
+
+	// Define flags first (needed for -config flag)
+	var configPath string
+	flag.StringVar(&configPath, "config", "", "Path to config file (default: .imgoptrc or ~/.imgoptrc)")
 	flag.IntVar(&config.Quality, "quality", defaultQuality, "Quality level (1-100)")
 	flag.IntVar(&config.Width, "width", 0, "Target width in pixels (0 = no resize)")
 	flag.IntVar(&config.Height, "height", 0, "Target height in pixels (0 = no resize)")
-	flag.StringVar(&config.Format, "format", "", "Output format (jpeg, png, webp, gif)")
+	flag.StringVar(&config.Format, "format", "", "Output format (jpeg, png, webp, avif, gif)")
 	flag.StringVar(&config.Output, "output", "", "Output directory (default: same as input)")
 	flag.StringVar(&config.APIEndpoint, "api", apiURL, "API endpoint URL")
 	flag.BoolVar(&config.ShowVersion, "version", false, "Show version information")
@@ -117,6 +186,62 @@ func parseFlags() Config {
 	flag.BoolVar(&config.ShowHelp, "h", false, "Show help message (shorthand)")
 
 	flag.Parse()
+
+	// Store config path
+	config.ConfigPath = configPath
+
+	// Load config file if it exists (before applying CLI flags)
+	configFile := findConfigFile(configPath)
+	if configFile != "" {
+		if fileConfig, err := loadConfigFile(configFile); err == nil {
+			// Apply config file values (only if not zero/empty)
+			if fileConfig.Quality > 0 {
+				config.Quality = fileConfig.Quality
+			}
+			if fileConfig.Width > 0 {
+				config.Width = fileConfig.Width
+			}
+			if fileConfig.Height > 0 {
+				config.Height = fileConfig.Height
+			}
+			if fileConfig.Format != "" {
+				config.Format = fileConfig.Format
+			}
+			if fileConfig.Output != "" {
+				config.Output = fileConfig.Output
+			}
+			if fileConfig.API != "" {
+				config.APIEndpoint = fileConfig.API
+			}
+		}
+	}
+
+	// CLI flags override config file values
+	// We need to check which flags were actually set by the user
+	flagsSet := make(map[string]bool)
+	flag.Visit(func(f *flag.Flag) {
+		flagsSet[f.Name] = true
+	})
+
+	// Re-apply only explicitly set flags
+	if flagsSet["quality"] {
+		flag.Lookup("quality").Value.Set(flag.Lookup("quality").Value.String())
+	}
+	if flagsSet["width"] {
+		flag.Lookup("width").Value.Set(flag.Lookup("width").Value.String())
+	}
+	if flagsSet["height"] {
+		flag.Lookup("height").Value.Set(flag.Lookup("height").Value.String())
+	}
+	if flagsSet["format"] {
+		flag.Lookup("format").Value.Set(flag.Lookup("format").Value.String())
+	}
+	if flagsSet["output"] {
+		flag.Lookup("output").Value.Set(flag.Lookup("output").Value.String())
+	}
+	if flagsSet["api"] {
+		flag.Lookup("api").Value.Set(flag.Lookup("api").Value.String())
+	}
 
 	// Remaining arguments are files
 	config.Files = flag.Args()
@@ -131,11 +256,17 @@ func printUsage() {
 	fmt.Println("Usage: imgopt [options] <file1> [file2] [file3] ...")
 	fmt.Println("\nOptions:")
 	flag.PrintDefaults()
+	fmt.Println("\nConfiguration File:")
+	fmt.Println("  Create a .imgoptrc file to set default values (YAML format)")
+	fmt.Println("  Search order: ./.imgoptrc → ~/.imgoptrc")
+	fmt.Println("  CLI flags override config file values")
+	fmt.Println("  See .imgoptrc.example for configuration options")
 	fmt.Println("\nExamples:")
 	fmt.Println("  imgopt photo.jpg")
 	fmt.Println("  imgopt -quality=90 -format=webp photo.jpg")
 	fmt.Println("  imgopt -width=800 -height=600 *.jpg")
 	fmt.Println("  imgopt -output=optimized/ photo1.jpg photo2.png")
+	fmt.Println("  imgopt -config=custom.imgoptrc photo.jpg")
 }
 
 // checkAPIAvailability checks if the API is reachable
