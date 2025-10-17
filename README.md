@@ -587,9 +587,12 @@ curl -X POST "http://localhost:8080/optimize?format=webp" \
 ```
 
 **Bypassed Endpoints** (no API key required):
-- `/health` - Health check
-- `/swagger/*` - API documentation
-- `/api/keys` - API key creation (for bootstrapping)
+- `/health` - Health check (all methods)
+- `/swagger/*` - API documentation (all methods)
+- `/optimize` - Image optimization (all methods, for public web UI access)
+- `/batch-optimize` - Batch optimization (all methods, for public web UI access)
+- `POST /api/keys` - API key creation only (for bootstrapping)
+  - **Note**: `GET /api/keys` (list) and `DELETE /api/keys/:id` (revoke) require authentication
 
 ## Configuration
 
@@ -680,11 +683,14 @@ go test -v ./routes/
 **Current Test Coverage:**
 - **Services**: 84.4% coverage
 - **Routes**: 69.8% coverage
-- **Total Tests**: 28 tests passing
+- **Middleware**: Security and auth testing
+- **Total Tests**: 35 tests passing
 
 **Test Structure:**
 ```
 api/
+├── middleware/
+│   └── api_key_test.go           # Security and auth middleware tests
 ├── services/
 │   └── image_service_test.go    # Unit tests for image processing
 ├── routes/
@@ -815,6 +821,7 @@ The API includes comprehensive security controls to protect against abuse and un
    - SQLite-backed key storage with secure random generation
    - Bearer token support in Authorization header
    - Revocable keys with audit trail (created_at, revoked_at)
+   - Method-specific bypass rules (only POST /api/keys allows bootstrap, GET/DELETE require auth)
    - Configurable via `API_KEY_AUTH_ENABLED` environment variable
 
 2. **Rate Limiting** ✅

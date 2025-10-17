@@ -9,21 +9,28 @@ import (
 	"github.com/keif/image-optimizer/db"
 )
 
+// BypassRule defines a path and optional HTTP method that bypasses authentication
+type BypassRule struct {
+	Path   string // Path prefix to match
+	Method string // HTTP method to match (empty = all methods)
+}
+
 // APIKeyConfig holds API key authentication configuration
 type APIKeyConfig struct {
-	Enabled       bool     // Whether API key authentication is enabled
-	BypassPaths   []string // Paths that bypass API key authentication
+	Enabled      bool          // Whether API key authentication is enabled
+	BypassRules  []BypassRule  // Rules that bypass API key authentication
 }
 
 // GetAPIKeyConfig loads API key config from environment variables
 func GetAPIKeyConfig() APIKeyConfig {
 	config := APIKeyConfig{
 		Enabled: true, // Default: enabled
-		BypassPaths: []string{
-			"/health",
-			"/swagger",
-			"/api/keys", // Allow API key creation without auth (bootstrap)
-			"/optimize",  // Allow public image optimization via web UI
+		BypassRules: []BypassRule{
+			{Path: "/health", Method: ""},           // Allow all methods
+			{Path: "/swagger", Method: ""},          // Allow all methods
+			{Path: "/api/keys", Method: "POST"},     // Only allow POST for bootstrap (create keys)
+			{Path: "/optimize", Method: ""},         // Allow public image optimization via web UI
+			{Path: "/batch-optimize", Method: ""},   // Allow public batch optimization via web UI
 		},
 	}
 
@@ -47,11 +54,16 @@ func RequireAPIKey() fiber.Handler {
 			return c.Next()
 		}
 
-		// Check if path is in bypass list
+		// Check if path and method match a bypass rule
 		path := c.Path()
-		for _, bypassPath := range config.BypassPaths {
-			if strings.HasPrefix(path, bypassPath) {
-				return c.Next()
+		method := c.Method()
+		for _, rule := range config.BypassRules {
+			// Check if path matches
+			if strings.HasPrefix(path, rule.Path) {
+				// If rule has no method specified, or method matches, bypass auth
+				if rule.Method == "" || rule.Method == method {
+					return c.Next()
+				}
 			}
 		}
 
