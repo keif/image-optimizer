@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import Link from "next/link";
 import "./globals.css";
 import SupportBanner from "@/components/SupportBanner";
 
@@ -26,6 +27,12 @@ export default function RootLayout({
                   </h1>
                 </div>
                 <div className="flex items-center gap-4">
+                  <Link
+                    href="/privacy"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                  >
+                    Privacy
+                  </Link>
                   <a
                     href="https://github.com/keif/image-optimizer"
                     target="_blank"
