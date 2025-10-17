@@ -45,6 +45,19 @@ func main() {
 	// Middleware
 	app.Use(logger.New())
 
+	// Security headers middleware
+	app.Use(func(c *fiber.Ctx) error {
+		c.Set("X-Content-Type-Options", "nosniff")
+		c.Set("X-Frame-Options", "DENY")
+		c.Set("X-XSS-Protection", "1; mode=block")
+		c.Set("Referrer-Policy", "strict-origin-when-cross-origin")
+		// Only set HSTS if running over HTTPS
+		if c.Protocol() == "https" {
+			c.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+		}
+		return c.Next()
+	})
+
 	// Configure CORS with environment variable support
 	allowedOrigins := os.Getenv("CORS_ORIGINS")
 	if allowedOrigins == "" {

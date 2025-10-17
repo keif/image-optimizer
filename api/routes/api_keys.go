@@ -1,11 +1,32 @@
 package routes
 
 import (
+	"os"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/keif/image-optimizer/db"
 )
+
+// isProductionEnv checks if we're running in production mode
+func isProductionEnv() bool {
+	env := os.Getenv("GO_ENV")
+	return env == "production" || env == "prod"
+}
+
+// apiErrorResponse creates an error response, optionally including details in development
+func apiErrorResponse(c *fiber.Ctx, status int, message string, err error) error {
+	response := fiber.Map{
+		"error": message,
+	}
+
+	// Only include error details in development mode
+	if !isProductionEnv() && err != nil {
+		response["details"] = err.Error()
+	}
+
+	return c.Status(status).JSON(response)
+}
 
 // RegisterAPIKeyRoutes registers the API key management routes
 func RegisterAPIKeyRoutes(app *fiber.App) {
@@ -49,10 +70,7 @@ func createAPIKey(c *fiber.Ctx) error {
 	// Create API key
 	apiKey, err := db.CreateAPIKey(req.Name)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to create API key",
-			"details": err.Error(),
-		})
+		return apiErrorResponse(c, fiber.StatusInternalServerError, "Failed to create API key", err)
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(apiKey)
@@ -70,10 +88,7 @@ func createAPIKey(c *fiber.Ctx) error {
 func listAPIKeys(c *fiber.Ctx) error {
 	keys, err := db.ListAPIKeys()
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to retrieve API keys",
-			"details": err.Error(),
-		})
+		return apiErrorResponse(c, fiber.StatusInternalServerError, "Failed to retrieve API keys", err)
 	}
 
 	return c.JSON(keys)
@@ -104,14 +119,9 @@ func revokeAPIKey(c *fiber.Ctx) error {
 	// Revoke API key
 	if err := db.RevokeAPIKey(id); err != nil {
 		if err.Error() == "API key not found or already revoked" {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"error": err.Error(),
-			})
+			return apiErrorResponse(c, fiber.StatusNotFound, "API key not found or already revoked", nil)
 		}
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Failed to revoke API key",
-			"details": err.Error(),
-		})
+		return apiErrorResponse(c, fiber.StatusInternalServerError, "Failed to revoke API key", err)
 	}
 
 	return c.JSON(fiber.Map{

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -22,32 +23,107 @@ const (
 	fetchTimeout = 10 * time.Second // 10 seconds
 )
 
+// isProduction checks if we're running in production mode
+func isProduction() bool {
+	env := os.Getenv("GO_ENV")
+	return env == "production" || env == "prod"
+}
+
+// errorResponse creates an error response, optionally including details in development
+func errorResponse(c *fiber.Ctx, status int, message string, err error) error {
+	response := fiber.Map{
+		"error": message,
+	}
+
+	// Only include error details in development mode
+	if !isProduction() && err != nil {
+		response["details"] = err.Error()
+	}
+
+	return c.Status(status).JSON(response)
+}
+
 // allowedDomains is a whitelist of domains allowed for URL-based image fetching
 // Can be configured via ALLOWED_DOMAINS env var (comma-separated list)
 // Default includes common image hosting/CDN services
+// Note: localhost/private IPs are blocked by SSRF protection regardless of whitelist
 var allowedDomains = []string{
 	"cloudinary.com",   // Cloudinary CDN
 	"imgur.com",        // Imgur image hosting
 	"unsplash.com",     // Unsplash stock photos
 	"pexels.com",       // Pexels stock photos
-	"localhost",        // Local development
-	"127.0.0.1",        // Local development
 }
 
 // InitializeConfig loads configuration from environment variables
 func InitializeConfig() {
 	// Load allowed domains from environment if set
-	if domainsEnv := os.Getenv("ALLOWED_DOMAINS"); domainsEnv != "" {
-		// Parse comma-separated list
-		domains := strings.Split(domainsEnv, ",")
-		allowedDomains = make([]string, 0, len(domains))
-		for _, domain := range domains {
-			domain = strings.TrimSpace(domain)
-			if domain != "" {
-				allowedDomains = append(allowedDomains, domain)
+	// Check if the env var is explicitly set (even if empty)
+	domainsEnv, isSet := os.LookupEnv("ALLOWED_DOMAINS")
+	if isSet {
+		if domainsEnv == "" {
+			// Empty string means allow all domains (no whitelist)
+			allowedDomains = []string{}
+		} else {
+			// Parse comma-separated list
+			domains := strings.Split(domainsEnv, ",")
+			allowedDomains = make([]string, 0, len(domains))
+			for _, domain := range domains {
+				domain = strings.TrimSpace(domain)
+				if domain != "" {
+					allowedDomains = append(allowedDomains, domain)
+				}
 			}
 		}
 	}
+}
+
+// isPrivateIP checks if an IP address is private, loopback, or a cloud metadata endpoint
+func isPrivateIP(host string) bool {
+	// Allow private IPs in test mode (for unit tests with localhost test servers)
+	if os.Getenv("ALLOW_PRIVATE_IPS") == "true" {
+		return false
+	}
+
+	// Try to parse as IP
+	ip := net.ParseIP(host)
+	if ip == nil {
+		// Not a direct IP, try to resolve the hostname
+		ips, err := net.LookupIP(host)
+		if err != nil || len(ips) == 0 {
+			// If we can't resolve, be conservative and block it
+			return true
+		}
+		ip = ips[0]
+	}
+
+	// Check for loopback (127.0.0.0/8, ::1)
+	if ip.IsLoopback() {
+		return true
+	}
+
+	// Check for private IP ranges (RFC 1918)
+	if ip.IsPrivate() {
+		return true
+	}
+
+	// Check for link-local (169.254.0.0/16)
+	if ip.IsLinkLocalUnicast() {
+		return true
+	}
+
+	// Block cloud metadata endpoints (AWS, GCP, Azure, etc.)
+	ipStr := ip.String()
+	cloudMetadata := []string{
+		"169.254.169.254", // AWS, Azure, GCP, OpenStack
+		"fd00:ec2::254",   // AWS IPv6
+	}
+	for _, metadata := range cloudMetadata {
+		if ipStr == metadata {
+			return true
+		}
+	}
+
+	return false
 }
 
 // isAllowedDomain checks whether the host is on the whitelist
@@ -58,6 +134,12 @@ func isAllowedDomain(u *url.URL) bool {
 	}
 
 	hostname := u.Hostname()
+
+	// Check for private/internal IPs (SSRF protection)
+	if isPrivateIP(hostname) {
+		return false
+	}
+
 	for _, domain := range allowedDomains {
 		if hostname == domain || strings.HasSuffix(hostname, "."+domain) {
 			return true
@@ -341,10 +423,7 @@ func handleOptimize(c *fiber.Ctx) error {
 	// Process the image
 	result, err := services.OptimizeImage(imgData, options)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error":   "Failed to process image",
-			"details": err.Error(),
-		})
+		return errorResponse(c, fiber.StatusInternalServerError, "Failed to process image", err)
 	}
 
 	// Return either the image file or JSON metadata

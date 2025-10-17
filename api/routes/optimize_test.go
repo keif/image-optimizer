@@ -287,6 +287,17 @@ func TestOptimizeEndpoint_InvalidFormat(t *testing.T) {
 }
 
 func TestOptimizeEndpoint_URLFetching(t *testing.T) {
+	// Set ALLOWED_DOMAINS to empty to disable domain whitelist for this test
+	// This allows the test to fetch from localhost test server
+	originalDomains := os.Getenv("ALLOWED_DOMAINS")
+	os.Setenv("ALLOWED_DOMAINS", "")
+	// Also set environment variable to allow private IPs in test mode
+	os.Setenv("ALLOW_PRIVATE_IPS", "true")
+	defer func() {
+		os.Setenv("ALLOWED_DOMAINS", originalDomains)
+		os.Unsetenv("ALLOW_PRIVATE_IPS")
+	}()
+
 	// Create a test HTTP server that serves an image
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		imageData := loadTestFixture(t, "test-100x100.jpg")
@@ -319,6 +330,11 @@ func TestOptimizeEndpoint_URLFetching(t *testing.T) {
 }
 
 func TestOptimizeEndpoint_InvalidURL(t *testing.T) {
+	// Set ALLOWED_DOMAINS to a specific whitelist to ensure this domain is blocked
+	originalDomains := os.Getenv("ALLOWED_DOMAINS")
+	os.Setenv("ALLOWED_DOMAINS", "cloudinary.com,imgur.com")
+	defer os.Setenv("ALLOWED_DOMAINS", originalDomains)
+
 	app := fiber.New()
 	RegisterOptimizeRoutes(app)
 
