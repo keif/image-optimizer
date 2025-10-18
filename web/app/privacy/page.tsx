@@ -93,7 +93,7 @@ export default function PrivacyPage() {
           </h2>
           <div className="space-y-4 text-gray-700 dark:text-gray-300">
             <p>
-              Squish is designed with privacy as a core principle. Here's exactly what
+              Squish is designed with privacy as a core principle. Here&apos;s exactly what
               happens when you use our service:
             </p>
             <ol className="list-decimal list-inside space-y-2 ml-4">
@@ -166,7 +166,7 @@ export default function PrivacyPage() {
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>
-                <strong>GoatCounter:</strong> Privacy-respecting analytics that doesn't track
+                <strong>GoatCounter:</strong> Privacy-respecting analytics that doesn&apos;t track
                 personal data. Learn more at{' '}
                 <a
                   href="https://www.goatcounter.com/help/privacy"
@@ -174,13 +174,13 @@ export default function PrivacyPage() {
                   rel="noopener noreferrer"
                   className="text-purple-600 dark:text-purple-400 hover:underline"
                 >
-                  GoatCounter's privacy policy
+                  GoatCounter&apos;s privacy policy
                 </a>
                 .
               </li>
               <li>
                 <strong>Render.com:</strong> Our hosting provider. Images are processed in memory
-                on Render's infrastructure and are never persisted.
+                on Render&apos;s infrastructure and are never persisted.
               </li>
             </ul>
           </div>
@@ -211,7 +211,7 @@ export default function PrivacyPage() {
           </h2>
           <div className="space-y-4 text-gray-700 dark:text-gray-300">
             <p>
-              Since we don't collect or store personal data or images, there's nothing to request,
+              Since we don&apos;t collect or store personal data or images, there&apos;s nothing to request,
               delete, or modify. You maintain complete control over your images:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
