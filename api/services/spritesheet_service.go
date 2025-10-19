@@ -17,23 +17,24 @@ import (
 
 // Sprite represents a single sprite to be packed
 type Sprite struct {
-	Name   string      // Name/identifier for the sprite
-	Image  image.Image // The image data
-	Buffer []byte      // Original image buffer
-	Width  int         // Original width
-	Height int         // Original height
+	Name      string      // Name/identifier for the sprite
+	Image     image.Image // The image data
+	Buffer    []byte      // Original image buffer
+	Width     int         // Current width (after trimming if applicable)
+	Height    int         // Current height (after trimming if applicable)
+	Trimmed   bool        // Whether transparency was trimmed
+	TrimmedX  int         // Pixels trimmed from left
+	TrimmedY  int         // Pixels trimmed from top
+	OriginalW int         // Original width before trimming
+	OriginalH int         // Original height before trimming
 }
 
 // PackedSprite represents a sprite with its position in the packed sheet
 type PackedSprite struct {
 	Sprite
-	X         int  // X position in the sheet
-	Y         int  // Y position in the sheet
-	Trimmed   bool // Whether transparency was trimmed
-	TrimmedX  int  // Pixels trimmed from left
-	TrimmedY  int  // Pixels trimmed from top
-	OriginalW int  // Original width before trimming
-	OriginalH int  // Original height before trimming
+	X int // X position in the sheet
+	Y int // Y position in the sheet
+	// Trimmed, TrimmedX, TrimmedY, OriginalW, OriginalH are inherited from Sprite
 }
 
 // PackingOptions contains parameters for sprite packing
@@ -336,11 +337,12 @@ func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, erro
 			processedSprites[i].Image = trimmed
 			processedSprites[i].Width = trimmed.Bounds().Dx()
 			processedSprites[i].Height = trimmed.Bounds().Dy()
-			// Store trim info for later
-			_ = trimX
-			_ = trimY
-			_ = origW
-			_ = origH
+			// Store trim info
+			processedSprites[i].Trimmed = true
+			processedSprites[i].TrimmedX = trimX
+			processedSprites[i].TrimmedY = trimY
+			processedSprites[i].OriginalW = origW
+			processedSprites[i].OriginalH = origH
 		}
 	}
 

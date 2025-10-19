@@ -54,7 +54,7 @@ func SetupSpritesheetRoutes(app *fiber.App) {
 // @Param trimTransparency query bool false "Trim transparent pixels from sprites" default(false)
 // @Param maxWidth query int false "Maximum sheet width in pixels" default(2048)
 // @Param maxHeight query int false "Maximum sheet height in pixels" default(2048)
-// @Param outputFormats query string false "Comma-separated list of output formats: json,css,csv,xml,unity,godot" default("json")
+// @Param outputFormats query string false "Comma-separated list of output formats: json,css,csv,xml,sparrow,texturepacker,cocos2d,unity,godot" default("json")
 // @Success 200 {object} PackSpritesResponse
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
@@ -220,12 +220,15 @@ func parseOutputFormats(s string) []string {
 	parts := strings.Split(s, ",")
 	formats := make([]string, 0, len(parts))
 	validFormats := map[string]bool{
-		"json":  true,
-		"css":   true,
-		"csv":   true,
-		"xml":   true,
-		"unity": true,
-		"godot": true,
+		"json":          true,
+		"css":           true,
+		"csv":           true,
+		"xml":           true,
+		"sparrow":       true,
+		"texturepacker": true,
+		"cocos2d":       true,
+		"unity":         true,
+		"godot":         true,
 	}
 
 	for _, part := range parts {
