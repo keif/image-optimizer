@@ -322,6 +322,14 @@ func TrimTransparency(img image.Image) (image.Image, int, int, int, int) {
 }
 
 // PackSprites packs multiple sprites into one or more spritesheets
+//
+// Multi-sheet splitting: If sprites don't fit in one sheet, they will be split across multiple sheets.
+// However, each INDIVIDUAL sprite must fit within MaxWidth x MaxHeight (max 8192x8192).
+// If a single sprite exceeds these dimensions, packing will fail - multi-sheet splitting cannot
+// split individual sprites across sheets.
+//
+// For oversized sprites, use the optimize-spritesheet endpoint with maxWidth/maxHeight parameters
+// to resize sprites before packing.
 func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, error) {
 	if len(sprites) == 0 {
 		return nil, fmt.Errorf("no sprites provided")

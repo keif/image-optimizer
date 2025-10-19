@@ -48,16 +48,16 @@ func SetupSpritesheetRoutes(app *fiber.App) {
 
 // PackSprites handles the sprite packing endpoint
 // @Summary Pack multiple sprites into optimized spritesheets
-// @Description Accepts multiple image files and packs them into one or more optimized spritesheets using the MaxRects bin packing algorithm
+// @Description Accepts multiple image files and packs them into one or more optimized spritesheets using the MaxRects bin packing algorithm. Automatically splits into multiple sheets if needed. IMPORTANT: Each individual sprite must be ≤8192x8192 pixels (hard limit). For larger sprites, use /optimize-spritesheet or /optimize to resize first.
 // @Tags spritesheet
 // @Accept multipart/form-data
 // @Produce json
-// @Param images formData file true "Sprite images to pack (multiple files supported)"
-// @Param padding query int false "Padding between sprites in pixels" default(2)
+// @Param images formData file true "Sprite images to pack (multiple files supported). Each sprite must be ≤8192x8192 pixels."
+// @Param padding query int false "Padding between sprites in pixels (0-32)" default(2)
 // @Param powerOfTwo query bool false "Force power-of-2 dimensions (256, 512, 1024, etc.)" default(false)
 // @Param trimTransparency query bool false "Trim transparent pixels from sprites" default(false)
-// @Param maxWidth query int false "Maximum sheet width in pixels" default(2048)
-// @Param maxHeight query int false "Maximum sheet height in pixels" default(2048)
+// @Param maxWidth query int false "Maximum sheet width in pixels (256-8192)" default(2048)
+// @Param maxHeight query int false "Maximum sheet height in pixels (256-8192)" default(2048)
 // @Param outputFormats query string false "Comma-separated list of output formats: json,css,csv,xml,sparrow,texturepacker,cocos2d,unity,godot" default("json")
 // @Success 200 {object} PackSpritesResponse
 // @Failure 400 {object} map[string]interface{}
@@ -138,12 +138,28 @@ func PackSprites(c *fiber.Ctx) error {
 			})
 		}
 
+		width := img.Bounds().Dx()
+		height := img.Bounds().Dy()
+
+		// Validate individual sprite size against absolute maximum (8192x8192)
+		const maxSpriteSize = 8192
+		if width > maxSpriteSize || height > maxSpriteSize {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": fmt.Sprintf(
+					"Sprite '%s' is %dx%d pixels, which exceeds the maximum allowed size of %dx%d per sprite. "+
+						"Multi-sheet splitting cannot help with oversized individual sprites. "+
+						"Please resize this sprite first using the /optimize endpoint or /optimize-spritesheet with maxWidth/maxHeight parameters.",
+					fileHeader.Filename, width, height, maxSpriteSize, maxSpriteSize,
+				),
+			})
+		}
+
 		// Create sprite
 		sprites = append(sprites, services.Sprite{
 			Name:   fileHeader.Filename,
 			Image:  img,
-			Width:  img.Bounds().Dx(),
-			Height: img.Bounds().Dy(),
+			Width:  width,
+			Height: height,
 		})
 	}
 
