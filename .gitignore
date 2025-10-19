@@ -32,6 +32,7 @@ Thumbs.db
 # Build output
 api/main
 api/image-optimizer
+api/imgopt
 cli/imgopt
 dist/
 build/
