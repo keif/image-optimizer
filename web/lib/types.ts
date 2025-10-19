@@ -91,4 +91,11 @@ export interface PackingResult {
   metadata: SheetMetadata[];
   outputFiles: { [key: string]: string };  // Format name -> file content
   totalSprites: number;
+  originalCount?: number;         // For optimize-spritesheet: original sprite count
+  duplicatesRemoved?: number;     // For optimize-spritesheet: number of duplicates removed
+  nameMapping?: { [key: string]: string }; // For optimize-spritesheet: duplicate name mapping
+}
+
+export interface OptimizationOptions extends PackingOptions {
+  deduplicate?: boolean;
 }

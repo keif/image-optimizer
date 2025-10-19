@@ -268,6 +268,43 @@ class ApiClient {
     return response.json();
   }
 
+  async optimizeSpritesheet(
+    spritesheetFile: File,
+    xmlFile: File,
+    options: OptimizationOptions
+  ): Promise<PackingResult> {
+    await this.ensureConfigLoaded();
+
+    const formData = new FormData();
+    formData.append('spritesheet', spritesheetFile);
+    formData.append('xml', xmlFile);
+
+    const params = new URLSearchParams();
+    params.append('deduplicate', (options.deduplicate ?? false).toString());
+    params.append('padding', options.padding.toString());
+    params.append('powerOfTwo', options.powerOfTwo.toString());
+    params.append('trimTransparency', options.trimTransparency.toString());
+    params.append('maxWidth', options.maxWidth.toString());
+    params.append('maxHeight', options.maxHeight.toString());
+    params.append('outputFormats', options.outputFormats.join(','));
+
+    const url = `${this.baseUrl}/optimize-spritesheet?${params.toString()}`;
+    console.log('[ApiClient] optimizeSpritesheet - Calling URL:', url);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error: APIError = await response.json();
+      throw new Error(error.error || 'Failed to optimize spritesheet');
+    }
+
+    return response.json();
+  }
+
   async checkHealth(): Promise<{ status: string }> {
     await this.ensureConfigLoaded();
 
@@ -284,3 +321,6 @@ export const apiClient = new ApiClient();
 // Export convenient functions
 export const packSprites = (files: File[], options: PackingOptions) =>
   apiClient.packSprites(files, options);
+
+export const optimizeSpritesheet = (spritesheetFile: File, xmlFile: File, options: OptimizationOptions) =>
+  apiClient.optimizeSpritesheet(spritesheetFile, xmlFile, options);

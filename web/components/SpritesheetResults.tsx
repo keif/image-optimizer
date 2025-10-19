@@ -58,8 +58,29 @@ export default function SpritesheetResults({ result }: SpritesheetResultsProps) 
       <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-6 border border-purple-200 dark:border-purple-800">
         <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
           <Layers className="w-6 h-6 text-purple-600" />
-          Packing Complete
+          {result.duplicatesRemoved !== undefined ? 'Optimization Complete' : 'Packing Complete'}
         </h2>
+
+        {/* Deduplication Stats (if applicable) */}
+        {result.duplicatesRemoved !== undefined && result.originalCount !== undefined && result.duplicatesRemoved > 0 && (
+          <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-green-900 dark:text-green-100">
+                  Deduplication Success
+                </p>
+                <p className="text-xs text-green-700 dark:text-green-300">
+                  Removed {result.duplicatesRemoved} duplicate sprite{result.duplicatesRemoved !== 1 ? 's' : ''} ({Math.round(result.duplicatesRemoved / result.originalCount * 100)}% reduction)
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="text-lg font-bold text-green-600">{result.originalCount} → {result.totalSprites}</div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">frames</div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <div className="text-2xl font-bold text-purple-600">
