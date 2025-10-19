@@ -67,3 +67,28 @@ export interface OptimizationHistory {
   result: OptimizationResult;
   options: OptimizationOptions;
 }
+
+// Spritesheet Packing Types
+export interface PackingOptions {
+  padding: number;
+  powerOfTwo: boolean;
+  trimTransparency: boolean;
+  maxWidth: number;
+  maxHeight: number;
+  outputFormats: string[];
+}
+
+export interface SheetMetadata {
+  index: number;
+  width: number;
+  height: number;
+  spriteCount: number;
+  efficiency: number;
+}
+
+export interface PackingResult {
+  sheets: string[];         // Base64-encoded PNG images
+  metadata: SheetMetadata[];
+  outputFiles: { [key: string]: string };  // Format name -> file content
+  totalSprites: number;
+}

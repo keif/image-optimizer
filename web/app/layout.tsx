@@ -33,6 +33,12 @@ export default function RootLayout({
                 </div>
                 <div className="flex items-center gap-4">
                   <Link
+                    href="/spritesheet"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                  >
+                    Spritesheet Packer
+                  </Link>
+                  <Link
                     href="/privacy"
                     className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
                   >

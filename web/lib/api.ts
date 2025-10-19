@@ -1,4 +1,4 @@
-import { OptimizationOptions, OptimizationResult, APIKey, APIError } from './types';
+import { OptimizationOptions, OptimizationResult, APIKey, APIError, PackingOptions, PackingResult } from './types';
 
 class ApiClient {
   private baseUrl: string;
@@ -232,6 +232,42 @@ class ApiClient {
     }
   }
 
+  async packSprites(
+    files: File[],
+    options: PackingOptions
+  ): Promise<PackingResult> {
+    await this.ensureConfigLoaded();
+
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('images', file);
+    });
+
+    const params = new URLSearchParams();
+    params.append('padding', options.padding.toString());
+    params.append('powerOfTwo', options.powerOfTwo.toString());
+    params.append('trimTransparency', options.trimTransparency.toString());
+    params.append('maxWidth', options.maxWidth.toString());
+    params.append('maxHeight', options.maxHeight.toString());
+    params.append('outputFormats', options.outputFormats.join(','));
+
+    const url = `${this.baseUrl}/pack-sprites?${params.toString()}`;
+    console.log('[ApiClient] packSprites - Calling URL:', url);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error: APIError = await response.json();
+      throw new Error(error.error || 'Failed to pack sprites');
+    }
+
+    return response.json();
+  }
+
   async checkHealth(): Promise<{ status: string }> {
     await this.ensureConfigLoaded();
 
@@ -244,3 +280,7 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+
+// Export convenient functions
+export const packSprites = (files: File[], options: PackingOptions) =>
+  apiClient.packSprites(files, options);

@@ -16,6 +16,11 @@ An API-first image optimization service built with Go and Fiber. Squish is desig
 - **Modern Format Support**: AVIF, WebP, JPEG, PNG, and GIF with format-specific controls
 - **Advanced Compression Options**: JPEG progressive encoding, PNG compression levels, WebP lossless, and more
 - **Batch Processing**: Optimize multiple images in a single API request
+- **Spritesheet Packer**: Pack multiple sprites into optimized spritesheets with MaxRects algorithm
+  - Multiple output formats (JSON, CSS, CSV, XML, Unity, Godot)
+  - Automatic packing with transparency trimming and padding control
+  - Power-of-2 dimensions for GPU optimization
+  - Multi-sheet atlas splitting for large sprite sets
 - **Interactive Before/After Comparison**: Visual slider to compare original vs optimized images
 - **Privacy First**: No server storage, in-memory processing only, zero tracking
 - **RESTful API**: Clean HTTP endpoints for easy integration
@@ -523,6 +528,120 @@ curl -X POST "http://localhost:8080/batch-optimize?width=800&height=600&quality=
 - **Detailed Results**: Each image gets its own result object with success/failure status
 - **Summary Statistics**: Aggregate metrics for the entire batch
 - **Same Parameters**: All images processed with the same quality, format, and dimension settings
+
+### Pack Sprites into Spritesheet
+
+```bash
+POST /pack-sprites?padding={pixels}&powerOfTwo={bool}&trimTransparency={bool}&maxWidth={pixels}&maxHeight={pixels}&outputFormats={formats}
+Content-Type: multipart/form-data
+```
+
+Pack multiple sprite images into optimized spritesheets using the MaxRects bin packing algorithm.
+
+**Form Parameters:**
+- `images` (files): Multiple sprite image files to pack (required)
+
+**Query Parameters (all optional):**
+- `padding` (integer): Padding between sprites in pixels (default: 2)
+  - Range: 0-32 pixels
+  - Prevents texture bleeding in games
+- `powerOfTwo` (boolean): Force power-of-2 dimensions like 256, 512, 1024, 2048 (default: false)
+  - Recommended for GPU optimization
+- `trimTransparency` (boolean): Remove transparent borders from sprites (default: false)
+  - Saves space by trimming empty pixels
+  - Original dimensions are preserved in metadata
+- `maxWidth` (integer): Maximum sheet width in pixels (default: 2048)
+  - Range: 256-8192 pixels
+- `maxHeight` (integer): Maximum sheet height in pixels (default: 2048)
+  - Range: 256-8192 pixels
+- `outputFormats` (string): Comma-separated list of output formats (default: "json")
+  - Available: `json`, `css`, `csv`, `xml`, `unity`, `godot`
+
+**Examples:**
+
+**1. Basic sprite packing with JSON output:**
+```bash
+curl -X POST "http://localhost:8080/pack-sprites" \
+  -F "images=@sprite1.png" \
+  -F "images=@sprite2.png" \
+  -F "images=@sprite3.png"
+```
+
+**2. Pack with padding and power-of-2 dimensions:**
+```bash
+curl -X POST "http://localhost:8080/pack-sprites?padding=4&powerOfTwo=true" \
+  -F "images=@sprite1.png" \
+  -F "images=@sprite2.png" \
+  -F "images=@sprite3.png"
+```
+
+**3. Pack with transparency trimming and multiple output formats:**
+```bash
+curl -X POST "http://localhost:8080/pack-sprites?trimTransparency=true&outputFormats=json,css,unity" \
+  -F "images=@sprite1.png" \
+  -F "images=@sprite2.png"
+```
+
+**4. Pack large sprite set with custom dimensions:**
+```bash
+curl -X POST "http://localhost:8080/pack-sprites?maxWidth=4096&maxHeight=4096&padding=8" \
+  -F "images=@*.png"
+```
+
+**Response:**
+```json
+{
+  "sheets": [
+    "iVBORw0KGgoAAAANSUhEUgAA..."  // Base64-encoded PNG
+  ],
+  "metadata": [
+    {
+      "index": 0,
+      "width": 512,
+      "height": 512,
+      "spriteCount": 24,
+      "efficiency": 0.87
+    }
+  ],
+  "outputFiles": {
+    "json": "{ \"frames\": { ... } }",
+    "css": ".sprite-1 { background-position: 0px 0px; ... }",
+    "unity": "fileFormatVersion: 2\nguid: ...\n..."
+  },
+  "totalSprites": 24
+}
+```
+
+**Response Fields:**
+- `sheets`: Array of base64-encoded PNG images (one or more if split)
+- `metadata`: Information about each sheet (dimensions, sprite count, packing efficiency)
+- `outputFiles`: Sprite coordinate data in requested formats
+- `totalSprites`: Total number of sprites packed
+
+**Output Format Details:**
+
+- **JSON**: Generic format with sprite names, positions, and dimensions
+- **CSS**: CSS classes with `background-position` for web sprites
+- **CSV**: Comma-separated values (name, x, y, width, height)
+- **XML**: Generic XML format for sprite coordinates
+- **Unity**: Unity TextureImporter metadata format (`.meta`)
+- **Godot**: Godot Engine AtlasTexture resource format (`.tres`)
+
+**Web UI:**
+
+Visit `/spritesheet` on the web interface for a visual drag-and-drop sprite packer with:
+- Multi-file upload with preview
+- Interactive configuration controls
+- Real-time sheet preview
+- Download packed sheets and coordinate files
+
+**Key Features:**
+- **MaxRects Algorithm**: Industry-standard bin packing with Best Short Side Fit heuristic
+- **High Efficiency**: Typically achieves 85-95% space utilization
+- **Atlas Splitting**: Automatically creates multiple sheets if sprites exceed max dimensions
+- **Transparency Trimming**: Removes transparent borders while preserving original dimensions in metadata
+- **Multi-Format Export**: Generate all output formats in a single API call
+- **GPU Optimization**: Power-of-2 dimensions for optimal GPU texture performance
 
 ### API Key Management
 

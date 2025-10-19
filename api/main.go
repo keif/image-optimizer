@@ -91,6 +91,7 @@ func main() {
 	// Register routes
 	routes.RegisterOptimizeRoutes(app)
 	routes.RegisterAPIKeyRoutes(app)
+	routes.SetupSpritesheetRoutes(app)
 
 	// Start server
 	port := os.Getenv("PORT")

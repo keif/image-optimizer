@@ -417,6 +417,115 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/pack-sprites": {
+            "post": {
+                "description": "Accepts multiple image files and packs them into one or more optimized spritesheets using the MaxRects bin packing algorithm",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "spritesheet"
+                ],
+                "summary": "Pack multiple sprites into optimized spritesheets",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Sprite images to pack (multiple files supported)",
+                        "name": "images",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 2,
+                        "description": "Padding between sprites in pixels",
+                        "name": "padding",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Force power-of-2 dimensions (256, 512, 1024, etc.)",
+                        "name": "powerOfTwo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Trim transparent pixels from sprites",
+                        "name": "trimTransparency",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 2048,
+                        "description": "Maximum sheet width in pixels",
+                        "name": "maxWidth",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 2048,
+                        "description": "Maximum sheet height in pixels",
+                        "name": "maxHeight",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "\"json\"",
+                        "description": "Comma-separated list of output formats: json,css,csv,xml,unity,godot",
+                        "name": "outputFormats",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.PackSpritesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/spritesheet/formats": {
+            "get": {
+                "description": "Returns a list of all supported output formats for spritesheet coordinate data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "spritesheet"
+                ],
+                "summary": "Get supported spritesheet output formats",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -506,6 +615,55 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
+                }
+            }
+        },
+        "routes.PackSpritesResponse": {
+            "type": "object",
+            "properties": {
+                "metadata": {
+                    "description": "Metadata for each sheet",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/routes.SheetMetadata"
+                    }
+                },
+                "outputFiles": {
+                    "description": "Format name -\u003e file content",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "sheets": {
+                    "description": "Base64-encoded PNG images",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "totalSprites": {
+                    "type": "integer"
+                }
+            }
+        },
+        "routes.SheetMetadata": {
+            "type": "object",
+            "properties": {
+                "efficiency": {
+                    "type": "number"
+                },
+                "height": {
+                    "type": "integer"
+                },
+                "index": {
+                    "type": "integer"
+                },
+                "spriteCount": {
+                    "type": "integer"
+                },
+                "width": {
+                    "type": "integer"
                 }
             }
         },

@@ -58,6 +58,39 @@ definitions:
             type: string
         type: object
     type: object
+  routes.PackSpritesResponse:
+    properties:
+      metadata:
+        description: Metadata for each sheet
+        items:
+          $ref: '#/definitions/routes.SheetMetadata'
+        type: array
+      outputFiles:
+        additionalProperties:
+          type: string
+        description: Format name -> file content
+        type: object
+      sheets:
+        description: Base64-encoded PNG images
+        items:
+          type: string
+        type: array
+      totalSprites:
+        type: integer
+    type: object
+  routes.SheetMetadata:
+    properties:
+      efficiency:
+        type: number
+      height:
+        type: integer
+      index:
+        type: integer
+      spriteCount:
+        type: integer
+      width:
+        type: integer
+    type: object
   services.OptimizeResult:
     properties:
       alreadyOptimized:
@@ -375,6 +408,83 @@ paths:
       summary: Optimize an image
       tags:
       - optimization
+  /pack-sprites:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Accepts multiple image files and packs them into one or more optimized
+        spritesheets using the MaxRects bin packing algorithm
+      parameters:
+      - description: Sprite images to pack (multiple files supported)
+        in: formData
+        name: images
+        required: true
+        type: file
+      - default: 2
+        description: Padding between sprites in pixels
+        in: query
+        name: padding
+        type: integer
+      - default: false
+        description: Force power-of-2 dimensions (256, 512, 1024, etc.)
+        in: query
+        name: powerOfTwo
+        type: boolean
+      - default: false
+        description: Trim transparent pixels from sprites
+        in: query
+        name: trimTransparency
+        type: boolean
+      - default: 2048
+        description: Maximum sheet width in pixels
+        in: query
+        name: maxWidth
+        type: integer
+      - default: 2048
+        description: Maximum sheet height in pixels
+        in: query
+        name: maxHeight
+        type: integer
+      - default: '"json"'
+        description: 'Comma-separated list of output formats: json,css,csv,xml,unity,godot'
+        in: query
+        name: outputFormats
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/routes.PackSpritesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Pack multiple sprites into optimized spritesheets
+      tags:
+      - spritesheet
+  /spritesheet/formats:
+    get:
+      description: Returns a list of all supported output formats for spritesheet
+        coordinate data
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get supported spritesheet output formats
+      tags:
+      - spritesheet
 schemes:
 - http
 - https
