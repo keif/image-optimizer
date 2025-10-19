@@ -65,3 +65,6 @@ docker-volumes/
 node_modules/
 .next/
 out/
+
+# notes
+_notes/
