@@ -9,7 +9,7 @@ services:
       - key: PORT
         value: 8080
       - key: CORS_ORIGINS
-        value: https://keif.github.io,https://squish.baker.is,https://image-optimizer.baker.is,http://localhost:3000
+        value: https://keif.github.io,https://sosquishy.io,https://www.sosquishy.io,http://localhost:3000
       - key: DB_PATH
         value: /opt/render/project/data/api_keys.db
       - key: RATE_LIMIT_ENABLED
@@ -31,4 +31,4 @@ services:
 
   # Web Service (Next.js) - Now deployed to GitHub Pages
   # See .github/workflows/deploy-pages.yml for deployment configuration
-  # Live at: https://squish.baker.is
+  # Live at: https://sosquishy.io

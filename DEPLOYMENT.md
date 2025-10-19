@@ -7,28 +7,31 @@
 
 ## Custom Domain Setup
 
-### Frontend Domain: squish.baker.is
+### Frontend Domain: sosquishy.io
 
 The frontend is deployed to GitHub Pages with a custom domain.
 
 #### DNS Configuration
 
-Add the following DNS records in your domain provider (baker.is):
+Add the following DNS records in your domain provider (sosquishy.io):
 
-**For squish.baker.is:**
+**For sosquishy.io (apex domain):**
 
 ```
-Type: CNAME
-Name: squish
-Value: keif.github.io
+Type: A
+Name: @
+Value: 185.199.108.153
+Value: 185.199.109.153
+Value: 185.199.110.153
+Value: 185.199.111.153
 TTL: 3600 (or Auto)
 ```
 
-**For image-optimizer.baker.is (optional alternative):**
+**For www.sosquishy.io:**
 
 ```
 Type: CNAME
-Name: image-optimizer
+Name: www
 Value: keif.github.io
 TTL: 3600 (or Auto)
 ```
@@ -37,17 +40,17 @@ TTL: 3600 (or Auto)
 
 1. Go to repository Settings → Pages
 2. Source: "GitHub Actions"
-3. Custom domain: `squish.baker.is`
+3. Custom domain: `sosquishy.io`
 4. Check "Enforce HTTPS" (after DNS propagates)
 
 ### Backend API: Render.com
 
-The API is hosted at: `https://squish-api.baker.is`
+The API is hosted at: `https://api.sosquishy.io`
 
 **CORS is configured to allow:**
 - `https://keif.github.io` (GitHub Pages default)
-- `https://squish.baker.is` (custom domain)
-- `https://image-optimizer.baker.is` (alternative domain)
+- `https://sosquishy.io` (custom domain)
+- `https://www.sosquishy.io` (www subdomain)
 - `http://localhost:3000` (local development)
 
 ## Deployment Workflow
@@ -59,12 +62,12 @@ Automatic deployment via GitHub Actions (`.github/workflows/deploy-pages.yml`):
 1. Triggers on push to `main` branch (when `web/` changes)
 2. Builds Next.js app with production API URL
 3. Deploys static files to GitHub Pages
-4. Available at: `https://squish.baker.is`
+4. Available at: `https://sosquishy.io`
 
 **Manual deployment:**
 ```bash
 cd web
-NEXT_PUBLIC_API_URL=https://squish-api.baker.is pnpm run build
+NEXT_PUBLIC_API_URL=https://api.sosquishy.io pnpm run build
 # Output in: web/out/
 ```
 
@@ -88,7 +91,7 @@ Set in workflow file (`.github/workflows/deploy-pages.yml`):
 
 ```yaml
 env:
-  NEXT_PUBLIC_API_URL: https://squish-api.baker.is
+  NEXT_PUBLIC_API_URL: https://api.sosquishy.io
 ```
 
 ### Backend (Render.com)
@@ -96,7 +99,7 @@ env:
 Configured in `render.yaml`:
 
 - `PORT`: 8080
-- `CORS_ORIGINS`: https://keif.github.io,https://squish.baker.is,https://image-optimizer.baker.is,http://localhost:3000
+- `CORS_ORIGINS`: https://keif.github.io,https://sosquishy.io,https://www.sosquishy.io,http://localhost:3000
 - `DB_PATH`: /opt/render/project/data/api_keys.db
 - `RATE_LIMIT_ENABLED`: true
 - `RATE_LIMIT_MAX`: 100
@@ -113,33 +116,36 @@ After adding DNS records, propagation can take:
 
 Check propagation status:
 ```bash
-# Check CNAME record
-dig squish.baker.is CNAME
+# Check A records for apex domain
+dig sosquishy.io A
 
 # Expected output:
-# squish.baker.is.  3600  IN  CNAME  keif.github.io.
+# sosquishy.io.  3600  IN  A  185.199.108.153
+# sosquishy.io.  3600  IN  A  185.199.109.153
+# sosquishy.io.  3600  IN  A  185.199.110.153
+# sosquishy.io.  3600  IN  A  185.199.111.153
 ```
 
 ## Testing
 
 ### Test Frontend
 ```bash
-curl -I https://squish.baker.is
+curl -I https://sosquishy.io
 # Should return: HTTP/2 200
 ```
 
 ### Test Backend
 ```bash
-curl https://squish-api.baker.is/health
+curl https://api.sosquishy.io/health
 # Should return: {"status":"ok"}
 ```
 
 ### Test CORS
 ```bash
-curl -H "Origin: https://squish.baker.is" \
+curl -H "Origin: https://sosquishy.io" \
      -H "Access-Control-Request-Method: POST" \
      -X OPTIONS \
-     https://squish-api.baker.is/optimize
+     https://api.sosquishy.io/optimize
 # Should include: Access-Control-Allow-Origin header
 ```
 
@@ -147,7 +153,7 @@ curl -H "Origin: https://squish.baker.is" \
 
 ### Frontend not loading
 1. Check GitHub Actions workflow status
-2. Verify DNS propagation: `dig squish.baker.is`
+2. Verify DNS propagation: `dig sosquishy.io`
 3. Check GitHub Pages settings
 4. Clear browser cache
 

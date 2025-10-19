@@ -58,7 +58,7 @@ jobs:
       - name: Build Next.js app
         working-directory: ./web
         env:
-          NEXT_PUBLIC_API_URL: https://squish-api.baker.is
+          NEXT_PUBLIC_API_URL: https://api.sosquishy.io
         run: pnpm run build
 
       - name: Upload artifact

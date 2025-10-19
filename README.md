@@ -4,11 +4,11 @@ An API-first image optimization service built with Go and Fiber. Squish is desig
 
 ## Live Demo
 
-**Try it now:** [https://squish.baker.is](https://squish.baker.is)
+**Try it now:** [https://sosquishy.io](https://sosquishy.io)
 
-**API Endpoint:** `https://squish-api.baker.is`
-- [Health Check](https://squish-api.baker.is/health)
-- [API Documentation](https://squish-api.baker.is/swagger/index.html)
+**API Endpoint:** `https://api.sosquishy.io`
+- [Health Check](https://api.sosquishy.io/health)
+- [API Documentation](https://api.sosquishy.io/swagger/index.html)
 
 ## Features
 

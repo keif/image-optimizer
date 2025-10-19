@@ -67,7 +67,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               window.goatcounter = {
-                path: function(p) { return 'squish.baker.is' + p }
+                path: function(p) { return 'sosquishy.io' + p }
               };
             `
           }}
