@@ -8,6 +8,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/swaggo/fiber-swagger v1.3.0
 	github.com/swaggo/swag v1.16.6
+	golang.org/x/image v0.32.0
 )
 
 require (

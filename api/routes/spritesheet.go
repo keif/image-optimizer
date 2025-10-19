@@ -5,6 +5,8 @@ import (
 	"encoding/base64"
 	"fmt"
 	"image"
+	_ "image/gif"  // Register GIF decoder
+	_ "image/jpeg" // Register JPEG decoder
 	"image/png"
 	"io"
 	"strconv"
@@ -12,6 +14,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/keif/image-optimizer/services"
+	_ "golang.org/x/image/webp" // Register WebP decoder
 )
 
 // PackSpritesRequest represents the request body for sprite packing
