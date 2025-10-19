@@ -39,7 +39,8 @@ func main() {
 	defer db.Close()
 
 	app := fiber.New(fiber.Config{
-		AppName: "Image Optimizer API v1.0",
+		AppName:   "Image Optimizer API v1.0",
+		BodyLimit: 8 * 1024 * 1024, // 8MB limit for large spritesheet uploads
 	})
 
 	// Middleware

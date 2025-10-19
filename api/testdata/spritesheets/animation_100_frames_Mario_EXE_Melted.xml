@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Created with Funkin Packer v0.1.3 DEV https://neeeoo.github.io/funkin-packer/
+-->
+<TextureAtlas imagePath="Mario_EXE_Melted.png" width="3583" height="7482" spritePadding="3" borderPadding="1">
+	<SubTexture name="meltio down0000" x="1" y="1" width="527" height="762" rotated="true" frameX="0" frameY="-33" frameWidth="763" frameHeight="560"/>
+	<SubTexture name="meltio down0001" x="531" y="1" width="536" height="754" rotated="true" frameX="-5" frameY="-24" frameWidth="763" frameHeight="560"/>
+	<SubTexture name="meltio down0002" x="531" y="1" width="536" height="754" rotated="true" frameX="-5" frameY="-24" frameWidth="763" frameHeight="560"/>
+	<SubTexture name="meltio down0003" x="1070" y="1" width="546" height="734" rotated="true" frameX="-11" frameY="-14" frameWidth="763" frameHeight="560"/>
+	<SubTexture name="meltio down0004" x="1070" y="1" width="546" height="734" rotated="true" frameX="-11" frameY="-14" frameWidth="763" frameHeight="560"/>
+	<SubTexture name="meltio down0005" x="1619" y="1" width="555" height="717" rotated="true" frameX="-16" frameY="-5" frameWidth="763" frameHeight="560"/>
+	<SubTexture name="meltio down0006" x="1619" y="1" width="555" height="717" rotated="true" frameX="-16" frameY="-5" frameWidth="763" frameHeight="560"/>
+	<SubTexture name="meltio down0007" x="1619" y="1" width="555" height="717" rotated="true" frameX="-16" frameY="-5" frameWidth="763" frameHeight="560"/>
+	<SubTexture name="meltio down0008" x="2177" y="1" width="560" height="711" rotated="true" frameX="-18" frameY="0" frameWidth="763" frameHeight="560"/>
+	<SubTexture name="meltio down0009" x="2177" y="1" width="560" height="711" rotated="true" frameX="-18" frameY="0" frameWidth="763" frameHeight="560"/>
+	<SubTexture name="meltio down0010" x="2177" y="1" width="560" height="711" rotated="true" frameX="-18" frameY="0" frameWidth="763" frameHeight="560"/>
+	<SubTexture name="meltio down0011" x="2177" y="1" width="560" height="711" rotated="true" frameX="-18" frameY="0" frameWidth="763" frameHeight="560"/>
+	<SubTexture name="meltio idle0000" x="2740" y="1" width="608" height="848" frameX="0" frameY="-15" frameWidth="611" frameHeight="863"/>
+	<SubTexture name="meltio idle0001" x="1" y="852" width="611" height="845" frameX="-1" frameY="-18" frameWidth="611" frameHeight="863"/>
+	<SubTexture name="meltio idle0002" x="1" y="852" width="611" height="845" frameX="-1" frameY="-18" frameWidth="611" frameHeight="863"/>
+	<SubTexture name="meltio idle0003" x="615" y="852" width="598" height="853" frameX="-2" frameY="-10" frameWidth="611" frameHeight="863"/>
+	<SubTexture name="meltio idle0004" x="615" y="852" width="598" height="853" frameX="-2" frameY="-10" frameWidth="611" frameHeight="863"/>
+	<SubTexture name="meltio idle0005" x="1216" y="852" width="594" height="858" frameX="-2" frameY="-5" frameWidth="611" frameHeight="863"/>
+	<SubTexture name="meltio idle0006" x="1216" y="852" width="594" height="858" frameX="-2" frameY="-5" frameWidth="611" frameHeight="863"/>
+	<SubTexture name="meltio idle0007" x="1813" y="852" width="587" height="863" frameX="-1" frameY="0" frameWidth="611" frameHeight="863"/>
+	<SubTexture name="meltio idle0008" x="1813" y="852" width="587" height="863" frameX="-1" frameY="0" frameWidth="611" frameHeight="863"/>
+	<SubTexture name="meltio idle0009" x="2403" y="852" width="589" height="862" frameX="-1" frameY="-1" frameWidth="611" frameHeight="863"/>
+	<SubTexture name="meltio idle0010" x="2403" y="852" width="589" height="862" frameX="-1" frameY="-1" frameWidth="611" frameHeight="863"/>
+	<SubTexture name="meltio idle0011" x="2995" y="852" width="587" height="863" frameX="-1" frameY="0" frameWidth="611" frameHeight="863"/>
+	<SubTexture name="meltio idle0012" x="2995" y="852" width="587" height="863" frameX="-1" frameY="0" frameWidth="611" frameHeight="863"/>
+	<SubTexture name="meltio jump0000" x="2836" y="1718" width="551" height="1156" frameX="0" frameY="0" frameWidth="551" frameHeight="1156"/>
+	<SubTexture name="meltio jump 20000" x="1" y="1718" width="577" height="1092" frameX="-38" frameY="0" frameWidth="776" frameHeight="1092"/>
+	<SubTexture name="meltio jump 20001" x="1" y="1718" width="577" height="1092" frameX="-38" frameY="0" frameWidth="776" frameHeight="1092"/>
+	<SubTexture name="meltio jump 20002" x="581" y="1718" width="776" height="819" frameX="0" frameY="-119" frameWidth="776" frameHeight="1092"/>
+	<SubTexture name="meltio jump 20003" x="581" y="1718" width="776" height="819" frameX="0" frameY="-119" frameWidth="776" frameHeight="1092"/>
+	<SubTexture name="meltio jump 20004" x="1360" y="1718" width="739" height="789" frameX="-29" frameY="-131" frameWidth="776" frameHeight="1092"/>
+	<SubTexture name="meltio jump 20005" x="1360" y="1718" width="739" height="789" frameX="-29" frameY="-131" frameWidth="776" frameHeight="1092"/>
+	<SubTexture name="meltio jump 20006" x="2102" y="1718" width="731" height="789" frameX="-37" frameY="-131" frameWidth="776" frameHeight="1092"/>
+	<SubTexture name="meltio jump 20007" x="2102" y="1718" width="731" height="789" frameX="-37" frameY="-131" frameWidth="776" frameHeight="1092"/>
+	<SubTexture name="meltio left0000" x="1" y="2877" width="659" height="919" frameX="0" frameY="0" frameWidth="659" frameHeight="919"/>
+	<SubTexture name="meltio left0001" x="663" y="2877" width="648" height="919" frameX="-12" frameY="0" frameWidth="659" frameHeight="919"/>
+	<SubTexture name="meltio left0002" x="663" y="2877" width="648" height="919" frameX="-12" frameY="0" frameWidth="659" frameHeight="919"/>
+	<SubTexture name="meltio left0003" x="1314" y="2877" width="643" height="912" frameX="-18" frameY="-7" frameWidth="659" frameHeight="919"/>
+	<SubTexture name="meltio left0004" x="1314" y="2877" width="643" height="912" frameX="-18" frameY="-7" frameWidth="659" frameHeight="919"/>
+	<SubTexture name="meltio left0005" x="1960" y="2877" width="645" height="908" frameX="-16" frameY="-11" frameWidth="659" frameHeight="919"/>
+	<SubTexture name="meltio left0006" x="1960" y="2877" width="645" height="908" frameX="-16" frameY="-11" frameWidth="659" frameHeight="919"/>
+	<SubTexture name="meltio left0007" x="1960" y="2877" width="645" height="908" frameX="-16" frameY="-11" frameWidth="659" frameHeight="919"/>
+	<SubTexture name="meltio left0008" x="2608" y="2877" width="623" height="907" frameX="-38" frameY="-12" frameWidth="659" frameHeight="919"/>
+	<SubTexture name="meltio left0009" x="2608" y="2877" width="623" height="907" frameX="-38" frameY="-12" frameWidth="659" frameHeight="919"/>
+	<SubTexture name="meltio left0010" x="2608" y="2877" width="623" height="907" frameX="-38" frameY="-12" frameWidth="659" frameHeight="919"/>
+	<SubTexture name="meltio left0011" x="2608" y="2877" width="623" height="907" frameX="-38" frameY="-12" frameWidth="659" frameHeight="919"/>
+	<SubTexture name="meltio right0000" x="1" y="3799" width="807" height="936" rotated="true" frameX="-21" frameY="-19" frameWidth="938" frameHeight="826"/>
+	<SubTexture name="meltio right0001" x="811" y="3799" width="812" height="926" rotated="true" frameX="-15" frameY="-14" frameWidth="938" frameHeight="826"/>
+	<SubTexture name="meltio right0002" x="811" y="3799" width="812" height="926" rotated="true" frameX="-15" frameY="-14" frameWidth="938" frameHeight="826"/>
+	<SubTexture name="meltio right0003" x="1626" y="3799" width="823" height="930" rotated="true" frameX="-6" frameY="-3" frameWidth="938" frameHeight="826"/>
+	<SubTexture name="meltio right0004" x="1626" y="3799" width="823" height="930" rotated="true" frameX="-6" frameY="-3" frameWidth="938" frameHeight="826"/>
+	<SubTexture name="meltio right0005" x="2452" y="3799" width="826" height="938" rotated="true" frameX="0" frameY="0" frameWidth="938" frameHeight="826"/>
+	<SubTexture name="meltio right0006" x="2452" y="3799" width="826" height="938" rotated="true" frameX="0" frameY="0" frameWidth="938" frameHeight="826"/>
+	<SubTexture name="meltio right0007" x="2452" y="3799" width="826" height="938" rotated="true" frameX="0" frameY="0" frameWidth="938" frameHeight="826"/>
+	<SubTexture name="meltio right0008" x="1" y="4740" width="826" height="864" rotated="true" frameX="0" frameY="0" frameWidth="938" frameHeight="826"/>
+	<SubTexture name="meltio right0009" x="1" y="4740" width="826" height="864" rotated="true" frameX="0" frameY="0" frameWidth="938" frameHeight="826"/>
+	<SubTexture name="meltio right0010" x="1" y="4740" width="826" height="864" rotated="true" frameX="0" frameY="0" frameWidth="938" frameHeight="826"/>
+	<SubTexture name="meltio right0011" x="1" y="4740" width="826" height="864" rotated="true" frameX="0" frameY="0" frameWidth="938" frameHeight="826"/>
+	<SubTexture name="meltio scream0000" x="830" y="4740" width="592" height="861" frameX="0" frameY="-99" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0001" x="1425" y="4740" width="667" height="696" frameX="-6" frameY="-270" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0002" x="1425" y="4740" width="667" height="696" frameX="-6" frameY="-270" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0003" x="2095" y="4740" width="668" height="677" frameX="-4" frameY="-289" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0004" x="2095" y="4740" width="668" height="677" frameX="-4" frameY="-289" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0005" x="2766" y="4740" width="668" height="675" frameX="-4" frameY="-291" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0006" x="2766" y="4740" width="668" height="675" frameX="-4" frameY="-291" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0007" x="2766" y="4740" width="668" height="675" frameX="-4" frameY="-291" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0008" x="2766" y="4740" width="668" height="675" frameX="-4" frameY="-291" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0009" x="1" y="5607" width="664" height="677" frameX="-5" frameY="-289" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0010" x="1" y="5607" width="664" height="677" frameX="-5" frameY="-289" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0011" x="668" y="5607" width="654" height="679" frameX="-8" frameY="-285" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0012" x="668" y="5607" width="654" height="679" frameX="-8" frameY="-285" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0013" x="1325" y="5607" width="752" height="951" frameX="-26" frameY="-12" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0014" x="1325" y="5607" width="752" height="951" frameX="-26" frameY="-12" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0015" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0016" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0017" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0018" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0019" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0020" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0021" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0022" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0023" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0024" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0025" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0026" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0027" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0028" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0029" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0030" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0031" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0032" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0033" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0034" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0035" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0036" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0037" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0038" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0039" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0040" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0041" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0042" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0043" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0044" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0045" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0046" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0047" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0048" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0049" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0050" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0051" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0052" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0053" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0054" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0055" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0056" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0057" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0058" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0059" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0060" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0061" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0062" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0063" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0064" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0065" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0066" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0067" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0068" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0069" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0070" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0071" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0072" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0073" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0074" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0075" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0076" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0077" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0078" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0079" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0080" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0081" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0082" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0083" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0084" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0085" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0086" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0087" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0088" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0089" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0090" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0091" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0092" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0093" x="2080" y="5607" width="741" height="963" frameX="-14" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio scream0094" x="2824" y="5607" width="743" height="963" frameX="-9" frameY="0" frameWidth="752" frameHeight="963"/>
+	<SubTexture name="meltio up0000" x="1" y="6573" width="1231" height="447" rotated="true" frameX="0" frameY="0" frameWidth="458" frameHeight="1231"/>
+	<SubTexture name="meltio up0001" x="1235" y="6573" width="1222" height="448" rotated="true" frameX="0" frameY="-9" frameWidth="458" frameHeight="1231"/>
+	<SubTexture name="meltio up0002" x="1235" y="6573" width="1222" height="448" rotated="true" frameX="0" frameY="-9" frameWidth="458" frameHeight="1231"/>
+	<SubTexture name="meltio up0003" x="1" y="7024" width="1201" height="448" rotated="true" frameX="-3" frameY="-30" frameWidth="458" frameHeight="1231"/>
+	<SubTexture name="meltio up0004" x="1" y="7024" width="1201" height="448" rotated="true" frameX="-3" frameY="-30" frameWidth="458" frameHeight="1231"/>
+	<SubTexture name="meltio up0005" x="1205" y="7024" width="1161" height="457" rotated="true" frameX="-7" frameY="-70" frameWidth="458" frameHeight="1231"/>
+	<SubTexture name="meltio up0006" x="1205" y="7024" width="1161" height="457" rotated="true" frameX="-7" frameY="-70" frameWidth="458" frameHeight="1231"/>
+	<SubTexture name="meltio up0007" x="1205" y="7024" width="1161" height="457" rotated="true" frameX="-7" frameY="-70" frameWidth="458" frameHeight="1231"/>
+	<SubTexture name="meltio up0008" x="2369" y="7024" width="1159" height="457" rotated="true" frameX="-9" frameY="-72" frameWidth="458" frameHeight="1231"/>
+	<SubTexture name="meltio up0009" x="2369" y="7024" width="1159" height="457" rotated="true" frameX="-9" frameY="-72" frameWidth="458" frameHeight="1231"/>
+	<SubTexture name="meltio up0010" x="2369" y="7024" width="1159" height="457" rotated="true" frameX="-9" frameY="-72" frameWidth="458" frameHeight="1231"/>
+	<SubTexture name="meltio up0011" x="2369" y="7024" width="1159" height="457" rotated="true" frameX="-9" frameY="-72" frameWidth="458" frameHeight="1231"/>
+</TextureAtlas>

@@ -48,9 +48,10 @@ func GetAPIKeyConfig() APIKeyConfig {
 	// Add optimization endpoints to bypass rules if public access is enabled
 	if publicOptEnabled {
 		config.BypassRules = append(config.BypassRules,
-			BypassRule{Path: "/optimize", Method: ""},       // Public image optimization
-			BypassRule{Path: "/batch-optimize", Method: ""}, // Public batch optimization
-			BypassRule{Path: "/pack-sprites", Method: ""},   // Public spritesheet packing
+			BypassRule{Path: "/optimize", Method: ""},            // Public image optimization
+			BypassRule{Path: "/batch-optimize", Method: ""},      // Public batch optimization
+			BypassRule{Path: "/pack-sprites", Method: ""},        // Public spritesheet packing
+			BypassRule{Path: "/optimize-spritesheet", Method: ""}, // Public spritesheet optimization
 		)
 	}
 

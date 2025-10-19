@@ -916,3 +916,153 @@ func generateCocos2d(sheets []Spritesheet) ([]byte, error) {
 
 	return buf.Bytes(), nil
 }
+
+// ============================================================================
+// Spritesheet Import and Optimization
+// ============================================================================
+
+// FrameData represents a single frame extracted from XML
+type FrameData struct {
+	Name        string
+	X           int
+	Y           int
+	Width       int
+	Height      int
+	FrameX      int // Offset from original position (for trimmed sprites)
+	FrameY      int // Offset from original position
+	FrameWidth  int // Original width before trimming
+	FrameHeight int // Original height before trimming
+}
+
+// ParseSparrowXML parses a Sparrow/Starling format XML and returns frame data
+func ParseSparrowXML(xmlData []byte) ([]FrameData, error) {
+	type SubTexture struct {
+		Name        string `xml:"name,attr"`
+		X           int    `xml:"x,attr"`
+		Y           int    `xml:"y,attr"`
+		Width       int    `xml:"width,attr"`
+		Height      int    `xml:"height,attr"`
+		FrameX      int    `xml:"frameX,attr"`
+		FrameY      int    `xml:"frameY,attr"`
+		FrameWidth  int    `xml:"frameWidth,attr"`
+		FrameHeight int    `xml:"frameHeight,attr"`
+	}
+
+	type TextureAtlas struct {
+		XMLName     xml.Name     `xml:"TextureAtlas"`
+		SubTextures []SubTexture `xml:"SubTexture"`
+	}
+
+	var atlas TextureAtlas
+	if err := xml.Unmarshal(xmlData, &atlas); err != nil {
+		return nil, fmt.Errorf("failed to parse Sparrow XML: %w", err)
+	}
+
+	frames := make([]FrameData, len(atlas.SubTextures))
+	for i, st := range atlas.SubTextures {
+		frames[i] = FrameData{
+			Name:        st.Name,
+			X:           st.X,
+			Y:           st.Y,
+			Width:       st.Width,
+			Height:      st.Height,
+			FrameX:      st.FrameX,
+			FrameY:      st.FrameY,
+			FrameWidth:  st.FrameWidth,
+			FrameHeight: st.FrameHeight,
+		}
+	}
+
+	return frames, nil
+}
+
+// ExtractFramesFromSheet extracts individual sprite frames from a spritesheet using frame data
+func ExtractFramesFromSheet(sheetImage image.Image, frames []FrameData) ([]Sprite, error) {
+	sprites := make([]Sprite, len(frames))
+
+	for i, frame := range frames {
+		// Extract the frame region from the sheet
+		rect := image.Rect(frame.X, frame.Y, frame.X+frame.Width, frame.Y+frame.Height)
+		frameImg := image.NewRGBA(rect)
+		draw.Draw(frameImg, frameImg.Bounds(), sheetImage, rect.Min, draw.Src)
+
+		// Encode to PNG buffer
+		var buf bytes.Buffer
+		if err := png.Encode(&buf, frameImg); err != nil {
+			return nil, fmt.Errorf("failed to encode frame %s: %w", frame.Name, err)
+		}
+
+		sprites[i] = Sprite{
+			Name:   frame.Name,
+			Image:  frameImg,
+			Buffer: buf.Bytes(),
+			Width:  frame.Width,
+			Height: frame.Height,
+		}
+
+		// Store original trim data if present
+		if frame.FrameWidth > 0 && frame.FrameHeight > 0 {
+			sprites[i].Trimmed = true
+			sprites[i].TrimmedX = -frame.FrameX // Sparrow uses negative offsets
+			sprites[i].TrimmedY = -frame.FrameY
+			sprites[i].OriginalW = frame.FrameWidth
+			sprites[i].OriginalH = frame.FrameHeight
+		}
+	}
+
+	return sprites, nil
+}
+
+// DeduplicateSprites removes duplicate sprites and returns unique ones with name mapping
+func DeduplicateSprites(sprites []Sprite) ([]Sprite, map[string]string) {
+	type spriteHash struct {
+		hash   string
+		sprite Sprite
+	}
+
+	seen := make(map[string]spriteHash)
+	nameMapping := make(map[string]string) // Maps duplicate names to canonical name
+	uniqueSprites := []Sprite{}
+
+	for _, sprite := range sprites {
+		// Create a simple hash by comparing pixel data
+		hash := fmt.Sprintf("%d_%d_%v", sprite.Width, sprite.Height, sprite.Buffer[:minInt(100, len(sprite.Buffer))])
+
+		if existing, found := seen[hash]; found {
+			// Check if images are actually identical (full pixel comparison)
+			if bytesEqual(sprite.Buffer, existing.sprite.Buffer) {
+				// Duplicate found - map this name to the canonical one
+				nameMapping[sprite.Name] = existing.sprite.Name
+				continue
+			}
+		}
+
+		// New unique sprite
+		seen[hash] = spriteHash{hash: hash, sprite: sprite}
+		uniqueSprites = append(uniqueSprites, sprite)
+		nameMapping[sprite.Name] = sprite.Name // Maps to itself
+	}
+
+	return uniqueSprites, nameMapping
+}
+
+// bytesEqual compares two byte slices for equality
+func bytesEqual(a, b []byte) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+// minInt returns the minimum of two integers
+func minInt(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}

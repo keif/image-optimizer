@@ -39,6 +39,7 @@ type SheetMetadata struct {
 // SetupSpritesheetRoutes registers spritesheet-related routes
 func SetupSpritesheetRoutes(app *fiber.App) {
 	app.Post("/pack-sprites", PackSprites)
+	app.Post("/optimize-spritesheet", OptimizeSpritesheet)
 	app.Get("/spritesheet/formats", GetSpritesheetFormats)
 }
 
@@ -285,4 +286,170 @@ func GetSpritesheetFormats(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"formats": formats,
 	})
+}
+
+// OptimizeSpritesheet handles importing an existing spritesheet and re-optimizing it
+// @Summary Optimize an existing spritesheet
+// @Description Accepts a spritesheet PNG and its XML, extracts frames, optionally deduplicates, and repacks optimally
+// @Tags spritesheet
+// @Accept multipart/form-data
+// @Produce json
+// @Param spritesheet formData file true "Spritesheet PNG image"
+// @Param xml formData file true "Spritesheet XML (Sparrow format)"
+// @Param deduplicate query bool false "Remove duplicate frames" default(false)
+// @Param padding query int false "Padding between sprites in pixels" default(2)
+// @Param powerOfTwo query bool false "Force power-of-2 dimensions" default(false)
+// @Param trimTransparency query bool false "Trim transparent pixels from sprites" default(false)
+// @Param maxWidth query int false "Maximum sheet width in pixels" default(2048)
+// @Param maxHeight query int false "Maximum sheet height in pixels" default(2048)
+// @Param outputFormats query string false "Comma-separated list of output formats" default("sparrow")
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /optimize-spritesheet [post]
+func OptimizeSpritesheet(c *fiber.Ctx) error {
+	// Parse multipart form
+	form, err := c.MultipartForm()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Failed to parse multipart form",
+		})
+	}
+
+	// Get spritesheet image
+	spritesheetFiles := form.File["spritesheet"]
+	if len(spritesheetFiles) == 0 {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "No spritesheet image provided",
+		})
+	}
+
+	// Get XML file
+	xmlFiles := form.File["xml"]
+	if len(xmlFiles) == 0 {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "No XML file provided",
+		})
+	}
+
+	// Read spritesheet image
+	sheetFile, err := spritesheetFiles[0].Open()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Failed to open spritesheet file",
+		})
+	}
+	defer sheetFile.Close()
+
+	sheetData, err := io.ReadAll(sheetFile)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Failed to read spritesheet data",
+		})
+	}
+
+	sheetImg, _, err := image.Decode(bytes.NewReader(sheetData))
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Failed to decode spritesheet image",
+		})
+	}
+
+	// Read XML file
+	xmlFile, err := xmlFiles[0].Open()
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Failed to open XML file",
+		})
+	}
+	defer xmlFile.Close()
+
+	xmlData, err := io.ReadAll(xmlFile)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Failed to read XML data",
+		})
+	}
+
+	// Parse XML to extract frame data
+	frames, err := services.ParseSparrowXML(xmlData)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": fmt.Sprintf("Failed to parse XML: %v", err),
+		})
+	}
+
+	// Extract individual frames from the spritesheet
+	sprites, err := services.ExtractFramesFromSheet(sheetImg, frames)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": fmt.Sprintf("Failed to extract frames: %v", err),
+		})
+	}
+
+	originalCount := len(sprites)
+	var nameMapping map[string]string
+
+	// Optionally deduplicate
+	deduplicate := c.Query("deduplicate", "false")
+	if deduplicate == "true" {
+		sprites, nameMapping = services.DeduplicateSprites(sprites)
+	}
+
+	// Parse packing options (same as PackSprites)
+	options := services.PackingOptions{
+		Padding:          parseInt(c.Query("padding", "2")),
+		PowerOfTwo:       parseBool(c.Query("powerOfTwo", "false")),
+		TrimTransparency: parseBool(c.Query("trimTransparency", "false")),
+		MaxWidth:         parseInt(c.Query("maxWidth", "2048")),
+		MaxHeight:        parseInt(c.Query("maxHeight", "2048")),
+		OutputFormats:    parseOutputFormats(c.Query("outputFormats", "sparrow")),
+	}
+
+	// Pack the sprites using existing packing logic
+	result, err := services.PackSprites(sprites, options)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": fmt.Sprintf("Failed to pack sprites: %v", err),
+		})
+	}
+
+	// Encode sheets to base64
+	base64Sheets := make([]string, len(result.Sheets))
+	for i, sheet := range result.Sheets {
+		base64Sheets[i] = base64.StdEncoding.EncodeToString(sheet.ImageBuffer)
+	}
+
+	// Build metadata response
+	metadata := make([]SheetMetadata, len(result.Sheets))
+	for i, sheet := range result.Sheets {
+		metadata[i] = SheetMetadata{
+			Index:       i,
+			Width:       sheet.Width,
+			Height:      sheet.Height,
+			SpriteCount: len(sheet.Sprites),
+			Efficiency:  sheet.Efficiency,
+		}
+	}
+
+	// Convert output formats to map
+	outputFiles := make(map[string]string)
+	for format, data := range result.Formats {
+		outputFiles[format] = string(data)
+	}
+
+	response := fiber.Map{
+		"sheets":         base64Sheets,
+		"metadata":       metadata,
+		"outputFiles":    outputFiles,
+		"totalSprites":   result.TotalSprites,
+		"originalCount":  originalCount,
+		"duplicatesRemoved": originalCount - len(sprites),
+	}
+
+	if deduplicate == "true" {
+		response["nameMapping"] = nameMapping
+	}
+
+	return c.JSON(response)
 }

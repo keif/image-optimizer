@@ -25,6 +25,9 @@ docker_build(
     'squish-web',
     './web',
     dockerfile='./web/Dockerfile',
+    build_args={
+        'NEXT_PUBLIC_API_URL': 'http://localhost:8080',  # Use local API for Tilt
+    },
     live_update=[
         # Full rebuild if dependencies change
         fall_back_on([
