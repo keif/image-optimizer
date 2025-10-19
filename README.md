@@ -846,8 +846,27 @@ The API includes comprehensive security controls to protect against abuse and un
    - SQLite-backed key storage with secure random generation
    - Bearer token support in Authorization header
    - Revocable keys with audit trail (created_at, revoked_at)
+   - **Secure by default**: Requires API keys for all optimization endpoints
+   - **Public Access Mode**: Configurable via `PUBLIC_OPTIMIZATION_ENABLED` for public web UIs
    - Method-specific bypass rules (only POST /api/keys allows bootstrap, GET/DELETE require auth)
    - Configurable via `API_KEY_AUTH_ENABLED` environment variable
+
+   **Configuration Options:**
+   - **Private/Self-hosted** (default, most secure):
+     ```bash
+     API_KEY_AUTH_ENABLED=true
+     PUBLIC_OPTIMIZATION_ENABLED=false  # Requires API keys
+     ```
+   - **Public Website** (like sosquishy.io):
+     ```bash
+     API_KEY_AUTH_ENABLED=true
+     PUBLIC_OPTIMIZATION_ENABLED=true   # Public web UI access
+     RATE_LIMIT_ENABLED=true            # Prevent abuse
+     ```
+   - **Local Development**:
+     ```bash
+     API_KEY_AUTH_ENABLED=false         # Easy testing
+     ```
 
 2. **Rate Limiting** ✅
    - In-memory sliding window rate limiter
@@ -882,14 +901,26 @@ The API includes comprehensive security controls to protect against abuse and un
 
 For production deployments:
 
+**Required (Essential):**
 - ✅ **Enable API key authentication** (`API_KEY_AUTH_ENABLED=true`)
+- ✅ **Configure public access mode** (`PUBLIC_OPTIMIZATION_ENABLED=true` for public sites, `false` for private)
 - ✅ **Configure rate limiting** (adjust `RATE_LIMIT_MAX` and `RATE_LIMIT_WINDOW`)
 - ✅ **Set domain whitelist** (specify allowed domains in `ALLOWED_DOMAINS`)
+
+**Recommended (Additional Protection):**
 - ⚠️ **Use HTTPS** (configure TLS or deploy behind reverse proxy)
 - ⚠️ **Deploy behind reverse proxy** (nginx, Caddy, Traefik for additional protection)
 - ⚠️ **Regular security audits** (review API keys, monitor rate limit violations)
 - ⚠️ **Database backups** (backup SQLite database regularly)
 - ⚠️ **Monitor logs** (track failed auth attempts, rate limit hits)
+
+**Deployment Types:**
+
+| Use Case | API_KEY_AUTH_ENABLED | PUBLIC_OPTIMIZATION_ENABLED | Notes |
+|----------|---------------------|----------------------------|-------|
+| Public website (sosquishy.io) | `true` | `true` | Web UI works, rate limiting protects API |
+| Private/Self-hosted | `true` | `false` | Most secure, all requests need API keys |
+| Local development | `false` | `true` | Easy testing, no security |
 
 ## License
 

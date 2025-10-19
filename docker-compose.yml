@@ -13,7 +13,11 @@ services:
       - RATE_LIMIT_ENABLED=true
       - RATE_LIMIT_MAX=100
       - RATE_LIMIT_WINDOW=1m
+      # API Key Authentication
+      # For local development: disabled for easy testing
+      # For production: enable with PUBLIC_OPTIMIZATION_ENABLED=true for web UI access
       - API_KEY_AUTH_ENABLED=false
+      - PUBLIC_OPTIMIZATION_ENABLED=true
       - ALLOWED_DOMAINS=cloudinary.com,imgur.com,unsplash.com,pexels.com,localhost
     volumes:
       - api-data:/app/data

@@ -23,18 +23,38 @@ type APIKeyConfig struct {
 
 // GetAPIKeyConfig loads API key config from environment variables
 func GetAPIKeyConfig() APIKeyConfig {
-	config := APIKeyConfig{
-		Enabled: true, // Default: enabled
-		BypassRules: []BypassRule{
-			{Path: "/health", Method: ""},           // Allow all methods
-			{Path: "/swagger", Method: ""},          // Allow all methods
-			{Path: "/api/keys", Method: "POST"},     // Only allow POST for bootstrap (create keys)
-			{Path: "/optimize", Method: ""},         // Allow public image optimization via web UI
-			{Path: "/batch-optimize", Method: ""},   // Allow public batch optimization via web UI
-		},
+	// Base bypass rules (always allowed)
+	baseBypassRules := []BypassRule{
+		{Path: "/health", Method: ""},       // Health check endpoint
+		{Path: "/swagger", Method: ""},      // API documentation
+		{Path: "/api/keys", Method: "POST"}, // Bootstrap: create first API key
 	}
 
-	// Load from environment
+	config := APIKeyConfig{
+		Enabled:     true, // Default: API key authentication enabled (secure by default)
+		BypassRules: baseBypassRules,
+	}
+
+	// Check if public optimization is enabled (for public web UI access)
+	// Default: false (secure by default - requires API keys for optimization)
+	// Set to true for public instances like sosquishy.io with rate limiting
+	publicOptEnabled := false
+	if publicOptStr := os.Getenv("PUBLIC_OPTIMIZATION_ENABLED"); publicOptStr != "" {
+		if enabled, err := strconv.ParseBool(publicOptStr); err == nil {
+			publicOptEnabled = enabled
+		}
+	}
+
+	// Add optimization endpoints to bypass rules if public access is enabled
+	if publicOptEnabled {
+		config.BypassRules = append(config.BypassRules,
+			BypassRule{Path: "/optimize", Method: ""},       // Public image optimization
+			BypassRule{Path: "/batch-optimize", Method: ""}, // Public batch optimization
+		)
+	}
+
+	// Check if API key authentication is enabled
+	// Default: true (enabled), can be disabled for local development
 	if enabledStr := os.Getenv("API_KEY_AUTH_ENABLED"); enabledStr != "" {
 		if enabled, err := strconv.ParseBool(enabledStr); err == nil {
 			config.Enabled = enabled

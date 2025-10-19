@@ -120,14 +120,14 @@ func TestAPIKeyMiddleware_BypassRules(t *testing.T) {
 			expectedStatus: 200,
 			description:    "GET /health should allow unauthenticated requests",
 		},
-		// /optimize should bypass auth for all methods
+		// /optimize should require auth by default (secure by default)
 		{
 			name:           "POST /optimize without auth",
 			method:         "POST",
 			path:           "/optimize",
 			apiKey:         "",
-			expectedStatus: 200,
-			description:    "POST /optimize should allow unauthenticated requests",
+			expectedStatus: 401,
+			description:    "POST /optimize should require authentication (secure by default)",
 		},
 	}
 
@@ -268,5 +268,65 @@ func TestAPIKeyMiddleware_Disabled(t *testing.T) {
 
 	if resp.StatusCode != 200 {
 		t.Errorf("Expected status 200 when auth is disabled, got %d", resp.StatusCode)
+	}
+}
+
+// TestAPIKeyMiddleware_PublicOptimizationEnabled tests PUBLIC_OPTIMIZATION_ENABLED
+func TestAPIKeyMiddleware_PublicOptimizationEnabled(t *testing.T) {
+	// Enable public optimization mode
+	os.Setenv("PUBLIC_OPTIMIZATION_ENABLED", "true")
+	os.Setenv("API_KEY_AUTH_ENABLED", "true")
+	defer os.Unsetenv("PUBLIC_OPTIMIZATION_ENABLED")
+	defer os.Unsetenv("API_KEY_AUTH_ENABLED")
+
+	os.Setenv("DB_PATH", ":memory:")
+	if err := db.Initialize(); err != nil {
+		t.Fatalf("Failed to initialize test database: %v", err)
+	}
+	defer db.Close()
+
+	app := fiber.New()
+	app.Use(RequireAPIKey())
+
+	app.Post("/optimize", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{"message": "POST /optimize"})
+	})
+
+	app.Post("/batch-optimize", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{"message": "POST /batch-optimize"})
+	})
+
+	tests := []struct {
+		name           string
+		path           string
+		expectedStatus int
+	}{
+		{
+			name:           "/optimize without auth",
+			path:           "/optimize",
+			expectedStatus: 200,
+		},
+		{
+			name:           "/batch-optimize without auth",
+			path:           "/batch-optimize",
+			expectedStatus: 200,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest("POST", tt.path, nil)
+			resp, err := app.Test(req)
+			if err != nil {
+				t.Fatalf("Request failed: %v", err)
+			}
+			defer resp.Body.Close()
+
+			if resp.StatusCode != tt.expectedStatus {
+				body, _ := io.ReadAll(resp.Body)
+				t.Errorf("Expected status %d, got %d. Response: %s",
+					tt.expectedStatus, resp.StatusCode, string(body))
+			}
+		})
 	}
 }
