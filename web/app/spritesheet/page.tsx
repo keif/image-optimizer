@@ -7,7 +7,7 @@ import SpritesheetImporter from '@/components/SpritesheetImporter';
 import SpritesheetControls from '@/components/SpritesheetControls';
 import SpritesheetResults from '@/components/SpritesheetResults';
 import { packSprites, optimizeSpritesheet } from '@/lib/api';
-import { PackingOptions, PackingResult, OptimizationOptions } from '@/lib/types';
+import { PackingOptions, PackingResult, SpritesheetOptimizationOptions } from '@/lib/types';
 
 type Mode = 'pack' | 'import';
 
@@ -72,7 +72,7 @@ export default function SpritesheetPage() {
     setError('');
 
     try {
-      const optimizationOptions: OptimizationOptions = {
+      const optimizationOptions: SpritesheetOptimizationOptions = {
         ...options,
         deduplicate,
       };

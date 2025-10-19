@@ -81,6 +81,29 @@ export default function SpritesheetResults({ result }: SpritesheetResultsProps) 
           </div>
         )}
 
+        {/* Auto-Resize Info (if applicable) */}
+        {result.resizedSprites && result.resizedSprites.length > 0 && (
+          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+              Auto-Resized Sprites ({result.resizedSprites.length})
+            </p>
+            <div className="space-y-1">
+              {result.resizedSprites.map((info, index) => (
+                <div key={index} className="text-xs text-blue-700 dark:text-blue-300">
+                  <span className="font-mono">{info.spriteName}</span>:{' '}
+                  <span className="text-blue-600 dark:text-blue-400">
+                    {info.originalWidth}×{info.originalHeight}
+                  </span>
+                  {' → '}
+                  <span className="text-blue-800 dark:text-blue-200 font-medium">
+                    {info.newWidth}×{info.newHeight}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <div className="text-2xl font-bold text-purple-600">

@@ -1,4 +1,4 @@
-import { OptimizationOptions, OptimizationResult, APIKey, APIError, PackingOptions, PackingResult } from './types';
+import { OptimizationOptions, OptimizationResult, APIKey, APIError, PackingOptions, PackingResult, SpritesheetOptimizationOptions } from './types';
 
 class ApiClient {
   private baseUrl: string;
@@ -250,6 +250,9 @@ class ApiClient {
     params.append('maxWidth', options.maxWidth.toString());
     params.append('maxHeight', options.maxHeight.toString());
     params.append('outputFormats', options.outputFormats.join(','));
+    if (options.autoResize) {
+      params.append('autoResize', 'true');
+    }
 
     const url = `${this.baseUrl}/pack-sprites?${params.toString()}`;
     console.log('[ApiClient] packSprites - Calling URL:', url);
@@ -271,7 +274,7 @@ class ApiClient {
   async optimizeSpritesheet(
     spritesheetFile: File,
     xmlFile: File,
-    options: OptimizationOptions
+    options: SpritesheetOptimizationOptions
   ): Promise<PackingResult> {
     await this.ensureConfigLoaded();
 
@@ -322,5 +325,5 @@ export const apiClient = new ApiClient();
 export const packSprites = (files: File[], options: PackingOptions) =>
   apiClient.packSprites(files, options);
 
-export const optimizeSpritesheet = (spritesheetFile: File, xmlFile: File, options: OptimizationOptions) =>
+export const optimizeSpritesheet = (spritesheetFile: File, xmlFile: File, options: SpritesheetOptimizationOptions) =>
   apiClient.optimizeSpritesheet(spritesheetFile, xmlFile, options);

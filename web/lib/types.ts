@@ -76,6 +76,15 @@ export interface PackingOptions {
   maxWidth: number;
   maxHeight: number;
   outputFormats: string[];
+  autoResize?: boolean;
+}
+
+export interface ResizeInfo {
+  spriteName: string;
+  originalWidth: number;
+  originalHeight: number;
+  newWidth: number;
+  newHeight: number;
 }
 
 export interface SheetMetadata {
@@ -91,11 +100,12 @@ export interface PackingResult {
   metadata: SheetMetadata[];
   outputFiles: { [key: string]: string };  // Format name -> file content
   totalSprites: number;
+  resizedSprites?: ResizeInfo[];  // Info about auto-resized sprites
   originalCount?: number;         // For optimize-spritesheet: original sprite count
   duplicatesRemoved?: number;     // For optimize-spritesheet: number of duplicates removed
   nameMapping?: { [key: string]: string }; // For optimize-spritesheet: duplicate name mapping
 }
 
-export interface OptimizationOptions extends PackingOptions {
+export interface SpritesheetOptimizationOptions extends PackingOptions {
   deduplicate?: boolean;
 }

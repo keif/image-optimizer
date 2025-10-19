@@ -112,6 +112,21 @@ export default function SpritesheetControls({ options, onChange }: SpritesheetCo
             </div>
           </div>
         </label>
+
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={options.autoResize || false}
+            onChange={(e) => onChange({ ...options, autoResize: e.target.checked })}
+            className="w-4 h-4"
+          />
+          <div className="flex-1">
+            <div className="text-sm font-medium">Auto-Resize Oversized Sprites</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Automatically resize sprites exceeding 8192×8192 pixels
+            </div>
+          </div>
+        </label>
       </div>
 
       {/* Output Formats */}
