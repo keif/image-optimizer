@@ -50,6 +50,7 @@ func GetAPIKeyConfig() APIKeyConfig {
 		config.BypassRules = append(config.BypassRules,
 			BypassRule{Path: "/optimize", Method: ""},       // Public image optimization
 			BypassRule{Path: "/batch-optimize", Method: ""}, // Public batch optimization
+			BypassRule{Path: "/pack-sprites", Method: ""},   // Public spritesheet packing
 		)
 	}
 
