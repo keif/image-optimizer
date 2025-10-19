@@ -127,8 +127,38 @@ export default function OptimizationControls({
         Leave dimensions empty to maintain original size. Aspect ratio is preserved.
       </p>
 
-      {/* Color Space Options */}
+      {/* Lossless Mode */}
       <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={options.losslessMode || false}
+            onChange={(e) =>
+              onChange({ ...options, losslessMode: e.target.checked })
+            }
+            disabled={disabled}
+            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+          />
+          <div className="flex-1">
+            <div className="text-sm font-medium text-gray-900 dark:text-white">
+              Lossless Mode
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Perfect quality preservation - no compression artifacts (larger files)
+            </div>
+          </div>
+        </label>
+        {options.losslessMode && effectiveFormat === 'jpeg' && (
+          <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+            <p className="text-xs text-yellow-800 dark:text-yellow-200">
+              ⚠️ Note: JPEG is inherently lossy. For true lossless mode, use WebP or PNG format.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Color Space Options */}
+      <div>
         <label className="flex items-center gap-3 cursor-pointer">
           <input
             type="checkbox"
@@ -169,6 +199,39 @@ export default function OptimizationControls({
 
           {showAdvanced && (
             <div className="mt-4 space-y-4">
+              {/* Interpolation/Upscaling Algorithm */}
+              {(options.width || options.height) && (
+                <div className="space-y-2 p-3 bg-gray-50 dark:bg-gray-900/30 rounded-lg">
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-gray-300">
+                    Resizing Quality
+                  </h4>
+                  <div>
+                    <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                      Interpolation Algorithm
+                    </label>
+                    <select
+                      value={options.interpolator || 'bicubic'}
+                      onChange={(e) =>
+                        onChange({
+                          ...options,
+                          interpolator: e.target.value as OptimizationOptions['interpolator'],
+                        })
+                      }
+                      disabled={disabled}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    >
+                      <option value="bicubic">Bicubic (Best quality, recommended)</option>
+                      <option value="nohalo">NoHalo (Sharp, detailed)</option>
+                      <option value="bilinear">Bilinear (Balanced)</option>
+                      <option value="nearest">Nearest Neighbor (Fastest, pixelated)</option>
+                    </select>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Higher quality algorithms produce better results, especially for upscaling
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* JPEG Advanced Options */}
               {showJpegOptions && (
                 <div className="space-y-3 p-3 bg-blue-50 dark:bg-blue-900/10 rounded-lg">

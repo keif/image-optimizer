@@ -22,6 +22,10 @@ export interface OptimizationOptions {
   returnImage?: boolean;
   forceSRGB?: boolean;
 
+  // Lossless mode - perfect quality preservation
+  losslessMode?: boolean;
+  interpolator?: 'nearest' | 'bilinear' | 'bicubic' | 'nohalo';
+
   // Advanced JPEG options
   progressive?: boolean;
   optimizeCoding?: boolean;

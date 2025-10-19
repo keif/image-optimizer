@@ -311,6 +311,23 @@ paths:
         in: query
         name: returnImage
         type: boolean
+      - default: false
+        description: Enable lossless mode (perfect quality preservation)
+        in: query
+        name: losslessMode
+        type: boolean
+      - description: Resizing interpolation algorithm
+        enum:
+        - nearest
+        - bilinear
+        - bicubic
+        - nohalo
+        - vsqbs
+        - lanczos2
+        - lanczos3
+        in: query
+        name: interpolator
+        type: string
       - description: Image file to optimize (multipart upload)
         in: formData
         name: image

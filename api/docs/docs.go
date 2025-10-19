@@ -338,6 +338,28 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Enable lossless mode (perfect quality preservation)",
+                        "name": "losslessMode",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "nearest",
+                            "bilinear",
+                            "bicubic",
+                            "nohalo",
+                            "vsqbs",
+                            "lanczos2",
+                            "lanczos3"
+                        ],
+                        "type": "string",
+                        "description": "Resizing interpolation algorithm",
+                        "name": "interpolator",
+                        "in": "query"
+                    },
+                    {
                         "type": "file",
                         "description": "Image file to optimize (multipart upload)",
                         "name": "image",

@@ -87,6 +87,10 @@ class ApiClient {
     }
     if (options.forceSRGB) params.append('forceSRGB', 'true');
 
+    // Lossless mode and interpolation
+    if (options.losslessMode) params.append('losslessMode', 'true');
+    if (options.interpolator) params.append('interpolator', options.interpolator);
+
     // Advanced JPEG options
     if (options.progressive) params.append('progressive', 'true');
     if (options.optimizeCoding) params.append('optimizeCoding', 'true');
@@ -135,6 +139,10 @@ class ApiClient {
     if (options.height) params.append('height', options.height.toString());
     if (options.format) params.append('format', options.format);
     if (options.forceSRGB) params.append('forceSRGB', 'true');
+
+    // Lossless mode and interpolation
+    if (options.losslessMode) params.append('losslessMode', 'true');
+    if (options.interpolator) params.append('interpolator', options.interpolator);
 
     // Advanced JPEG options
     if (options.progressive) params.append('progressive', 'true');

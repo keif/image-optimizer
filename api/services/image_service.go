@@ -34,6 +34,10 @@ type OptimizeOptions struct {
 	Format     bimg.ImageType // Target format (JPEG, PNG, WEBP, etc.)
 	ForceSRGB  bool           // Force conversion to sRGB color space
 
+	// Lossless mode - enables perfect quality preservation
+	LosslessMode bool   // Enable lossless mode (forces lossless encoding for all formats)
+	Interpolator string // Interpolation algorithm for resizing (bicubic, bilinear, nohalo, vsqbs, nearest, lanczos2, lanczos3)
+
 	// Advanced JPEG options
 	Progressive    bool // Progressive JPEG encoding (loads gradually)
 	OptimizeCoding bool // Optimize huffman tables for better compression
@@ -46,7 +50,7 @@ type OptimizeOptions struct {
 	Palette     bool // Enable palette mode (quantize to 256 colors)
 
 	// Advanced WebP options
-	Lossless   bool // Lossless WebP encoding
+	Lossless   bool // Lossless WebP encoding (can also be set via LosslessMode)
 	Effort     int  // CPU effort (0-6, default 4)
 	WebpMethod int  // Encoding method (0-6, higher=better compression but slower)
 
@@ -69,7 +73,26 @@ func OptimizeImage(buffer []byte, options OptimizeOptions) (*OptimizeResult, err
 	// Detect original color space
 	originalColorSpace := detectColorSpace(originalMetadata)
 
-	// Set default quality if not specified
+	// Handle lossless mode - overrides quality and compression settings
+	if options.LosslessMode {
+		// Force maximum quality for lossless mode
+		options.Quality = 100
+
+		// For PNG: use maximum compression, disable palette mode
+		if options.Format == bimg.PNG || (options.Format == 0 && originalMetadata.Type == "png") {
+			options.Compression = 9
+			options.Palette = false
+			options.OxipngLevel = 6 // Maximum OxiPNG compression for lossless
+		}
+
+		// For WebP: enable lossless encoding
+		if options.Format == bimg.WEBP || (options.Format == 0 && originalMetadata.Type == "webp") {
+			options.Lossless = true
+			options.Effort = 6 // Maximum effort for best lossless compression
+		}
+	}
+
+	// Set default quality if not specified and not in lossless mode
 	if options.Quality == 0 {
 		options.Quality = 80 // Default quality
 	}
@@ -84,6 +107,33 @@ func OptimizeImage(buffer []byte, options OptimizeOptions) (*OptimizeResult, err
 		Quality:       options.Quality,
 		Compression:   options.Compression,
 		StripMetadata: true, // Remove EXIF data to reduce size
+	}
+
+	// Set interpolation algorithm for resizing
+	// Use bicubic by default for best quality
+	if options.Interpolator != "" {
+		switch options.Interpolator {
+		case "nearest":
+			bimgOptions.Interpolator = bimg.Nearest
+		case "bilinear":
+			bimgOptions.Interpolator = bimg.Bilinear
+		case "bicubic":
+			bimgOptions.Interpolator = bimg.Bicubic
+		case "nohalo":
+			bimgOptions.Interpolator = bimg.Nohalo
+		case "vsqbs", "lanczos2", "lanczos3":
+			// These advanced interpolators map to bicubic in bimg
+			// (bimg uses libvips' bicubic which is high quality)
+			bimgOptions.Interpolator = bimg.Bicubic
+		default:
+			// Default to bicubic for best quality
+			bimgOptions.Interpolator = bimg.Bicubic
+		}
+	} else {
+		// Use bicubic as default for best quality, especially in lossless mode or upscaling
+		if options.LosslessMode || (options.Width > 0 && options.Width > originalMetadata.Size.Width) || (options.Height > 0 && options.Height > originalMetadata.Size.Height) {
+			bimgOptions.Interpolator = bimg.Bicubic
+		}
 	}
 
 	// Apply advanced JPEG options

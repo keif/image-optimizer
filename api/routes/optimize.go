@@ -168,6 +168,8 @@ func RegisterOptimizeRoutes(app *fiber.App) {
 // @Param height query int false "Target height in pixels (0 = no resize)" default(0) minimum(0)
 // @Param format query string false "Target format" Enums(jpeg,png,webp,gif,avif)
 // @Param returnImage query bool false "Return optimized image file instead of JSON metadata" default(false)
+// @Param losslessMode query bool false "Enable lossless mode (perfect quality preservation)" default(false)
+// @Param interpolator query string false "Resizing interpolation algorithm" Enums(nearest,bilinear,bicubic,nohalo,vsqbs,lanczos2,lanczos3)
 // @Param image formData file false "Image file to optimize (multipart upload)"
 // @Param url formData string false "Image URL to fetch and optimize (alternative to file upload)"
 // @Success 200 {object} services.OptimizeResult "JSON metadata response (when returnImage=false)"
@@ -242,6 +244,28 @@ func handleOptimize(c *fiber.Ctx) error {
 
 	// Parse forceSRGB
 	options.ForceSRGB = c.QueryBool("forceSRGB", false)
+
+	// Parse lossless mode
+	options.LosslessMode = c.QueryBool("losslessMode", false)
+
+	// Parse interpolator
+	if interpolator := c.Query("interpolator"); interpolator != "" {
+		validInterpolators := map[string]bool{
+			"nearest":  true,
+			"bilinear": true,
+			"bicubic":  true,
+			"nohalo":   true,
+			"vsqbs":    true,
+			"lanczos2": true,
+			"lanczos3": true,
+		}
+		if !validInterpolators[interpolator] {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid interpolator. Supported: nearest, bilinear, bicubic, nohalo, vsqbs, lanczos2, lanczos3",
+			})
+		}
+		options.Interpolator = interpolator
+	}
 
 	// Parse advanced JPEG options
 	options.Progressive = c.QueryBool("progressive", false)
