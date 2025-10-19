@@ -22,12 +22,22 @@ type PackSpritesRequest struct {
 	Images [][]byte `json:"images"`
 }
 
+// ResizeInfo contains information about a sprite that was auto-resized
+type ResizeInfo struct {
+	SpriteName     string `json:"spriteName"`
+	OriginalWidth  int    `json:"originalWidth"`
+	OriginalHeight int    `json:"originalHeight"`
+	NewWidth       int    `json:"newWidth"`
+	NewHeight      int    `json:"newHeight"`
+}
+
 // PackSpritesResponse represents the response for sprite packing
 type PackSpritesResponse struct {
 	Sheets       []string          `json:"sheets"`       // Base64-encoded PNG images
 	Metadata     []SheetMetadata   `json:"metadata"`     // Metadata for each sheet
 	OutputFiles  map[string]string `json:"outputFiles"`  // Format name -> file content
 	TotalSprites int               `json:"totalSprites"`
+	ResizedSprites []ResizeInfo    `json:"resizedSprites,omitempty"` // Info about auto-resized sprites
 }
 
 // SheetMetadata contains information about a packed sheet
@@ -48,18 +58,19 @@ func SetupSpritesheetRoutes(app *fiber.App) {
 
 // PackSprites handles the sprite packing endpoint
 // @Summary Pack multiple sprites into optimized spritesheets
-// @Description Accepts multiple image files and packs them into one or more optimized spritesheets using the MaxRects bin packing algorithm. Automatically splits into multiple sheets if needed. IMPORTANT: Each individual sprite must be ≤8192x8192 pixels (hard limit). For larger sprites, use /optimize-spritesheet or /optimize to resize first.
+// @Description Accepts multiple image files and packs them into one or more optimized spritesheets using the MaxRects bin packing algorithm. Automatically splits into multiple sheets if needed. IMPORTANT: Each individual sprite must be ≤8192x8192 pixels (hard limit). Use autoResize=true to automatically resize oversized sprites - the response will include details of all resize operations.
 // @Tags spritesheet
 // @Accept multipart/form-data
 // @Produce json
-// @Param images formData file true "Sprite images to pack (multiple files supported). Each sprite must be ≤8192x8192 pixels."
+// @Param images formData file true "Sprite images to pack (multiple files supported). Each sprite must be ≤8192x8192 pixels unless autoResize=true."
 // @Param padding query int false "Padding between sprites in pixels (0-32)" default(2)
 // @Param powerOfTwo query bool false "Force power-of-2 dimensions (256, 512, 1024, etc.)" default(false)
 // @Param trimTransparency query bool false "Trim transparent pixels from sprites" default(false)
 // @Param maxWidth query int false "Maximum sheet width in pixels (256-8192)" default(2048)
 // @Param maxHeight query int false "Maximum sheet height in pixels (256-8192)" default(2048)
+// @Param autoResize query bool false "Automatically resize sprites exceeding 8192x8192 to fit. Resize details returned in response." default(false)
 // @Param outputFormats query string false "Comma-separated list of output formats: json,css,csv,xml,sparrow,texturepacker,cocos2d,unity,godot" default("json")
-// @Success 200 {object} PackSpritesResponse
+// @Success 200 {object} PackSpritesResponse "Success response includes resizedSprites array if any sprites were auto-resized"
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /pack-sprites [post]
@@ -87,6 +98,7 @@ func PackSprites(c *fiber.Ctx) error {
 		MaxWidth:         parseInt(c.Query("maxWidth", "2048")),
 		MaxHeight:        parseInt(c.Query("maxHeight", "2048")),
 		OutputFormats:    parseOutputFormats(c.Query("outputFormats", "json")),
+		AutoResize:       parseBool(c.Query("autoResize", "false")),
 	}
 
 	// Validate options
@@ -113,6 +125,8 @@ func PackSprites(c *fiber.Ctx) error {
 
 	// Load sprites from uploaded files
 	sprites := make([]services.Sprite, 0, len(files))
+	resizedSprites := make([]ResizeInfo, 0)
+
 	for _, fileHeader := range files {
 		file, err := fileHeader.Open()
 		if err != nil {
@@ -138,19 +152,68 @@ func PackSprites(c *fiber.Ctx) error {
 			})
 		}
 
-		width := img.Bounds().Dx()
-		height := img.Bounds().Dy()
+		originalWidth := img.Bounds().Dx()
+		originalHeight := img.Bounds().Dy()
+		width := originalWidth
+		height := originalHeight
 
 		// Validate individual sprite size against absolute maximum (8192x8192)
 		const maxSpriteSize = 8192
 		if width > maxSpriteSize || height > maxSpriteSize {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": fmt.Sprintf(
-					"Sprite '%s' is %dx%d pixels, which exceeds the maximum allowed size of %dx%d per sprite. "+
-						"Multi-sheet splitting cannot help with oversized individual sprites. "+
-						"Please resize this sprite first using the /optimize endpoint or /optimize-spritesheet with maxWidth/maxHeight parameters.",
-					fileHeader.Filename, width, height, maxSpriteSize, maxSpriteSize,
-				),
+			if !options.AutoResize {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"error": fmt.Sprintf(
+						"Sprite '%s' is %dx%d pixels, which exceeds the maximum allowed size of %dx%d per sprite. "+
+							"Options: (1) Enable autoResize=true to automatically resize sprites, or "+
+							"(2) Resize manually using /optimize or /optimize-spritesheet endpoints.",
+						fileHeader.Filename, width, height, maxSpriteSize, maxSpriteSize,
+					),
+				})
+			}
+
+			// Auto-resize sprite to fit within maxSpriteSize
+			scale := 1.0
+			if width > maxSpriteSize {
+				scale = float64(maxSpriteSize) / float64(width)
+			}
+			if height > maxSpriteSize {
+				heightScale := float64(maxSpriteSize) / float64(height)
+				if heightScale < scale {
+					scale = heightScale
+				}
+			}
+
+			width = int(float64(originalWidth) * scale)
+			height = int(float64(originalHeight) * scale)
+
+			// Resize image using services.OptimizeImage
+			resizeResult, err := services.OptimizeImage(data, services.OptimizeOptions{
+				Quality: 100,
+				Width:   width,
+				Height:  height,
+				// Format is auto-detected from input, PNG will be preserved
+			})
+			if err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+					"error": fmt.Sprintf("Failed to resize sprite %s: %v", fileHeader.Filename, err),
+				})
+			}
+
+			// Decode resized image
+			img, _, err = image.Decode(bytes.NewReader(resizeResult.OptimizedImage))
+			if err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+					"error": fmt.Sprintf("Failed to decode resized sprite %s: %v", fileHeader.Filename, err),
+				})
+			}
+
+			// Track resize operation
+			resizedSprites = append(resizedSprites, ResizeInfo{
+				SpriteName:     fileHeader.Filename,
+				OriginalWidth:  originalWidth,
+				OriginalHeight: originalHeight,
+				NewWidth:       width,
+				NewHeight:      height,
 			})
 		}
 
@@ -205,10 +268,11 @@ func PackSprites(c *fiber.Ctx) error {
 
 	// Prepare response
 	response := PackSpritesResponse{
-		Sheets:       sheetData,
-		Metadata:     metadata,
-		OutputFiles:  outputFiles,
-		TotalSprites: len(sprites),
+		Sheets:         sheetData,
+		Metadata:       metadata,
+		OutputFiles:    outputFiles,
+		TotalSprites:   len(sprites),
+		ResizedSprites: resizedSprites,
 	}
 
 	return c.JSON(response)

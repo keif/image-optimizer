@@ -39,13 +39,14 @@ type PackedSprite struct {
 
 // PackingOptions contains parameters for sprite packing
 type PackingOptions struct {
-	Padding         int      // Padding between sprites (pixels)
-	PowerOfTwo      bool     // Force output dimensions to power of 2
+	Padding          int      // Padding between sprites (pixels)
+	PowerOfTwo       bool     // Force output dimensions to power of 2
 	TrimTransparency bool     // Trim transparent borders from sprites
-	MaxWidth        int      // Maximum sheet width (0 = unlimited)
-	MaxHeight       int      // Maximum sheet height (0 = unlimited)
-	OutputFormats   []string // Desired output formats (json, css, csv, xml, sparrow, texturepacker, cocos2d, unity, godot)
-	AllowRotation   bool     // Allow sprite rotation for better packing
+	MaxWidth         int      // Maximum sheet width (0 = unlimited)
+	MaxHeight        int      // Maximum sheet height (0 = unlimited)
+	OutputFormats    []string // Desired output formats (json, css, csv, xml, sparrow, texturepacker, cocos2d, unity, godot)
+	AllowRotation    bool     // Allow sprite rotation for better packing
+	AutoResize       bool     // Automatically resize sprites that exceed MaxWidth/MaxHeight
 }
 
 // Spritesheet represents the packed result
