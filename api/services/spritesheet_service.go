@@ -401,28 +401,66 @@ func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, erro
 				}
 			}
 
-			// Calculate suggested dimensions (with 20% overhead for packing efficiency)
-			suggestedW := int(float64(maxSpriteW) * 1.2)
-			suggestedH := int(float64(maxSpriteH) * 1.2)
-			if suggestedW < maxW {
-				suggestedW = maxW
+			// Cap suggestions at API maximum (8192x8192)
+			const maxAllowed = 8192
+			suggestedW := maxW
+			suggestedH := maxH
+
+			if maxSpriteW > maxAllowed || maxSpriteH > maxAllowed {
+				// Sprite exceeds absolute maximum - can't pack even with max sheet size
+				return nil, fmt.Errorf(
+					"failed to pack sprites - sprite '%s' is %dx%d pixels, which exceeds the maximum sheet size of %dx%d. "+
+						"Individual sprites must fit within sheet dimensions. Current sheet size: %dx%d. "+
+						"Either increase sheet size to maximum (%dx%d) or enable autoResize to automatically resize oversized sprites",
+					largestSpriteName, maxSpriteW, maxSpriteH, maxAllowed, maxAllowed, maxW, maxH, maxAllowed, maxAllowed,
+				)
 			}
-			if suggestedH < maxH {
-				suggestedH = maxH
+
+			// Calculate suggested dimensions (with 20% overhead for packing efficiency)
+			desiredW := int(float64(maxSpriteW) * 1.2)
+			desiredH := int(float64(maxSpriteH) * 1.2)
+
+			if desiredW > suggestedW {
+				suggestedW = desiredW
+			}
+			if desiredH > suggestedH {
+				suggestedH = desiredH
+			}
+
+			// Cap at maximum allowed
+			if suggestedW > maxAllowed {
+				suggestedW = maxAllowed
+			}
+			if suggestedH > maxAllowed {
+				suggestedH = maxAllowed
 			}
 
 			// Round up to next power of 2 for cleaner suggestion
 			if options.PowerOfTwo {
 				suggestedW = nextPowerOfTwo(suggestedW)
 				suggestedH = nextPowerOfTwo(suggestedH)
+				// Ensure we don't exceed max after rounding
+				if suggestedW > maxAllowed {
+					suggestedW = maxAllowed
+				}
+				if suggestedH > maxAllowed {
+					suggestedH = maxAllowed
+				}
 			} else {
 				// Round to nearest 512
 				suggestedW = ((suggestedW + 511) / 512) * 512
 				suggestedH = ((suggestedH + 511) / 512) * 512
+				// Ensure we don't exceed max after rounding
+				if suggestedW > maxAllowed {
+					suggestedW = maxAllowed
+				}
+				if suggestedH > maxAllowed {
+					suggestedH = maxAllowed
+				}
 			}
 
 			return nil, fmt.Errorf(
-				"failed to pack sprites - largest sprite '%s' is %dx%d pixels, but max dimensions are %dx%d. Try increasing maxWidth and maxHeight to at least %dx%d",
+				"failed to pack sprites - largest sprite '%s' is %dx%d pixels, but max sheet dimensions are %dx%d. Try increasing maxWidth and maxHeight to %dx%d",
 				largestSpriteName, maxSpriteW, maxSpriteH, maxW, maxH, suggestedW, suggestedH,
 			)
 		}
