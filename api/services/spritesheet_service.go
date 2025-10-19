@@ -43,7 +43,7 @@ type PackingOptions struct {
 	TrimTransparency bool     // Trim transparent borders from sprites
 	MaxWidth        int      // Maximum sheet width (0 = unlimited)
 	MaxHeight       int      // Maximum sheet height (0 = unlimited)
-	OutputFormats   []string // Desired output formats (json, css, csv, xml, unity, godot)
+	OutputFormats   []string // Desired output formats (json, css, csv, xml, sparrow, texturepacker, cocos2d, unity, godot)
 	AllowRotation   bool     // Allow sprite rotation for better packing
 }
 
@@ -503,6 +503,12 @@ func generateOutputFormat(sheets []Spritesheet, format string) ([]byte, error) {
 		return generateCSV(sheets)
 	case "xml":
 		return generateXML(sheets)
+	case "sparrow":
+		return generateSparrow(sheets)
+	case "texturepacker":
+		return generateTexturePacker(sheets)
+	case "cocos2d":
+		return generateCocos2d(sheets)
 	case "unity":
 		return generateUnity(sheets)
 	case "godot":
@@ -729,6 +735,182 @@ func generateGodot(sheets []Spritesheet) ([]byte, error) {
 				sprite.X, sprite.Y, sprite.Width, sprite.Height))
 		}
 	}
+
+	return buf.Bytes(), nil
+}
+
+// Sparrow/Starling XML format (used by HaxeFlixel, Friday Night Funkin', etc.)
+func generateSparrow(sheets []Spritesheet) ([]byte, error) {
+	type SparrowSprite struct {
+		Name        string  `xml:"name,attr"`
+		X           int     `xml:"x,attr"`
+		Y           int     `xml:"y,attr"`
+		Width       int     `xml:"width,attr"`
+		Height      int     `xml:"height,attr"`
+		FrameX      int     `xml:"frameX,attr,omitempty"`
+		FrameY      int     `xml:"frameY,attr,omitempty"`
+		FrameWidth  int     `xml:"frameWidth,attr,omitempty"`
+		FrameHeight int     `xml:"frameHeight,attr,omitempty"`
+	}
+
+	type SparrowAtlas struct {
+		XMLName   xml.Name        `xml:"TextureAtlas"`
+		ImagePath string          `xml:"imagePath,attr"`
+		Sprites   []SparrowSprite `xml:"SubTexture"`
+	}
+
+	// Sparrow typically uses single sheet
+	if len(sheets) == 0 {
+		return nil, fmt.Errorf("no sheets to export")
+	}
+
+	sheet := sheets[0]
+	atlas := SparrowAtlas{
+		ImagePath: "spritesheet-0.png",
+		Sprites:   []SparrowSprite{},
+	}
+
+	for _, sprite := range sheet.Sprites {
+		sparrowSprite := SparrowSprite{
+			Name:   sprite.Name,
+			X:      sprite.X,
+			Y:      sprite.Y,
+			Width:  sprite.Width,
+			Height: sprite.Height,
+		}
+
+		// Add frame offset data if sprite was trimmed
+		if sprite.Trimmed {
+			sparrowSprite.FrameX = -sprite.TrimmedX      // Negative offset from left
+			sparrowSprite.FrameY = -sprite.TrimmedY      // Negative offset from top
+			sparrowSprite.FrameWidth = sprite.OriginalW  // Original width
+			sparrowSprite.FrameHeight = sprite.OriginalH // Original height
+		}
+
+		atlas.Sprites = append(atlas.Sprites, sparrowSprite)
+	}
+
+	return xml.MarshalIndent(atlas, "", "  ")
+}
+
+// TexturePacker Generic XML format
+func generateTexturePacker(sheets []Spritesheet) ([]byte, error) {
+	type TPSprite struct {
+		Name     string `xml:"n,attr"`
+		X        int    `xml:"x,attr"`
+		Y        int    `xml:"y,attr"`
+		Width    int    `xml:"w,attr"`
+		Height   int    `xml:"h,attr"`
+		OffsetX  int    `xml:"oX,attr,omitempty"`
+		OffsetY  int    `xml:"oY,attr,omitempty"`
+		OriginalW int   `xml:"oW,attr,omitempty"`
+		OriginalH int   `xml:"oH,attr,omitempty"`
+	}
+
+	type TPAtlas struct {
+		XMLName   xml.Name   `xml:"TextureAtlas"`
+		ImagePath string     `xml:"imagePath,attr"`
+		Width     int        `xml:"width,attr"`
+		Height    int        `xml:"height,attr"`
+		Sprites   []TPSprite `xml:"sprite"`
+	}
+
+	// TexturePacker typically uses single sheet
+	if len(sheets) == 0 {
+		return nil, fmt.Errorf("no sheets to export")
+	}
+
+	sheet := sheets[0]
+	atlas := TPAtlas{
+		ImagePath: "spritesheet-0.png",
+		Width:     sheet.Width,
+		Height:    sheet.Height,
+		Sprites:   []TPSprite{},
+	}
+
+	for _, sprite := range sheet.Sprites {
+		tpSprite := TPSprite{
+			Name:   sprite.Name,
+			X:      sprite.X,
+			Y:      sprite.Y,
+			Width:  sprite.Width,
+			Height: sprite.Height,
+		}
+
+		// Add offset data if sprite was trimmed
+		if sprite.Trimmed {
+			tpSprite.OffsetX = sprite.TrimmedX
+			tpSprite.OffsetY = sprite.TrimmedY
+			tpSprite.OriginalW = sprite.OriginalW
+			tpSprite.OriginalH = sprite.OriginalH
+		}
+
+		atlas.Sprites = append(atlas.Sprites, tpSprite)
+	}
+
+	return xml.MarshalIndent(atlas, "", "  ")
+}
+
+// Cocos2d plist format (Apple Property List XML)
+func generateCocos2d(sheets []Spritesheet) ([]byte, error) {
+	var buf bytes.Buffer
+
+	buf.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+	buf.WriteString("<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n")
+	buf.WriteString("<plist version=\"1.0\">\n<dict>\n")
+	buf.WriteString("\t<key>frames</key>\n\t<dict>\n")
+
+	// Cocos2d typically uses single sheet
+	if len(sheets) == 0 {
+		return nil, fmt.Errorf("no sheets to export")
+	}
+
+	sheet := sheets[0]
+
+	for _, sprite := range sheet.Sprites {
+		buf.WriteString(fmt.Sprintf("\t\t<key>%s</key>\n", sprite.Name))
+		buf.WriteString("\t\t<dict>\n")
+
+		// Frame: {{x,y},{w,h}}
+		buf.WriteString("\t\t\t<key>frame</key>\n")
+		buf.WriteString(fmt.Sprintf("\t\t\t<string>{{%d,%d},{%d,%d}}</string>\n",
+			sprite.X, sprite.Y, sprite.Width, sprite.Height))
+
+		// Offset: {offsetX, offsetY} - center offset if trimmed
+		if sprite.Trimmed {
+			offsetX := (sprite.OriginalW - sprite.Width) / 2
+			offsetY := (sprite.OriginalH - sprite.Height) / 2
+			buf.WriteString("\t\t\t<key>offset</key>\n")
+			buf.WriteString(fmt.Sprintf("\t\t\t<string>{%d,%d}</string>\n", offsetX, offsetY))
+		} else {
+			buf.WriteString("\t\t\t<key>offset</key>\n")
+			buf.WriteString("\t\t\t<string>{0,0}</string>\n")
+		}
+
+		// Source size: {originalW, originalH}
+		origW := sprite.Width
+		origH := sprite.Height
+		if sprite.Trimmed {
+			origW = sprite.OriginalW
+			origH = sprite.OriginalH
+		}
+		buf.WriteString("\t\t\t<key>sourceSize</key>\n")
+		buf.WriteString(fmt.Sprintf("\t\t\t<string>{%d,%d}</string>\n", origW, origH))
+
+		buf.WriteString("\t\t</dict>\n")
+	}
+
+	buf.WriteString("\t</dict>\n")
+	buf.WriteString("\t<key>metadata</key>\n")
+	buf.WriteString("\t<dict>\n")
+	buf.WriteString("\t\t<key>format</key>\n")
+	buf.WriteString("\t\t<integer>2</integer>\n")
+	buf.WriteString("\t\t<key>textureFileName</key>\n")
+	buf.WriteString("\t\t<string>spritesheet-0.png</string>\n")
+	buf.WriteString("\t\t<key>size</key>\n")
+	buf.WriteString(fmt.Sprintf("\t\t<string>{%d,%d}</string>\n", sheet.Width, sheet.Height))
+	buf.WriteString("\t</dict>\n")
+	buf.WriteString("</dict>\n</plist>\n")
 
 	return buf.Bytes(), nil
 }

@@ -555,7 +555,7 @@ Pack multiple sprite images into optimized spritesheets using the MaxRects bin p
 - `maxHeight` (integer): Maximum sheet height in pixels (default: 2048)
   - Range: 256-8192 pixels
 - `outputFormats` (string): Comma-separated list of output formats (default: "json")
-  - Available: `json`, `css`, `csv`, `xml`, `unity`, `godot`
+  - Available: `json`, `css`, `csv`, `xml`, `sparrow`, `texturepacker`, `cocos2d`, `unity`, `godot`
 
 **Examples:**
 
@@ -577,7 +577,7 @@ curl -X POST "http://localhost:8080/pack-sprites?padding=4&powerOfTwo=true" \
 
 **3. Pack with transparency trimming and multiple output formats:**
 ```bash
-curl -X POST "http://localhost:8080/pack-sprites?trimTransparency=true&outputFormats=json,css,unity" \
+curl -X POST "http://localhost:8080/pack-sprites?trimTransparency=true&outputFormats=json,sparrow,unity" \
   -F "images=@sprite1.png" \
   -F "images=@sprite2.png"
 ```
@@ -624,6 +624,9 @@ curl -X POST "http://localhost:8080/pack-sprites?maxWidth=4096&maxHeight=4096&pa
 - **CSS**: CSS classes with `background-position` for web sprites
 - **CSV**: Comma-separated values (name, x, y, width, height)
 - **XML**: Generic XML format for sprite coordinates
+- **Sparrow**: Sparrow/Starling XML format with frame offsets (HaxeFlixel, Friday Night Funkin')
+- **TexturePacker**: TexturePacker Generic XML format with trim offsets
+- **Cocos2d**: Cocos2d plist format (Apple Property List XML)
 - **Unity**: Unity TextureImporter metadata format (`.meta`)
 - **Godot**: Godot Engine AtlasTexture resource format (`.tres`)
 
