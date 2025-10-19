@@ -381,7 +381,41 @@ func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, erro
 	for len(remainingSprites) > 0 {
 		sheet, unpacked := packSingleSheet(remainingSprites, maxW, maxH, options)
 		if sheet == nil {
-			return nil, fmt.Errorf("failed to pack sprites - sheet size may be too small")
+			// Find the largest sprite to give helpful error
+			maxSpriteW, maxSpriteH := 0, 0
+			largestSpriteName := ""
+			for _, sprite := range remainingSprites {
+				if sprite.Width > maxSpriteW || sprite.Height > maxSpriteH {
+					maxSpriteW = sprite.Width
+					maxSpriteH = sprite.Height
+					largestSpriteName = sprite.Name
+				}
+			}
+
+			// Calculate suggested dimensions (with 20% overhead for packing efficiency)
+			suggestedW := int(float64(maxSpriteW) * 1.2)
+			suggestedH := int(float64(maxSpriteH) * 1.2)
+			if suggestedW < maxW {
+				suggestedW = maxW
+			}
+			if suggestedH < maxH {
+				suggestedH = maxH
+			}
+
+			// Round up to next power of 2 for cleaner suggestion
+			if options.PowerOfTwo {
+				suggestedW = nextPowerOfTwo(suggestedW)
+				suggestedH = nextPowerOfTwo(suggestedH)
+			} else {
+				// Round to nearest 512
+				suggestedW = ((suggestedW + 511) / 512) * 512
+				suggestedH = ((suggestedH + 511) / 512) * 512
+			}
+
+			return nil, fmt.Errorf(
+				"failed to pack sprites - largest sprite '%s' is %dx%d pixels, but max dimensions are %dx%d. Try increasing maxWidth and maxHeight to at least %dx%d",
+				largestSpriteName, maxSpriteW, maxSpriteH, maxW, maxH, suggestedW, suggestedH,
+			)
 		}
 
 		sheets = append(sheets, *sheet)
