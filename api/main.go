@@ -33,6 +33,12 @@ import (
 // @schemes http https
 
 func main() {
+	// Log version information on startup
+	log.Printf("Image Optimizer API")
+	log.Printf("Version: %s", version)
+	log.Printf("Commit: %s", commit)
+	log.Printf("Build Time: %s", buildTime)
+
 	// Initialize database
 	if err := db.Initialize(); err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
@@ -76,18 +82,8 @@ func main() {
 	app.Use(middleware.NewRateLimiter())
 	app.Use(middleware.RequireAPIKey())
 
-	// Health check endpoint
-	// @Summary Health check
-	// @Description Check if the API is running
-	// @Tags health
-	// @Produce json
-	// @Success 200 {object} map[string]string
-	// @Router /health [get]
-	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"status": "ok",
-		})
-	})
+	// Health check endpoint with version information
+	app.Get("/health", routes.HealthHandler(version, commit))
 
 	// Swagger documentation endpoint
 	app.Get("/swagger/*", fiberswagger.WrapHandler)

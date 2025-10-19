@@ -1,6 +1,11 @@
 # Build stage
 FROM golang:1.24-alpine AS builder
 
+# Build arguments for version information
+ARG APP_VERSION=dev
+ARG GIT_COMMIT=none
+ARG BUILD_TIME=unknown
+
 # Install build dependencies
 RUN apk add --no-cache \
     gcc \
@@ -18,8 +23,11 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build the application
-RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o main .
+# Build the application with version information injected via ldflags
+RUN CGO_ENABLED=1 GOOS=linux go build \
+    -a -installsuffix cgo \
+    -ldflags="-X main.version=${APP_VERSION} -X main.commit=${GIT_COMMIT} -X main.buildTime=${BUILD_TIME}" \
+    -o main .
 
 # Runtime stage
 FROM alpine:latest

@@ -1,0 +1,77 @@
+# fly.toml app configuration file generated for image-optimizer-billowing-waterfall-5108 on 2025-10-19T15:03:49-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'image-optimizer-billowing-waterfall-5108'
+primary_region = 'iad'
+kill_signal = 'SIGINT'
+kill_timeout = '10s'
+
+[experimental]
+  auto_rollback = true
+
+[build]
+  dockerfile = 'Dockerfile'
+
+[deploy]
+  strategy = 'rolling'
+  wait_timeout = '5m0s'
+
+[env]
+  PORT = '8080'
+
+[[mounts]]
+  source = 'image_optimizer_data'
+  destination = '/app/data'
+  initial_size = '1gb'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'off'
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = 'requests'
+    hard_limit = 250
+    soft_limit = 200
+
+[[services]]
+  protocol = 'tcp'
+  internal_port = 8080
+  auto_stop_machines = 'off'
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[services.ports]]
+    port = 80
+    handlers = ['http']
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ['http', 'tls']
+
+  [services.concurrency]
+    type = 'connections'
+    hard_limit = 250
+    soft_limit = 200
+
+  [[services.http_checks]]
+    interval = '30s'
+    timeout = '5s'
+    grace_period = '10s'
+    method = 'GET'
+    path = '/health'
+    protocol = 'http'
+
+[[vm]]
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 2048
+
+[[metrics]]
+  port = 9091
+  path = '/metrics'
