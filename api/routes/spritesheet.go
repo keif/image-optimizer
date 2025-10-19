@@ -186,13 +186,8 @@ func PackSprites(c *fiber.Ctx) error {
 			width = int(float64(originalWidth) * scale)
 			height = int(float64(originalHeight) * scale)
 
-			// Resize image using services.OptimizeImage
-			resizeResult, err := services.OptimizeImage(data, services.OptimizeOptions{
-				Quality: 100,
-				Width:   width,
-				Height:  height,
-				// Format is auto-detected from input, PNG will be preserved
-			})
+			// Use fast resize path optimized for speed
+			resizedData, err := services.FastResizeImage(data, width, height)
 			if err != nil {
 				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 					"error": fmt.Sprintf("Failed to resize sprite %s: %v", fileHeader.Filename, err),
@@ -200,7 +195,7 @@ func PackSprites(c *fiber.Ctx) error {
 			}
 
 			// Decode resized image
-			img, _, err = image.Decode(bytes.NewReader(resizeResult.OptimizedImage))
+			img, _, err = image.Decode(bytes.NewReader(resizedData))
 			if err != nil {
 				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 					"error": fmt.Sprintf("Failed to decode resized sprite %s: %v", fileHeader.Filename, err),

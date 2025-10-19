@@ -373,3 +373,18 @@ func optimizePNGWithOxipng(inputBuffer []byte, level int) ([]byte, error) {
 	// Return optimized buffer (even if larger - caller will decide)
 	return optimizedBuffer, nil
 }
+
+// FastResizeImage performs a quick resize operation on image data using bimg
+// This is optimized for speed over quality - perfect for auto-resize scenarios
+// Returns resized image data as PNG
+func FastResizeImage(buffer []byte, targetWidth, targetHeight int) ([]byte, error) {
+	options := bimg.Options{
+		Width:        targetWidth,
+		Height:       targetHeight,
+		Interpolator: bimg.Bilinear, // Fast interpolation
+		Type:         bimg.PNG,
+		Quality:      90, // Good quality, fast encoding
+	}
+
+	return bimg.Resize(buffer, options)
+}
