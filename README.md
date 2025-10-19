@@ -1,6 +1,6 @@
-# Image Optimizer
+# Squish - Image Optimizer
 
-An API-first image optimization service built with Go and Fiber. Designed for local development with future expansion to a multi-user SaaS platform.
+An API-first image optimization service built with Go and Fiber. Squish is designed for local development with future expansion to a multi-user SaaS platform.
 
 ## Live Demo
 

@@ -76,7 +76,7 @@ jobs:
 
     - name: Build API
       working-directory: ./api
-      run: go build -v -o image-optimizer main.go
+      run: go build -v -o squish-api main.go
 
     - name: Build CLI
       working-directory: ./cli

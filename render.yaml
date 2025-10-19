@@ -1,7 +1,7 @@
 services:
   # API Service (Go + libvips)
   - type: web
-    name: image-optimizer-api
+    name: squish-api
     runtime: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .

@@ -1,6 +1,7 @@
 {
-  "name": "image-optimizer-web",
+  "name": "squish-web",
   "version": "0.1.0",
+  "description": "Squish - Modern image optimization web interface",
   "private": true,
   "scripts": {
     "dev": "next dev",

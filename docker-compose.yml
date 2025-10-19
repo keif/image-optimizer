@@ -3,8 +3,8 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
-    image: image-optimizer-api
-    container_name: image-optimizer-api
+    image: squish-api
+    container_name: squish-api
     ports:
       - "8080:8080"
     environment:
@@ -31,8 +31,8 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
-    image: image-optimizer-web
-    container_name: image-optimizer-web
+    image: squish-web
+    container_name: squish-web
     ports:
       - "3000:3000"
     environment:

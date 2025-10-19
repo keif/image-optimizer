@@ -1,4 +1,4 @@
-# Tiltfile for Image Optimizer
+# Tiltfile for Squish
 # Provides hot-reload development environment for both API and web services
 
 # Load docker-compose configuration
@@ -6,7 +6,7 @@ docker_compose('./docker-compose.yml')
 
 # Configure API service with live updates
 docker_build(
-    'image-optimizer-api',
+    'squish-api',
     './api',
     dockerfile='./api/Dockerfile',
     live_update=[
@@ -22,7 +22,7 @@ docker_build(
 
 # Configure web service with live updates
 docker_build(
-    'image-optimizer-web',
+    'squish-web',
     './web',
     dockerfile='./web/Dockerfile',
     live_update=[
@@ -83,7 +83,7 @@ local_resource(
 # Print helpful information
 print("""
 ╔════════════════════════════════════════════════════════════════╗
-║                    Image Optimizer - Tilt                      ║
+║                       Squish - Tilt                            ║
 ╠════════════════════════════════════════════════════════════════╣
 ║                                                                ║
 ║  Services:                                                     ║
