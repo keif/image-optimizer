@@ -6,6 +6,9 @@ interface SpritesheetControlsProps {
 }
 
 export default function SpritesheetControls({ options, onChange }: SpritesheetControlsProps) {
+  const MIN_DIMENSION = 256;
+  const MAX_DIMENSION = 8192;
+
   const outputFormatOptions = [
     { value: 'json', label: 'JSON', description: 'Generic JSON format' },
     { value: 'css', label: 'CSS', description: 'CSS sprite classes' },
@@ -27,6 +30,24 @@ export default function SpritesheetControls({ options, onChange }: SpritesheetCo
     if (newFormats.length > 0) {
       onChange({ ...options, outputFormats: newFormats });
     }
+  };
+
+  const handleDimensionChange = (field: 'maxWidth' | 'maxHeight', value: string) => {
+    const numValue = parseInt(value);
+
+    // Allow empty input for better UX while typing
+    if (value === '') {
+      onChange({ ...options, [field]: '' as any });
+      return;
+    }
+
+    // Clamp value between min and max
+    const clampedValue = Math.max(MIN_DIMENSION, Math.min(MAX_DIMENSION, numValue || MIN_DIMENSION));
+    onChange({ ...options, [field]: clampedValue });
+  };
+
+  const isValidDimension = (value: number) => {
+    return value >= MIN_DIMENSION && value <= MAX_DIMENSION;
   };
 
   return (
@@ -57,13 +78,28 @@ export default function SpritesheetControls({ options, onChange }: SpritesheetCo
           </label>
           <input
             type="number"
-            min="256"
-            max="8192"
+            min={MIN_DIMENSION}
+            max={MAX_DIMENSION}
             step="256"
             value={options.maxWidth}
-            onChange={(e) => onChange({ ...options, maxWidth: parseInt(e.target.value) || 2048 })}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm"
+            onChange={(e) => handleDimensionChange('maxWidth', e.target.value)}
+            onBlur={(e) => {
+              // Ensure valid value on blur
+              if (!e.target.value || !isValidDimension(parseInt(e.target.value))) {
+                handleDimensionChange('maxWidth', String(MIN_DIMENSION));
+              }
+            }}
+            className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-700 text-sm ${
+              options.maxWidth && !isValidDimension(options.maxWidth)
+                ? 'border-red-500 dark:border-red-400'
+                : 'border-gray-300 dark:border-gray-600'
+            }`}
           />
+          {options.maxWidth && !isValidDimension(options.maxWidth) && (
+            <p className="text-xs text-red-500 dark:text-red-400 mt-1">
+              Must be between {MIN_DIMENSION} and {MAX_DIMENSION}
+            </p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">
@@ -71,15 +107,33 @@ export default function SpritesheetControls({ options, onChange }: SpritesheetCo
           </label>
           <input
             type="number"
-            min="256"
-            max="8192"
+            min={MIN_DIMENSION}
+            max={MAX_DIMENSION}
             step="256"
             value={options.maxHeight}
-            onChange={(e) => onChange({ ...options, maxHeight: parseInt(e.target.value) || 2048 })}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm"
+            onChange={(e) => handleDimensionChange('maxHeight', e.target.value)}
+            onBlur={(e) => {
+              // Ensure valid value on blur
+              if (!e.target.value || !isValidDimension(parseInt(e.target.value))) {
+                handleDimensionChange('maxHeight', String(MIN_DIMENSION));
+              }
+            }}
+            className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-700 text-sm ${
+              options.maxHeight && !isValidDimension(options.maxHeight)
+                ? 'border-red-500 dark:border-red-400'
+                : 'border-gray-300 dark:border-gray-600'
+            }`}
           />
+          {options.maxHeight && !isValidDimension(options.maxHeight) && (
+            <p className="text-xs text-red-500 dark:text-red-400 mt-1">
+              Must be between {MIN_DIMENSION} and {MAX_DIMENSION}
+            </p>
+          )}
         </div>
       </div>
+      <p className="text-xs text-gray-500 dark:text-gray-400">
+        Valid range: {MIN_DIMENSION}–{MAX_DIMENSION} pixels
+      </p>
 
       {/* Checkboxes */}
       <div className="space-y-3">
