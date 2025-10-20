@@ -39,14 +39,15 @@ type PackedSprite struct {
 
 // PackingOptions contains parameters for sprite packing
 type PackingOptions struct {
-	Padding          int      // Padding between sprites (pixels)
-	PowerOfTwo       bool     // Force output dimensions to power of 2
-	TrimTransparency bool     // Trim transparent borders from sprites
-	MaxWidth         int      // Maximum sheet width (0 = unlimited)
-	MaxHeight        int      // Maximum sheet height (0 = unlimited)
-	OutputFormats    []string // Desired output formats (json, css, csv, xml, sparrow, texturepacker, cocos2d, unity, godot)
-	AllowRotation    bool     // Allow sprite rotation for better packing
-	AutoResize       bool     // Automatically resize sprites that exceed MaxWidth/MaxHeight
+	Padding          int               // Padding between sprites (pixels)
+	PowerOfTwo       bool              // Force output dimensions to power of 2
+	TrimTransparency bool              // Trim transparent borders from sprites
+	MaxWidth         int               // Maximum sheet width (0 = unlimited)
+	MaxHeight        int               // Maximum sheet height (0 = unlimited)
+	OutputFormats    []string          // Desired output formats (json, css, csv, xml, sparrow, texturepacker, cocos2d, unity, godot)
+	AllowRotation    bool              // Allow sprite rotation for better packing
+	AutoResize       bool              // Automatically resize sprites that exceed MaxWidth/MaxHeight
+	NameMapping      map[string]string // Maps duplicate sprite names to canonical names (for deduplication)
 }
 
 // Spritesheet represents the packed result
@@ -478,7 +479,7 @@ func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, erro
 	formats := make(map[string][]byte)
 	if len(options.OutputFormats) > 0 {
 		for _, format := range options.OutputFormats {
-			data, err := generateOutputFormat(sheets, format)
+			data, err := generateOutputFormat(sheets, format, options.NameMapping)
 			if err != nil {
 				return nil, fmt.Errorf("failed to generate %s format: %w", format, err)
 			}
@@ -576,33 +577,33 @@ func packSingleSheet(sprites []Sprite, maxW, maxH int, options PackingOptions) (
 }
 
 // generateOutputFormat generates coordinate data in the requested format
-func generateOutputFormat(sheets []Spritesheet, format string) ([]byte, error) {
+func generateOutputFormat(sheets []Spritesheet, format string, nameMapping map[string]string) ([]byte, error) {
 	switch strings.ToLower(format) {
 	case "json":
-		return generateJSON(sheets)
+		return generateJSON(sheets, nameMapping)
 	case "css":
-		return generateCSS(sheets)
+		return generateCSS(sheets, nameMapping)
 	case "csv":
-		return generateCSV(sheets)
+		return generateCSV(sheets, nameMapping)
 	case "xml":
-		return generateXML(sheets)
+		return generateXML(sheets, nameMapping)
 	case "sparrow":
-		return generateSparrow(sheets)
+		return generateSparrow(sheets, nameMapping)
 	case "texturepacker":
-		return generateTexturePacker(sheets)
+		return generateTexturePacker(sheets, nameMapping)
 	case "cocos2d":
-		return generateCocos2d(sheets)
+		return generateCocos2d(sheets, nameMapping)
 	case "unity":
-		return generateUnity(sheets)
+		return generateUnity(sheets, nameMapping)
 	case "godot":
-		return generateGodot(sheets)
+		return generateGodot(sheets, nameMapping)
 	default:
 		return nil, fmt.Errorf("unsupported format: %s", format)
 	}
 }
 
 // JSON output format
-func generateJSON(sheets []Spritesheet) ([]byte, error) {
+func generateJSON(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
 	type JSONSprite struct {
 		Name   string `json:"name"`
 		X      int    `json:"x"`
@@ -646,7 +647,7 @@ func generateJSON(sheets []Spritesheet) ([]byte, error) {
 }
 
 // CSS output format
-func generateCSS(sheets []Spritesheet) ([]byte, error) {
+func generateCSS(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
 	var buf bytes.Buffer
 
 	for sheetIdx, sheet := range sheets {
@@ -672,7 +673,7 @@ func generateCSS(sheets []Spritesheet) ([]byte, error) {
 }
 
 // CSV output format
-func generateCSV(sheets []Spritesheet) ([]byte, error) {
+func generateCSV(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
 	var buf bytes.Buffer
 	writer := csv.NewWriter(&buf)
 
@@ -697,7 +698,7 @@ func generateCSV(sheets []Spritesheet) ([]byte, error) {
 }
 
 // XML output format
-func generateXML(sheets []Spritesheet) ([]byte, error) {
+func generateXML(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
 	type XMLSprite struct {
 		Name   string `xml:"name,attr"`
 		X      int    `xml:"x,attr"`
@@ -747,7 +748,7 @@ func generateXML(sheets []Spritesheet) ([]byte, error) {
 }
 
 // Unity output format (TexturePackerJSONArray format)
-func generateUnity(sheets []Spritesheet) ([]byte, error) {
+func generateUnity(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
 	type UnityFrame struct {
 		Filename string `json:"filename"`
 		Frame    struct {
@@ -804,7 +805,7 @@ func generateUnity(sheets []Spritesheet) ([]byte, error) {
 }
 
 // Godot output format (.tres resource file)
-func generateGodot(sheets []Spritesheet) ([]byte, error) {
+func generateGodot(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
 	var buf bytes.Buffer
 
 	for sheetIdx, sheet := range sheets {
@@ -823,7 +824,7 @@ func generateGodot(sheets []Spritesheet) ([]byte, error) {
 }
 
 // Sparrow/Starling XML format (used by HaxeFlixel, Friday Night Funkin', etc.)
-func generateSparrow(sheets []Spritesheet) ([]byte, error) {
+func generateSparrow(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
 	type SparrowSprite struct {
 		Name        string  `xml:"name,attr"`
 		X           int     `xml:"x,attr"`
@@ -853,31 +854,49 @@ func generateSparrow(sheets []Spritesheet) ([]byte, error) {
 		Sprites:   []SparrowSprite{},
 	}
 
+	// Create reverse mapping: canonical name -> list of all names (including duplicates)
+	reverseMapping := make(map[string][]string)
+	if nameMapping != nil {
+		for originalName, canonicalName := range nameMapping {
+			reverseMapping[canonicalName] = append(reverseMapping[canonicalName], originalName)
+		}
+	}
+
 	for _, sprite := range sheet.Sprites {
-		sparrowSprite := SparrowSprite{
-			Name:   sprite.Name,
-			X:      sprite.X,
-			Y:      sprite.Y,
-			Width:  sprite.Width,
-			Height: sprite.Height,
+		// Get all names that should reference this sprite (canonical + duplicates)
+		names := reverseMapping[sprite.Name]
+		if len(names) == 0 {
+			// No mapping, just use the sprite's name
+			names = []string{sprite.Name}
 		}
 
-		// Add frame offset data if sprite was trimmed
-		if sprite.Trimmed {
-			sparrowSprite.FrameX = -sprite.TrimmedX      // Negative offset from left
-			sparrowSprite.FrameY = -sprite.TrimmedY      // Negative offset from top
-			sparrowSprite.FrameWidth = sprite.OriginalW  // Original width
-			sparrowSprite.FrameHeight = sprite.OriginalH // Original height
-		}
+		// Create an entry for each name (preserves duplicate frames in XML)
+		for _, name := range names {
+			sparrowSprite := SparrowSprite{
+				Name:   name,
+				X:      sprite.X,
+				Y:      sprite.Y,
+				Width:  sprite.Width,
+				Height: sprite.Height,
+			}
 
-		atlas.Sprites = append(atlas.Sprites, sparrowSprite)
+			// Add frame offset data if sprite was trimmed
+			if sprite.Trimmed {
+				sparrowSprite.FrameX = -sprite.TrimmedX      // Negative offset from left
+				sparrowSprite.FrameY = -sprite.TrimmedY      // Negative offset from top
+				sparrowSprite.FrameWidth = sprite.OriginalW  // Original width
+				sparrowSprite.FrameHeight = sprite.OriginalH // Original height
+			}
+
+			atlas.Sprites = append(atlas.Sprites, sparrowSprite)
+		}
 	}
 
 	return xml.MarshalIndent(atlas, "", "  ")
 }
 
 // TexturePacker Generic XML format
-func generateTexturePacker(sheets []Spritesheet) ([]byte, error) {
+func generateTexturePacker(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
 	type TPSprite struct {
 		Name     string `xml:"n,attr"`
 		X        int    `xml:"x,attr"`
@@ -935,7 +954,7 @@ func generateTexturePacker(sheets []Spritesheet) ([]byte, error) {
 }
 
 // Cocos2d plist format (Apple Property List XML)
-func generateCocos2d(sheets []Spritesheet) ([]byte, error) {
+func generateCocos2d(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
 	var buf bytes.Buffer
 
 	buf.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")

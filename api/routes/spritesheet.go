@@ -496,6 +496,7 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 		MaxWidth:         parseInt(c.Query("maxWidth", "2048")),
 		MaxHeight:        parseInt(c.Query("maxHeight", "2048")),
 		OutputFormats:    parseOutputFormats(c.Query("outputFormats", "sparrow")),
+		NameMapping:      nameMapping, // Pass deduplication mapping to preserve all frame names in XML
 	}
 
 	// Pack the sprites using existing packing logic
