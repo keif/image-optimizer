@@ -36,7 +36,7 @@ export default function RootLayout({
                     href="/spritesheet"
                     className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
                   >
-                    Spritesheet Packer
+                    Spritesheet Tools
                   </Link>
                   <Link
                     href="/privacy"
