@@ -110,18 +110,33 @@ class ApiClient {
     const url = `${this.baseUrl}/optimize${params.toString() ? '?' + params.toString() : ''}`;
     console.log('[ApiClient] optimizeImage - Calling URL:', url);
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: this.getHeaders(),
-      body: formData,
-    });
+    // 5 minute timeout for long-running optimizations
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
 
-    if (!response.ok) {
-      const error: APIError = await response.json();
-      throw new Error(error.error || 'Failed to optimize image');
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: formData,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const error: APIError = await response.json();
+        throw new Error(error.error || 'Failed to optimize image');
+      }
+
+      return response.json();
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out after 5 minutes. Try reducing image size or quality settings.');
+      }
+      throw error;
     }
-
-    return response.json();
   }
 
   async optimizeImageAndDownload(
@@ -164,23 +179,38 @@ class ApiClient {
 
     const url = `${this.baseUrl}/optimize?${params.toString()}`;
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: this.getHeaders(),
-      body: formData,
-    });
+    // 5 minute timeout for long-running optimizations
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
 
-    if (!response.ok) {
-      const text = await response.text();
-      try {
-        const error: APIError = JSON.parse(text);
-        throw new Error(error.error || 'Failed to optimize image');
-      } catch {
-        throw new Error('Failed to optimize image');
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: formData,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const text = await response.text();
+        try {
+          const error: APIError = JSON.parse(text);
+          throw new Error(error.error || 'Failed to optimize image');
+        } catch {
+          throw new Error('Failed to optimize image');
+        }
       }
-    }
 
-    return response.blob();
+      return response.blob();
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out after 5 minutes. Try reducing image size or quality settings.');
+      }
+      throw error;
+    }
   }
 
   async createApiKey(name: string): Promise<APIKey> {
@@ -257,18 +287,33 @@ class ApiClient {
     const url = `${this.baseUrl}/pack-sprites?${params.toString()}`;
     console.log('[ApiClient] packSprites - Calling URL:', url);
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: this.getHeaders(),
-      body: formData,
-    });
+    // 5 minute timeout for packing large sprite collections
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
 
-    if (!response.ok) {
-      const error: APIError = await response.json();
-      throw new Error(error.error || 'Failed to pack sprites');
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: formData,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const error: APIError = await response.json();
+        throw new Error(error.error || 'Failed to pack sprites');
+      }
+
+      return response.json();
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out after 5 minutes. Try with fewer sprites or smaller images.');
+      }
+      throw error;
     }
-
-    return response.json();
   }
 
   async optimizeSpritesheet(
@@ -294,18 +339,33 @@ class ApiClient {
     const url = `${this.baseUrl}/optimize-spritesheet?${params.toString()}`;
     console.log('[ApiClient] optimizeSpritesheet - Calling URL:', url);
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: this.getHeaders(),
-      body: formData,
-    });
+    // 5 minute timeout for spritesheet optimization
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
 
-    if (!response.ok) {
-      const error: APIError = await response.json();
-      throw new Error(error.error || 'Failed to optimize spritesheet');
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: formData,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const error: APIError = await response.json();
+        throw new Error(error.error || 'Failed to optimize spritesheet');
+      }
+
+      return response.json();
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out after 5 minutes. Try with a smaller spritesheet.');
+      }
+      throw error;
     }
-
-    return response.json();
   }
 
   async checkHealth(): Promise<{ status: string }> {
