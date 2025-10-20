@@ -159,6 +159,20 @@ func PackSprites(c *fiber.Ctx) error {
 
 		// Validate individual sprite size against absolute maximum (8192x8192)
 		const maxSpriteSize = 8192
+
+		// Calculate effective max size accounting for padding
+		// Each sprite needs padding on all sides, so reduce max by padding * 2
+		effectiveMaxWidth := options.MaxWidth - (options.Padding * 2)
+		effectiveMaxHeight := options.MaxHeight - (options.Padding * 2)
+
+		// Ensure effective dimensions are at least 256 (minimum sprite size)
+		if effectiveMaxWidth < 256 {
+			effectiveMaxWidth = 256
+		}
+		if effectiveMaxHeight < 256 {
+			effectiveMaxHeight = 256
+		}
+
 		if width > maxSpriteSize || height > maxSpriteSize {
 			if !options.AutoResize {
 				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -171,13 +185,13 @@ func PackSprites(c *fiber.Ctx) error {
 				})
 			}
 
-			// Auto-resize sprite to fit within maxSpriteSize
+			// Auto-resize sprite to fit within effective max size (accounting for padding)
 			scale := 1.0
-			if width > maxSpriteSize {
-				scale = float64(maxSpriteSize) / float64(width)
+			if width > effectiveMaxWidth {
+				scale = float64(effectiveMaxWidth) / float64(width)
 			}
-			if height > maxSpriteSize {
-				heightScale := float64(maxSpriteSize) / float64(height)
+			if height > effectiveMaxHeight {
+				heightScale := float64(effectiveMaxHeight) / float64(height)
 				if heightScale < scale {
 					scale = heightScale
 				}
