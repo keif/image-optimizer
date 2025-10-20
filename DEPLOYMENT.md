@@ -93,7 +93,22 @@ NEXT_PUBLIC_API_URL=https://api.sosquishy.io pnpm run build
 
 **For complete migration guide, see [HETZNER_MIGRATION.md](./HETZNER_MIGRATION.md)**
 
-**Quick deployment steps:**
+**Quick deployment using script:**
+
+```bash
+# One-command deployment
+./deploy-hetzner.sh
+```
+
+The script will:
+1. Copy source code to server
+2. Build binary on server with version info
+3. Verify binary is Linux ELF (not macOS)
+4. Deploy to /usr/local/bin/
+5. Restart systemd service
+6. Verify health endpoint
+
+**Manual deployment steps:**
 
 1. Copy source to server:
    ```bash

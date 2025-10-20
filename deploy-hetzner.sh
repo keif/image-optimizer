@@ -1,0 +1,89 @@
+#!/bin/bash
+set -e
+
+# Hetzner Deployment Script for Image Optimizer API
+# Usage: ./deploy-hetzner.sh
+
+echo "🚀 Deploying Image Optimizer API to Hetzner..."
+
+# Configuration
+SERVER="root@sosquishy-server"
+BUILD_DIR="/tmp/api-build"
+API_DIR="./api"
+
+# Colors for output
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# Step 1: Copy source to server
+echo -e "${BLUE}📦 Step 1: Copying source code to server...${NC}"
+rsync -avz --exclude='node_modules' --exclude='.git' --exclude='web' \
+  ${API_DIR}/ ${SERVER}:${BUILD_DIR}/
+
+# Step 2: Build on server and deploy
+echo -e "${BLUE}🔨 Step 2: Building on server...${NC}"
+ssh ${SERVER} << 'ENDSSH'
+set -e
+
+cd /tmp/api-build
+
+# Build with version info
+echo "Building binary..."
+go build -v \
+  -ldflags "-X main.version=$(git describe --tags --always 2>/dev/null || echo 'v0.1.0') -X main.commit=$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown') -X main.buildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  -o image-optimizer \
+  main.go
+
+# Verify it's a Linux binary
+echo "Verifying binary..."
+BINARY_TYPE=$(file image-optimizer)
+if [[ $BINARY_TYPE == *"ELF 64-bit"* ]]; then
+    echo "✓ Binary is correct (Linux ELF 64-bit)"
+else
+    echo "✗ ERROR: Binary is not Linux ELF! Got: $BINARY_TYPE"
+    exit 1
+fi
+
+# Deploy
+echo "Deploying binary..."
+mv image-optimizer /usr/local/bin/image-optimizer
+chmod +x /usr/local/bin/image-optimizer
+
+# Restart service
+echo "Restarting service..."
+systemctl restart image-optimizer
+
+# Wait a moment for service to start
+sleep 2
+
+# Check status
+echo "Checking service status..."
+systemctl status image-optimizer --no-pager -l
+
+# Cleanup
+echo "Cleaning up build directory..."
+cd ~
+rm -rf /tmp/api-build
+
+echo "Deployment complete!"
+ENDSSH
+
+# Step 3: Verify deployment
+echo -e "${BLUE}✅ Step 3: Verifying deployment...${NC}"
+echo "Checking health endpoint..."
+sleep 1
+
+HEALTH_RESPONSE=$(curl -s https://api.sosquishy.io/health)
+if [[ $? -eq 0 ]]; then
+    echo -e "${GREEN}✓ API is responding!${NC}"
+    echo "Response: $HEALTH_RESPONSE"
+else
+    echo -e "${RED}✗ Health check failed${NC}"
+    exit 1
+fi
+
+echo ""
+echo -e "${GREEN}🎉 Deployment successful!${NC}"
+echo "API is live at: https://api.sosquishy.io"
