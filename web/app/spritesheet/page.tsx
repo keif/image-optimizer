@@ -6,6 +6,7 @@ import SpritesUploader from '@/components/SpritesUploader';
 import SpritesheetImporter from '@/components/SpritesheetImporter';
 import SpritesheetControls from '@/components/SpritesheetControls';
 import SpritesheetResults from '@/components/SpritesheetResults';
+import ProgressIndicator from '@/components/ProgressIndicator';
 import { packSprites, optimizeSpritesheet } from '@/lib/api';
 import { PackingOptions, PackingResult, SpritesheetOptimizationOptions } from '@/lib/types';
 
@@ -32,8 +33,25 @@ export default function SpritesheetPage() {
     outputFormats: ['json'],
   });
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStage, setProcessingStage] = useState(0);
   const [result, setResult] = useState<PackingResult | null>(null);
   const [error, setError] = useState<string>('');
+
+  // Define processing stages
+  const packingStages = [
+    { id: 'upload', label: 'Uploading sprites to server', estimatedDuration: '1-2s' },
+    { id: 'resize', label: 'Resizing oversized sprites (if needed)', estimatedDuration: '5-30s' },
+    { id: 'pack', label: 'Packing sprites into spritesheet', estimatedDuration: '2-5s' },
+    { id: 'finalize', label: 'Generating output files', estimatedDuration: '1-2s' },
+  ];
+
+  const optimizationStages = [
+    { id: 'upload', label: 'Uploading files to server', estimatedDuration: '1-2s' },
+    { id: 'extract', label: 'Extracting sprites from spritesheet', estimatedDuration: '2-5s' },
+    { id: 'dedupe', label: 'Deduplicating identical sprites', estimatedDuration: '3-10s' },
+    { id: 'pack', label: 'Repacking optimized sprites', estimatedDuration: '2-5s' },
+    { id: 'finalize', label: 'Generating output files', estimatedDuration: '1-2s' },
+  ];
 
   const handleFilesSelected = (files: File[]) => {
     setSelectedFiles(files);
@@ -52,16 +70,34 @@ export default function SpritesheetPage() {
     if (selectedFiles.length === 0) return;
 
     setIsProcessing(true);
+    setProcessingStage(0);
     setError('');
 
     try {
-      const packingResult = await packSprites(selectedFiles, options);
+      // Simulate progress through stages
+      const stageTimings = [100, 800, 1500, 2000]; // Timings to advance to each stage
+      const stagePromises = stageTimings.map((delay, index) =>
+        new Promise<void>((resolve) => {
+          setTimeout(() => {
+            setProcessingStage(index + 1);
+            resolve();
+          }, delay);
+        })
+      );
+
+      // Start the API call and stage progression in parallel
+      const [packingResult] = await Promise.all([
+        packSprites(selectedFiles, options),
+        ...stagePromises,
+      ]);
+
       setResult(packingResult);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to pack sprites');
       console.error('Packing error:', err);
     } finally {
       setIsProcessing(false);
+      setProcessingStage(0);
     }
   };
 
@@ -69,20 +105,39 @@ export default function SpritesheetPage() {
     if (!spritesheetFile || !xmlFile) return;
 
     setIsProcessing(true);
+    setProcessingStage(0);
     setError('');
 
     try {
+      // Simulate progress through stages
+      const stageTimings = [100, 1000, 2000, 3000, 3500]; // Timings to advance to each stage
+      const stagePromises = stageTimings.map((delay, index) =>
+        new Promise<void>((resolve) => {
+          setTimeout(() => {
+            setProcessingStage(index + 1);
+            resolve();
+          }, delay);
+        })
+      );
+
       const optimizationOptions: SpritesheetOptimizationOptions = {
         ...options,
         deduplicate,
       };
-      const optimizationResult = await optimizeSpritesheet(spritesheetFile, xmlFile, optimizationOptions);
+
+      // Start the API call and stage progression in parallel
+      const [optimizationResult] = await Promise.all([
+        optimizeSpritesheet(spritesheetFile, xmlFile, optimizationOptions),
+        ...stagePromises,
+      ]);
+
       setResult(optimizationResult);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to optimize spritesheet');
       console.error('Optimization error:', err);
     } finally {
       setIsProcessing(false);
+      setProcessingStage(0);
     }
   };
 
@@ -257,7 +312,18 @@ export default function SpritesheetPage() {
             </div>
           )}
 
-          {result ? (
+          {isProcessing ? (
+            <ProgressIndicator
+              stages={mode === 'pack' ? packingStages : optimizationStages}
+              currentStage={processingStage}
+              totalStages={mode === 'pack' ? packingStages.length : optimizationStages.length}
+              message={
+                mode === 'pack'
+                  ? `Processing ${selectedFiles.length} sprite${selectedFiles.length !== 1 ? 's' : ''}...`
+                  : 'Extracting and optimizing spritesheet...'
+              }
+            />
+          ) : result ? (
             <SpritesheetResults result={result} />
           ) : (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-12 text-center">

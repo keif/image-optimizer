@@ -135,6 +135,32 @@ export default function SpritesheetControls({ options, onChange }: SpritesheetCo
         Valid range: {MIN_DIMENSION}–{MAX_DIMENSION} pixels
       </p>
 
+      {/* Effective Max Size Indicator */}
+      {options.padding > 0 && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-3">
+          <div className="flex items-start gap-2">
+            <svg className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div className="flex-1 text-xs">
+              <p className="font-medium text-blue-900 dark:text-blue-100 mb-1">
+                Effective Max Sprite Size
+              </p>
+              <p className="text-blue-700 dark:text-blue-300">
+                With {options.padding}px padding, maximum sprite dimensions are:{' '}
+                <span className="font-mono font-semibold">
+                  {options.maxWidth - (options.padding * 2)}×{options.maxHeight - (options.padding * 2)}
+                </span>
+                {' '}pixels
+              </p>
+              <p className="text-blue-600 dark:text-blue-400 mt-1">
+                (Padding adds {options.padding}px on each side)
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Checkboxes */}
       <div className="space-y-3">
         <label className="flex items-center gap-3 cursor-pointer">

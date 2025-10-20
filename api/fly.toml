@@ -14,6 +14,11 @@ kill_timeout = '10s'
 [build]
   dockerfile = 'Dockerfile'
 
+  [build.args]
+    APP_VERSION = "v0.1.0"
+    GIT_COMMIT = ""  # Will be populated by deployment script
+    BUILD_TIME = ""  # Will be populated by deployment script
+
 [deploy]
   strategy = 'rolling'
   wait_timeout = '5m0s'

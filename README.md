@@ -178,6 +178,60 @@ tilt down
 - API Server: http://localhost:8080
 - API Documentation: http://localhost:8080/swagger/index.html
 
+## Deployment
+
+### Frontend Deployment (GitHub Pages)
+
+The frontend (Next.js static site) is deployed via **GitHub Pages**:
+
+```bash
+# Build the frontend
+cd web
+pnpm run build
+
+# The build output is in web/out/
+# Commit and push to trigger GitHub Pages deployment
+git add .
+git commit -m "Update frontend"
+git push origin main
+```
+
+**Configuration:**
+- Static export mode is configured in `web/next.config.js`
+- GitHub Pages serves the `out/` directory after build
+- Environment variables for API endpoint are configured at build time
+
+**Production URL:** https://sosquishy.io
+
+### Backend Deployment (Fly.io)
+
+The backend API is deployed to **Fly.io**:
+
+```bash
+# Deploy to production (recommended - injects git version automatically)
+cd api
+./deploy.sh
+
+# Manual deployment (if needed)
+flyctl deploy --remote-only \
+  --build-arg APP_VERSION="$(git describe --tags --always)" \
+  --build-arg GIT_COMMIT="$(git rev-parse --short HEAD)" \
+  --build-arg BUILD_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+# Check deployment status
+flyctl status
+
+# View logs
+flyctl logs
+
+# Check health (verify version info)
+curl https://api.sosquishy.io/health | jq
+```
+
+**Production API:** https://api.sosquishy.io
+
+**Note:** The `deploy.sh` script automatically injects version information from git into the build, which is displayed in the `/health` endpoint.
+
 ## CLI Tool
 
 The `imgopt` CLI provides a convenient command-line interface for optimizing images locally. It calls the local API server, so make sure the API is running first.
