@@ -203,26 +203,40 @@ git push origin main
 
 **Production URL:** https://sosquishy.io
 
-### Backend Deployment (Fly.io)
+### Backend Deployment (Hetzner Cloud)
 
-The backend API is deployed to **Fly.io**:
+The backend API is deployed to **Hetzner Cloud VPS** (Ubuntu 22.04 with Caddy reverse proxy):
+
+**For complete migration and deployment guide, see [HETZNER_MIGRATION.md](./HETZNER_MIGRATION.md)**
+
+**Quick deployment:**
 
 ```bash
-# Deploy to production (recommended - injects git version automatically)
-cd api
-./deploy.sh
+# Copy source to server (bimg requires CGO, so we build on server)
+cd /Users/keif/projects/git/image-optimizer
+rsync -avz --exclude='node_modules' --exclude='.git' --exclude='web' \
+  ./api/ root@sosquishy-server:/tmp/api-build/
 
-# Manual deployment (if needed)
-flyctl deploy --remote-only \
-  --build-arg APP_VERSION="$(git describe --tags --always)" \
-  --build-arg GIT_COMMIT="$(git rev-parse --short HEAD)" \
-  --build-arg BUILD_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+# SSH and build on server (MUST build on Linux, not Mac!)
+ssh sosquishy-server
+cd /tmp/api-build
+go build -v \
+  -ldflags "-X main.version=$(git describe --tags --always 2>/dev/null || echo 'v0.1.0') -X main.commit=$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown') -X main.buildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  -o image-optimizer \
+  main.go
 
-# Check deployment status
-flyctl status
+# Verify it's a Linux binary
+file image-optimizer
+# Must show: "ELF 64-bit LSB executable, x86-64"
 
-# View logs
-flyctl logs
+# Deploy
+mv image-optimizer /usr/local/bin/image-optimizer
+chmod +x /usr/local/bin/image-optimizer
+rm -rf /tmp/api-build
+systemctl restart image-optimizer
+
+# Check status
+systemctl status image-optimizer
 
 # Check health (verify version info)
 curl https://api.sosquishy.io/health | jq
@@ -230,7 +244,9 @@ curl https://api.sosquishy.io/health | jq
 
 **Production API:** https://api.sosquishy.io
 
-**Note:** The `deploy.sh` script automatically injects version information from git into the build, which is displayed in the `/health` endpoint.
+**Migration notes:**
+- Migrated from Fly.io due to memory limitations (OOM errors with large images)
+- Hetzner CX22: 4GB RAM (vs Fly.io 2GB) at lower cost (~$6.50/month vs ~$12/month)
 
 ## CLI Tool
 
@@ -970,7 +986,7 @@ View the workflow at `.github/workflows/test.yml`
 - **Image Processing**: bimg (libvips wrapper), libvips 8.17+
 - **Database**: SQLite (with migration path to PostgreSQL)
 - **Containerization**: Docker, Docker Compose
-- **Deployment**: Render.com (API), GitHub Pages (Frontend)
+- **Deployment**: Hetzner Cloud VPS (API), GitHub Pages (Frontend)
 - **Future**: PostgreSQL, Redis, User authentication
 
 ## Features in Detail

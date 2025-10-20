@@ -2,8 +2,16 @@
 
 ## Architecture
 
-- **Frontend**: GitHub Pages (static Next.js export)
-- **Backend**: Render.com (Go API with libvips)
+- **Frontend**: GitHub Pages (static Next.js export at https://sosquishy.io)
+- **Backend**: Hetzner Cloud VPS (Ubuntu 22.04, previously Fly.io)
+  - **Migration reason**: Memory limitations on Fly.io causing OOM (Out of Memory) errors
+
+## Quick Links
+
+- **Migration to Hetzner**: See [HETZNER_MIGRATION.md](./HETZNER_MIGRATION.md) for complete migration guide from Fly.io
+- **Memory Issue**: The migration was triggered by OOM (Out of Memory) errors on Fly.io's 2GB VMs during large image processing
+
+---
 
 ## Custom Domain Setup
 
@@ -43,12 +51,22 @@ TTL: 3600 (or Auto)
 3. Custom domain: `sosquishy.io`
 4. Check "Enforce HTTPS" (after DNS propagates)
 
-### Backend API: Render.com
+### Backend API: Hetzner Cloud
 
-The API is hosted at: `https://api.sosquishy.io`
+The API is hosted at: `https://api.sosquishy.io` (Hetzner Cloud VPS)
+
+**DNS Configuration:**
+
+Add the following DNS record in your domain provider:
+
+```
+Type: A
+Name: api
+Value: [Your Hetzner Server IP]
+TTL: 3600 (or Auto)
+```
 
 **CORS is configured to allow:**
-- `https://keif.github.io` (GitHub Pages default)
 - `https://sosquishy.io` (custom domain)
 - `https://www.sosquishy.io` (www subdomain)
 - `http://localhost:3000` (local development)
@@ -71,17 +89,57 @@ NEXT_PUBLIC_API_URL=https://api.sosquishy.io pnpm run build
 # Output in: web/out/
 ```
 
-### Backend Deployment
+### Backend Deployment (Hetzner Cloud)
 
-Automatic deployment via Render.com:
+**For complete migration guide, see [HETZNER_MIGRATION.md](./HETZNER_MIGRATION.md)**
 
-1. Connected to GitHub repository
-2. Auto-deploys on push to `main` branch
-3. Uses `render.yaml` for configuration
-4. Dockerfile: `api/Dockerfile`
+**Quick deployment steps:**
 
-**Manual trigger:**
-- Visit Render.com dashboard → Manual Deploy
+1. Copy source to server:
+   ```bash
+   cd /Users/keif/projects/git/image-optimizer
+   rsync -avz --exclude='node_modules' --exclude='.git' --exclude='web' \
+     ./api/ root@sosquishy-server:/tmp/api-build/
+   ```
+
+2. Build on server (IMPORTANT: Build on Linux, not on your Mac):
+   ```bash
+   ssh sosquishy-server
+   cd /tmp/api-build
+
+   # Build with version info
+   go build -v \
+     -ldflags "-X main.version=$(git describe --tags --always 2>/dev/null || echo 'v0.1.0') -X main.commit=$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown') -X main.buildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+     -o image-optimizer \
+     main.go
+
+   # Verify it's a Linux binary (must show "ELF 64-bit LSB executable")
+   file image-optimizer
+
+   # Deploy
+   mv image-optimizer /usr/local/bin/image-optimizer
+   chmod +x /usr/local/bin/image-optimizer
+   rm -rf /tmp/api-build
+   ```
+
+3. Restart service:
+   ```bash
+   systemctl restart image-optimizer
+   ```
+
+4. Verify deployment:
+   ```bash
+   curl https://api.sosquishy.io/health
+   ```
+
+**Important Notes:**
+- The app uses `bimg` which requires CGO - you MUST build on the Linux server
+- Never build on your Mac and copy the binary - it won't work (different architecture)
+- Always verify with `file image-optimizer` - must show "ELF 64-bit LSB executable"
+- The ldflags set version info: `-X main.version`, `-X main.commit`, `-X main.buildTime`
+
+**Alternative: Docker deployment**
+- See Section 7 in [HETZNER_MIGRATION.md](./HETZNER_MIGRATION.md)
 
 ## Environment Variables
 
@@ -94,18 +152,19 @@ env:
   NEXT_PUBLIC_API_URL: https://api.sosquishy.io
 ```
 
-### Backend (Render.com)
+### Backend (Hetzner Cloud)
 
-Configured in `render.yaml`:
+Configured in `/opt/image-optimizer/.env`:
 
 - `PORT`: 8080
-- `CORS_ORIGINS`: https://keif.github.io,https://sosquishy.io,https://www.sosquishy.io,http://localhost:3000
-- `DB_PATH`: /opt/render/project/data/api_keys.db
+- `CORS_ORIGINS`: https://sosquishy.io,https://www.sosquishy.io,http://localhost:3000
+- `DB_PATH`: /opt/image-optimizer/data/api_keys.db
 - `RATE_LIMIT_ENABLED`: true
 - `RATE_LIMIT_MAX`: 100
 - `RATE_LIMIT_WINDOW`: 1m
 - `API_KEY_AUTH_ENABLED`: true
-- `ALLOWED_DOMAINS`: cloudinary.com,imgur.com,unsplash.com,pexels.com
+- `PUBLIC_OPTIMIZATION_ENABLED`: true
+- `ALLOWED_DOMAINS`: cloudinary.com,imgur.com,unsplash.com,pexels.com,localhost,127.0.0.1
 
 ## DNS Propagation
 

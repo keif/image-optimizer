@@ -159,7 +159,7 @@ export default function Home() {
           <OptimizationControls
             options={options}
             onChange={setOptions}
-            disabled={isProcessing || !selectedFile}
+            disabled={isProcessing}
             originalFormat={getOriginalFormat()}
           />
 

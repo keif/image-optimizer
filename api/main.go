@@ -16,6 +16,13 @@ import (
 	fiberswagger "github.com/swaggo/fiber-swagger"
 )
 
+// Build-time variables (set via ldflags during build)
+var (
+	version   = "dev"
+	commit    = "none"
+	buildTime = "unknown"
+)
+
 // @title Image Optimizer API
 // @version 1.0
 // @description High-performance image optimization service with format conversion, resizing, and quality adjustment
