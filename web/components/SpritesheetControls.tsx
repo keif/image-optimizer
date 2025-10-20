@@ -7,7 +7,7 @@ interface SpritesheetControlsProps {
 
 export default function SpritesheetControls({ options, onChange }: SpritesheetControlsProps) {
   const MIN_DIMENSION = 256;
-  const MAX_DIMENSION = 8192;
+  const MAX_DIMENSION = 12288;
 
   const outputFormatOptions = [
     { value: 'json', label: 'JSON', description: 'Generic JSON format' },

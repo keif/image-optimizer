@@ -325,7 +325,7 @@ func TrimTransparency(img image.Image) (image.Image, int, int, int, int) {
 // PackSprites packs multiple sprites into one or more spritesheets
 //
 // Multi-sheet splitting: If sprites don't fit in one sheet, they will be split across multiple sheets.
-// However, each INDIVIDUAL sprite must fit within MaxWidth x MaxHeight (max 8192x8192).
+// However, each INDIVIDUAL sprite must fit within MaxWidth x MaxHeight (max 12288x12288).
 // If a single sprite exceeds these dimensions, packing will fail - multi-sheet splitting cannot
 // split individual sprites across sheets.
 //
@@ -401,8 +401,8 @@ func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, erro
 				}
 			}
 
-			// Cap suggestions at API maximum (8192x8192)
-			const maxAllowed = 8192
+			// Cap suggestions at API maximum (12288x12288)
+			const maxAllowed = 12288
 			suggestedW := maxW
 			suggestedH := maxH
 

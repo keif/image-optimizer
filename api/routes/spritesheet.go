@@ -58,17 +58,17 @@ func SetupSpritesheetRoutes(app *fiber.App) {
 
 // PackSprites handles the sprite packing endpoint
 // @Summary Pack multiple sprites into optimized spritesheets
-// @Description Accepts multiple image files and packs them into one or more optimized spritesheets using the MaxRects bin packing algorithm. Automatically splits into multiple sheets if needed. IMPORTANT: Each individual sprite must be ≤8192x8192 pixels (hard limit). Use autoResize=true to automatically resize oversized sprites - the response will include details of all resize operations.
+// @Description Accepts multiple image files and packs them into one or more optimized spritesheets using the MaxRects bin packing algorithm. Automatically splits into multiple sheets if needed. IMPORTANT: Each individual sprite must be ≤12288x12288 pixels (hard limit). Use autoResize=true to automatically resize oversized sprites - the response will include details of all resize operations.
 // @Tags spritesheet
 // @Accept multipart/form-data
 // @Produce json
-// @Param images formData file true "Sprite images to pack (multiple files supported). Each sprite must be ≤8192x8192 pixels unless autoResize=true."
+// @Param images formData file true "Sprite images to pack (multiple files supported). Each sprite must be ≤12288x12288 pixels unless autoResize=true."
 // @Param padding query int false "Padding between sprites in pixels (0-32)" default(2)
 // @Param powerOfTwo query bool false "Force power-of-2 dimensions (256, 512, 1024, etc.)" default(false)
 // @Param trimTransparency query bool false "Trim transparent pixels from sprites" default(false)
-// @Param maxWidth query int false "Maximum sheet width in pixels (256-8192)" default(2048)
-// @Param maxHeight query int false "Maximum sheet height in pixels (256-8192)" default(2048)
-// @Param autoResize query bool false "Automatically resize sprites exceeding 8192x8192 to fit. Resize details returned in response." default(false)
+// @Param maxWidth query int false "Maximum sheet width in pixels (256-12288)" default(2048)
+// @Param maxHeight query int false "Maximum sheet height in pixels (256-12288)" default(2048)
+// @Param autoResize query bool false "Automatically resize sprites exceeding 12288x12288 to fit. Resize details returned in response." default(false)
 // @Param outputFormats query string false "Comma-separated list of output formats: json,css,csv,xml,sparrow,texturepacker,cocos2d,unity,godot" default("json")
 // @Success 200 {object} PackSpritesResponse "Success response includes resizedSprites array if any sprites were auto-resized"
 // @Failure 400 {object} map[string]interface{}
@@ -102,14 +102,14 @@ func PackSprites(c *fiber.Ctx) error {
 	}
 
 	// Validate options
-	if options.MaxWidth < 256 || options.MaxWidth > 8192 {
+	if options.MaxWidth < 256 || options.MaxWidth > 12288 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "maxWidth must be between 256 and 8192 pixels",
+			"error": "maxWidth must be between 256 and 12288 pixels",
 		})
 	}
-	if options.MaxHeight < 256 || options.MaxHeight > 8192 {
+	if options.MaxHeight < 256 || options.MaxHeight > 12288 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "maxHeight must be between 256 and 8192 pixels",
+			"error": "maxHeight must be between 256 and 12288 pixels",
 		})
 	}
 	if options.Padding < 0 || options.Padding > 32 {
@@ -157,8 +157,8 @@ func PackSprites(c *fiber.Ctx) error {
 		width := originalWidth
 		height := originalHeight
 
-		// Validate individual sprite size against absolute maximum (8192x8192)
-		const maxSpriteSize = 8192
+		// Validate individual sprite size against absolute maximum (12288x12288)
+		const maxSpriteSize = 12288
 
 		// Calculate effective max size accounting for padding
 		// Each sprite needs padding on all sides, so reduce max by padding * 2
