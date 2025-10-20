@@ -21,36 +21,35 @@ export default function RootLayout({
           <nav className="border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between h-16 items-center">
-                <div className="flex items-center">
-                  <Link href="/" className="flex items-baseline gap-2 group">
+                <div className="flex items-center gap-6">
+                  <Link href="/" className="group">
                     <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                       Squish
                     </h1>
-                    <span className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                      Image Optimizer
-                    </span>
                   </Link>
+                  <div className="flex items-center gap-4">
+                    <Link
+                      href="/"
+                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                    >
+                      Optimizer
+                    </Link>
+                    <Link
+                      href="/spritesheet"
+                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                    >
+                      Spritesheet
+                    </Link>
+                  </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <Link
-                    href="/spritesheet"
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-                  >
-                    Spritesheet Tools
-                  </Link>
-                  <Link
-                    href="/privacy"
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-                  >
-                    Privacy
-                  </Link>
                   <a
                     href="https://github.com/keif/image-optimizer"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
                   >
-                    ⭐ Star on GitHub
+                    GitHub
                   </a>
                   <a
                     href="https://buymeacoffee.com/keif"
@@ -58,13 +57,25 @@ export default function RootLayout({
                     rel="noopener noreferrer"
                     className="text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1.5 rounded-md hover:from-purple-600 hover:to-pink-600 transition-all"
                   >
-                    ☕ Support
+                    Support
                   </a>
                 </div>
               </div>
             </div>
           </nav>
           <main>{children}</main>
+          <footer className="border-t border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm mt-auto">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <div className="flex justify-center items-center">
+                <Link
+                  href="/privacy"
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                >
+                  Privacy Policy
+                </Link>
+              </div>
+            </div>
+          </footer>
           <SupportBanner />
         </div>
         <Script
