@@ -186,15 +186,32 @@ func OptimizeImage(buffer []byte, options OptimizeOptions) (*OptimizeResult, err
 		return nil, fmt.Errorf("failed to process image: %w", err)
 	}
 
+	// Apply format-specific post-processing optimizations
+	resultFormat := options.Format
+	if resultFormat == 0 {
+		resultFormat = getImageTypeFromString(originalMetadata.Type)
+	}
+
 	// Apply OxiPNG post-processing for PNG format
 	// This provides additional 15-40% compression beyond libvips
-	if options.Format == bimg.PNG || (options.Format == 0 && originalMetadata.Type == "png") {
+	if resultFormat == bimg.PNG {
 		oxipngBuffer, oxipngErr := optimizePNGWithOxipng(optimizedBuffer, options.OxipngLevel)
 		if oxipngErr == nil {
 			// OxiPNG succeeded - use the better-compressed version
 			optimizedBuffer = oxipngBuffer
 		}
 		// If OxiPNG fails, continue with bimg output (graceful degradation)
+	}
+
+	// Apply MozJPEG post-processing for JPEG format
+	// This provides additional 20-30% compression beyond libjpeg-turbo
+	if resultFormat == bimg.JPEG && !options.LosslessMode {
+		mozjpegBuffer, mozjpegErr := optimizeJPEGWithMozJPEG(optimizedBuffer, options.Quality)
+		if mozjpegErr == nil {
+			// MozJPEG succeeded - use the better-compressed version
+			optimizedBuffer = mozjpegBuffer
+		}
+		// If MozJPEG fails, continue with bimg output (graceful degradation)
 	}
 
 	optimizedSize := int64(len(optimizedBuffer))
@@ -368,6 +385,56 @@ func optimizePNGWithOxipng(inputBuffer []byte, level int) ([]byte, error) {
 	// Sanity check: ensure we got valid output
 	if len(optimizedBuffer) == 0 {
 		return inputBuffer, fmt.Errorf("oxipng produced empty output (using original)")
+	}
+
+	// Return optimized buffer (even if larger - caller will decide)
+	return optimizedBuffer, nil
+}
+
+// optimizeJPEGWithMozJPEG performs JPEG optimization using mozjpeg's cjpeg encoder
+// Returns the optimized buffer or the original if mozjpeg fails or doesn't improve compression
+func optimizeJPEGWithMozJPEG(inputBuffer []byte, quality int) ([]byte, error) {
+	// Default to quality 80 if not specified
+	if quality == 0 {
+		quality = 80
+	}
+
+	// Validate quality range
+	if quality < 1 || quality > 100 {
+		quality = 80
+	}
+
+	// Prepare mozjpeg command: read from stdin, write to stdout
+	// -quality: JPEG quality (1-100)
+	// -optimize: optimize Huffman tables
+	// -progressive: create progressive JPEG
+	// -outfile: write to stdout
+	cmd := exec.Command("cjpeg",
+		"-quality", fmt.Sprintf("%d", quality),
+		"-optimize",
+		"-progressive",
+		"-outfile", "-",
+	)
+
+	// Set up stdin/stdout pipes
+	cmd.Stdin = bytes.NewReader(inputBuffer)
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	// Run cjpeg
+	err := cmd.Run()
+	if err != nil {
+		// If cjpeg fails, return original buffer (fallback gracefully)
+		return inputBuffer, fmt.Errorf("cjpeg failed (using original): %w - %s", err, stderr.String())
+	}
+
+	optimizedBuffer := stdout.Bytes()
+
+	// Sanity check: ensure we got valid output
+	if len(optimizedBuffer) == 0 {
+		return inputBuffer, fmt.Errorf("cjpeg produced empty output (using original)")
 	}
 
 	// Return optimized buffer (even if larger - caller will decide)

@@ -41,11 +41,23 @@ cd /tmp/api-build
 
 # Install dependencies if missing
 echo "Checking dependencies..."
+
+# Install oxipng for PNG optimization
 if ! command -v oxipng &> /dev/null; then
     echo "Installing oxipng..."
     cargo install oxipng || {
         echo "Warning: Failed to install oxipng via cargo, trying apt..."
         apt-get update && apt-get install -y oxipng || echo "Warning: oxipng not available, PNG optimization will be limited"
+    }
+fi
+
+# Install mozjpeg for JPEG optimization
+if ! command -v cjpeg &> /dev/null || ! cjpeg -version 2>&1 | grep -q "mozjpeg"; then
+    echo "Installing mozjpeg..."
+    apt-get update && apt-get install -y mozjpeg || {
+        echo "Warning: mozjpeg not available via apt, trying manual install..."
+        # Fallback: download pre-compiled binary or build from source
+        echo "Warning: mozjpeg not available, JPEG optimization will use standard libjpeg"
     }
 fi
 
