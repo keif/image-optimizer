@@ -12,9 +12,37 @@ RUN apk add --no-cache \
     g++ \
     make \
     vips-dev \
-    libheif-dev
+    libheif-dev \
+    wget \
+    tar
 
 WORKDIR /app
+
+# Download and install optimization tools
+# Using separate RUN commands for better layer caching during development
+
+# Install oxipng (PNG optimizer) - has pre-compiled binaries
+RUN OXIPNG_VERSION=9.1.5 && \
+    ARCH=$(uname -m) && \
+    if [ "$ARCH" = "x86_64" ]; then \
+        OXIPNG_ARCH="x86_64-unknown-linux-musl"; \
+    elif [ "$ARCH" = "aarch64" ]; then \
+        OXIPNG_ARCH="aarch64-unknown-linux-musl"; \
+    else \
+        echo "Warning: Unsupported architecture for oxipng: $ARCH (will use libvips only)"; \
+        exit 0; \
+    fi && \
+    wget -q "https://github.com/shssoichiro/oxipng/releases/download/v${OXIPNG_VERSION}/oxipng-${OXIPNG_VERSION}-${OXIPNG_ARCH}.tar.gz" && \
+    tar -xzf "oxipng-${OXIPNG_VERSION}-${OXIPNG_ARCH}.tar.gz" && \
+    mv oxipng /usr/local/bin/oxipng && \
+    chmod +x /usr/local/bin/oxipng && \
+    rm "oxipng-${OXIPNG_VERSION}-${OXIPNG_ARCH}.tar.gz" && \
+    oxipng --version
+
+# Note: MozJPEG is not included in Docker image due to complexity
+# - Requires building from source (slow builds, large build deps)
+# - Can be added on production server via deploy script
+# - Code has graceful fallback to libjpeg-turbo (already good compression)
 
 # Copy go mod files
 COPY go.mod go.sum ./
@@ -41,8 +69,10 @@ RUN apk add --no-cache \
 
 WORKDIR /app
 
-# Copy binary from builder
+# Copy binaries from builder
 COPY --from=builder /app/main .
+# Copy oxipng if it was successfully built (may not exist on all architectures)
+COPY --from=builder /usr/local/bin/oxipng* /usr/local/bin/ || true
 
 # Create data directory for SQLite database
 RUN mkdir -p /app/data
