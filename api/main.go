@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/keif/image-optimizer/db"
@@ -62,6 +63,12 @@ func main() {
 
 	// Middleware
 	app.Use(logger.New())
+
+	// Response compression (gzip, deflate, brotli)
+	// Compresses JSON responses and reduces bandwidth by 60-80%
+	app.Use(compress.New(compress.Config{
+		Level: compress.LevelBestSpeed, // Balance between speed and compression
+	}))
 
 	// Security headers middleware
 	app.Use(func(c *fiber.Ctx) error {

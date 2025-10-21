@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net"
 	"net/http"
 	"net/url"
@@ -515,6 +516,74 @@ type BatchOptimizeResponse struct {
 	} `json:"summary"`
 }
 
+// processSingleImage processes a single image file and returns the result
+// This is extracted for use in parallel batch processing
+func processSingleImage(file *multipart.FileHeader, options services.OptimizeOptions) BatchImageResult {
+	result := BatchImageResult{
+		Filename: file.Filename,
+	}
+
+	// Validate file type
+	contentType := file.Header.Get("Content-Type")
+	validTypes := map[string]bool{
+		"image/jpeg": true,
+		"image/jpg":  true,
+		"image/png":  true,
+		"image/webp": true,
+		"image/gif":  true,
+		"image/avif": true,
+	}
+
+	if !validTypes[contentType] {
+		result.Success = false
+		result.Error = "Invalid file type. Supported types: jpeg, jpg, png, webp, gif, avif"
+		return result
+	}
+
+	// Read file contents
+	f, err := file.Open()
+	if err != nil {
+		result.Success = false
+		result.Error = "Failed to open file"
+		return result
+	}
+
+	imgData, err := io.ReadAll(io.LimitReader(f, maxImageSize))
+	f.Close()
+
+	if err != nil {
+		result.Success = false
+		result.Error = "Failed to read file"
+		return result
+	}
+
+	// Check size limit
+	if len(imgData) >= int(maxImageSize) {
+		result.Success = false
+		result.Error = "File exceeds maximum size of 10MB"
+		return result
+	}
+
+	// Process the image
+	optimizeResult, err := services.OptimizeImage(imgData, options)
+	if err != nil {
+		result.Success = false
+		result.Error = "Failed to process image: " + err.Error()
+		return result
+	}
+
+	// Success - populate result
+	result.Success = true
+	result.OriginalSize = optimizeResult.OriginalSize
+	result.OptimizedSize = optimizeResult.OptimizedSize
+	result.Format = optimizeResult.Format
+	result.Width = optimizeResult.Width
+	result.Height = optimizeResult.Height
+	result.Savings = optimizeResult.Savings
+
+	return result
+}
+
 // handleBatchOptimize handles POST /batch-optimize requests
 // @Summary Optimize multiple images in a single request
 // @Description Optimize multiple image files with the same quality, dimensions, and format settings
@@ -679,92 +748,63 @@ func handleBatchOptimize(c *fiber.Ctx) error {
 
 	// Initialize response
 	response := BatchOptimizeResponse{
-		Results: make([]BatchImageResult, 0, len(files)),
+		Results: make([]BatchImageResult, len(files)),
 	}
 
 	var totalOriginalSize int64
 	var totalOptimizedSize int64
 
-	// Process each file
-	for _, file := range files {
-		result := BatchImageResult{
-			Filename: file.Filename,
-		}
-
-		// Validate file type
-		contentType := file.Header.Get("Content-Type")
-		validTypes := map[string]bool{
-			"image/jpeg": true,
-			"image/jpg":  true,
-			"image/png":  true,
-			"image/webp": true,
-			"image/gif":  true,
-			"image/avif": true,
-		}
-
-		if !validTypes[contentType] {
-			result.Success = false
-			result.Error = "Invalid file type. Supported types: jpeg, jpg, png, webp, gif, avif"
-			response.Results = append(response.Results, result)
-			response.Summary.Failed++
-			continue
-		}
-
-		// Read file contents
-		f, err := file.Open()
-		if err != nil {
-			result.Success = false
-			result.Error = "Failed to open file"
-			response.Results = append(response.Results, result)
-			response.Summary.Failed++
-			continue
-		}
-
-		imgData, err := io.ReadAll(io.LimitReader(f, maxImageSize))
-		f.Close()
-
-		if err != nil {
-			result.Success = false
-			result.Error = "Failed to read file"
-			response.Results = append(response.Results, result)
-			response.Summary.Failed++
-			continue
-		}
-
-		// Check size limit
-		if len(imgData) >= int(maxImageSize) {
-			result.Success = false
-			result.Error = "File exceeds maximum size of 10MB"
-			response.Results = append(response.Results, result)
-			response.Summary.Failed++
-			continue
-		}
-
-		// Process the image
-		optimizeResult, err := services.OptimizeImage(imgData, options)
-		if err != nil {
-			result.Success = false
-			result.Error = "Failed to process image: " + err.Error()
-			response.Results = append(response.Results, result)
-			response.Summary.Failed++
-			continue
-		}
-
-		// Success - populate result
-		result.Success = true
-		result.OriginalSize = optimizeResult.OriginalSize
-		result.OptimizedSize = optimizeResult.OptimizedSize
-		result.Format = optimizeResult.Format
-		result.Width = optimizeResult.Width
-		result.Height = optimizeResult.Height
-		result.Savings = optimizeResult.Savings
-
-		totalOriginalSize += optimizeResult.OriginalSize
-		totalOptimizedSize += optimizeResult.OptimizedSize
-
-		response.Results = append(response.Results, result)
-		response.Summary.Successful++
+	// Parallel processing with worker pool
+	// Use 4 workers for optimal CPU utilization without overwhelming the system
+	numWorkers := 4
+	if len(files) < numWorkers {
+		numWorkers = len(files)
 	}
+
+	type job struct {
+		index int
+		file  *multipart.FileHeader
+	}
+
+	jobs := make(chan job, len(files))
+	results := make(chan struct {
+		index  int
+		result BatchImageResult
+	}, len(files))
+
+	// Start workers
+	for w := 0; w < numWorkers; w++ {
+		go func() {
+			for j := range jobs {
+				result := processSingleImage(j.file, options)
+				results <- struct {
+					index  int
+					result BatchImageResult
+				}{j.index, result}
+			}
+		}()
+	}
+
+	// Send jobs
+	for i, file := range files {
+		jobs <- job{index: i, file: file}
+	}
+	close(jobs)
+
+	// Collect results
+	for i := 0; i < len(files); i++ {
+		r := <-results
+		response.Results[r.index] = r.result
+
+		if r.result.Success {
+			totalOriginalSize += r.result.OriginalSize
+			totalOptimizedSize += r.result.OptimizedSize
+			response.Summary.Successful++
+		} else {
+			response.Summary.Failed++
+		}
+	}
+	close(results)
 
 	// Calculate summary statistics
 	response.Summary.Total = len(files)

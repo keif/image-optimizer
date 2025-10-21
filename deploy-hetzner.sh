@@ -39,6 +39,16 @@ set -e
 
 cd /tmp/api-build
 
+# Install dependencies if missing
+echo "Checking dependencies..."
+if ! command -v oxipng &> /dev/null; then
+    echo "Installing oxipng..."
+    cargo install oxipng || {
+        echo "Warning: Failed to install oxipng via cargo, trying apt..."
+        apt-get update && apt-get install -y oxipng || echo "Warning: oxipng not available, PNG optimization will be limited"
+    }
+fi
+
 # Build with version info from local git
 echo "Building binary with version info..."
 echo "  Version: ${VERSION}"
