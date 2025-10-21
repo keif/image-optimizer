@@ -17,6 +17,16 @@ BLUE='\033[0;34m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# Get version info from local git (before rsync excludes .git)
+echo -e "${BLUE}📋 Getting version info...${NC}"
+VERSION=$(git describe --tags --always 2>/dev/null || echo 'v0.1.0')
+COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')
+BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+echo "Version: ${VERSION}"
+echo "Commit: ${COMMIT}"
+echo "Build Time: ${BUILD_TIME}"
+
 # Step 1: Copy source to server
 echo -e "${BLUE}📦 Step 1: Copying source code to server...${NC}"
 rsync -avz --exclude='node_modules' --exclude='.git' --exclude='web' \
@@ -24,15 +34,19 @@ rsync -avz --exclude='node_modules' --exclude='.git' --exclude='web' \
 
 # Step 2: Build on server and deploy
 echo -e "${BLUE}🔨 Step 2: Building on server...${NC}"
-ssh ${SERVER} << 'ENDSSH'
+ssh ${SERVER} "bash -s" << ENDSSH
 set -e
 
 cd /tmp/api-build
 
-# Build with version info
-echo "Building binary..."
+# Build with version info from local git
+echo "Building binary with version info..."
+echo "  Version: ${VERSION}"
+echo "  Commit: ${COMMIT}"
+echo "  Build Time: ${BUILD_TIME}"
+
 go build -v \
-  -ldflags "-X main.version=$(git describe --tags --always 2>/dev/null || echo 'v0.1.0') -X main.commit=$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown') -X main.buildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  -ldflags "-X main.version=${VERSION} -X main.commit=${COMMIT} -X main.buildTime=${BUILD_TIME}" \
   -o image-optimizer \
   main.go
 
