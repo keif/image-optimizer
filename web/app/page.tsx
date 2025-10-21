@@ -5,6 +5,7 @@ import Image from 'next/image';
 import ImageUploader from '@/components/ImageUploader';
 import OptimizationControls from '@/components/OptimizationControls';
 import ResultsDisplay from '@/components/ResultsDisplay';
+import AdBanner from '@/components/AdBanner';
 import { apiClient } from '@/lib/api';
 import { OptimizationOptions, OptimizationResult } from '@/lib/types';
 import { Loader2, AlertCircle } from 'lucide-react';
@@ -96,6 +97,11 @@ export default function Home() {
           Compress, resize, and convert images with high-performance libvips processing.
           Reduce file sizes while maintaining quality.
         </p>
+      </div>
+
+      {/* Top Banner Ad */}
+      <div className="mb-8">
+        <AdBanner placeholderId={101} variant="banner" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -202,6 +208,11 @@ export default function Home() {
               <li>• Resize to custom dimensions (optional)</li>
               <li>• Download your optimized image</li>
             </ul>
+          </div>
+
+          {/* Sidebar Ad - Desktop Only */}
+          <div className="hidden lg:block">
+            <AdBanner placeholderId={102} variant="sidebar" />
           </div>
 
           {/* Privacy Notice */}

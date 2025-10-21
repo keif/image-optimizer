@@ -14,9 +14,43 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Only load Ezoic scripts in production (not localhost)
+  const isProduction = process.env.NODE_ENV === 'production';
+
   return (
     <html lang="en">
       <body className="antialiased">
+        {/* Ezoic Privacy Scripts - Only in production */}
+        {isProduction && (
+          <>
+            <Script
+              src="https://cmp.gatekeeperconsent.com/min.js"
+              strategy="beforeInteractive"
+              data-cfasync="false"
+            />
+            <Script
+              src="https://the.gatekeeperconsent.com/cmp.min.js"
+              strategy="beforeInteractive"
+              data-cfasync="false"
+            />
+            {/* Ezoic Header Script - Main ad system initialization */}
+            <Script
+              src="//www.ezojs.com/ezoic/sa.min.js"
+              strategy="beforeInteractive"
+              async
+            />
+            <Script
+              id="ezoic-init"
+              strategy="beforeInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.ezstandalone = window.ezstandalone || {};
+                  ezstandalone.cmd = ezstandalone.cmd || [];
+                `
+              }}
+            />
+          </>
+        )}
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
           <nav className="border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
