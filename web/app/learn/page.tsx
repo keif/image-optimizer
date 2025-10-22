@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Learn More - SoSquishy",
@@ -37,8 +38,15 @@ export default function LearnPage() {
             {/* Mascot Image - Floating Animation */}
             <div className="flex justify-center lg:justify-end">
               <div className="relative animate-float">
-                <div className="w-64 h-64 sm:w-80 sm:h-80 bg-gradient-to-br from-blue-400 to-cyan-300 rounded-full shadow-2xl shadow-blue-500/50 flex items-center justify-center">
-                  <div className="text-9xl">💧</div>
+                <div className="w-64 h-64 sm:w-80 sm:h-80 bg-gradient-to-br from-blue-400 to-cyan-300 rounded-full shadow-2xl shadow-blue-500/50 flex items-center justify-center overflow-hidden">
+                  <Image
+                    src="/images/so-squishy-squish.png"
+                    alt="Squish - The SoSquishy Mascot"
+                    width={320}
+                    height={320}
+                    className="w-full h-full object-contain"
+                    priority
+                  />
                 </div>
                 {/* Glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-300 to-cyan-200 rounded-full blur-2xl opacity-30 -z-10"></div>
@@ -151,29 +159,57 @@ export default function LearnPage() {
 
       {/* Call to Action */}
       <section className="relative py-16 px-4 sm:px-6 lg:px-8 pb-24">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link
-              href="/"
-              className="px-8 py-4 bg-white text-blue-600 rounded-full font-bold text-lg shadow-lg shadow-blue-300/50 hover:shadow-2xl hover:shadow-blue-400/60 hover:-translate-y-1 transition-all duration-300 min-w-[200px] text-center"
-            >
-              Go Home
-            </Link>
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg mb-8 text-center">
+            Stay Connected
+          </h2>
 
+          {/* Social Media Links */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <a
-              href="https://facebook.com/sosquishy"
+              href="https://www.facebook.com/profile.php?id=61582866203089"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full font-bold text-lg shadow-lg shadow-purple-300/50 hover:shadow-2xl hover:shadow-purple-400/60 hover:-translate-y-1 transition-all duration-300 min-w-[200px] text-center"
+              className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl font-bold text-center shadow-lg shadow-blue-300/50 hover:shadow-2xl hover:shadow-blue-400/60 hover:-translate-y-1 transition-all duration-300"
             >
-              Follow Us
+              Facebook
             </a>
 
-            <Link
-              href="/shop"
-              className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-teal-500 text-white rounded-full font-bold text-lg shadow-lg shadow-teal-300/50 hover:shadow-2xl hover:shadow-teal-400/60 hover:-translate-y-1 transition-all duration-300 min-w-[200px] text-center"
+            <a
+              href="https://x.com/SoSquishyIO"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-4 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-2xl font-bold text-center shadow-lg shadow-gray-300/50 hover:shadow-2xl hover:shadow-gray-400/60 hover:-translate-y-1 transition-all duration-300"
             >
-              Shop the Squish
+              X (Twitter)
+            </a>
+
+            <a
+              href="https://bsky.app/profile/sosquishy.bsky.social"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-4 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-2xl font-bold text-center shadow-lg shadow-sky-300/50 hover:shadow-2xl hover:shadow-sky-400/60 hover:-translate-y-1 transition-all duration-300"
+            >
+              Bluesky
+            </a>
+
+            <a
+              href="https://instagram.com/sosquishyio"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 text-white rounded-2xl font-bold text-center shadow-lg shadow-purple-300/50 hover:shadow-2xl hover:shadow-purple-400/60 hover:-translate-y-1 transition-all duration-300"
+            >
+              Instagram
+            </a>
+          </div>
+
+          {/* Home Button */}
+          <div className="flex justify-center">
+            <Link
+              href="/"
+              className="px-12 py-5 bg-white text-blue-600 rounded-full font-bold text-xl shadow-lg shadow-blue-300/50 hover:shadow-2xl hover:shadow-blue-400/60 hover:-translate-y-1 transition-all duration-300"
+            >
+              Go Home
             </Link>
           </div>
         </div>
