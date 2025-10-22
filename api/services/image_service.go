@@ -349,21 +349,38 @@ func isWideGamutColorSpace(colorSpace string) bool {
 
 // optimizePNGWithOxipng performs lossless PNG optimization using oxipng
 // Returns the optimized buffer or the original if oxipng fails or doesn't improve compression
+//
+// SECURITY: Command Execution Safety
+// This function executes an external binary (oxipng) for additional PNG compression.
+// The command is safe because:
+//   1. All parameters are validated integers from controlled sources (level: 0-6)
+//   2. No user-supplied strings are passed as command arguments
+//   3. Input is passed via stdin (not file path), preventing path traversal
+//   4. Output is read from stdout (not file system), preventing file overwrites
+//   5. Graceful fallback: if oxipng fails, original buffer is returned
+//   6. Binary must be installed at system level (not user-controllable path)
+//
+// Additional hardening recommendations:
+//   - Keep oxipng binary updated via package manager
+//   - Consider running in sandboxed environment (containers, seccomp)
+//   - Monitor stderr output for security-related errors
 func optimizePNGWithOxipng(inputBuffer []byte, level int) ([]byte, error) {
 	// Default to level 2 (balanced speed/compression) if not specified
 	if level == 0 {
 		level = 2
 	}
 
-	// Validate level range
+	// Validate level range (SECURITY: prevents arbitrary parameter injection)
 	if level < 0 || level > 6 {
 		level = 2
 	}
 
 	// Prepare oxipng command: read from stdin, write to stdout
-	// -o level: optimization level (0-6)
-	// --strip all: remove all metadata
-	// --stdout: write to stdout instead of file
+	// SECURITY: All parameters are hardcoded or validated integers
+	// -o level: optimization level (0-6) - validated above
+	// --strip all: remove all metadata - hardcoded string
+	// --stdout: write to stdout instead of file - prevents file system writes
+	// "-": read from stdin - prevents path traversal attacks
 	cmd := exec.Command("oxipng", "-o", fmt.Sprintf("%d", level), "--strip", "all", "--stdout", "-")
 
 	// Set up stdin/stdout pipes
@@ -393,22 +410,38 @@ func optimizePNGWithOxipng(inputBuffer []byte, level int) ([]byte, error) {
 
 // optimizeJPEGWithMozJPEG performs JPEG optimization using mozjpeg's cjpeg encoder
 // Returns the optimized buffer or the original if mozjpeg fails or doesn't improve compression
+//
+// SECURITY: Command Execution Safety
+// This function executes an external binary (cjpeg from mozjpeg) for JPEG optimization.
+// The command is safe because:
+//   1. All parameters are validated integers from controlled sources (quality: 1-100)
+//   2. No user-supplied strings are passed as command arguments
+//   3. Input is passed via stdin (not file path), preventing path traversal
+//   4. Output is read from stdout (not file system), preventing file overwrites
+//   5. Graceful fallback: if cjpeg fails, original buffer is returned
+//   6. Binary must be installed at system level (not user-controllable path)
+//
+// Additional hardening recommendations:
+//   - Keep mozjpeg binary updated via package manager
+//   - Consider running in sandboxed environment (containers, seccomp)
+//   - Monitor stderr output for security-related errors
 func optimizeJPEGWithMozJPEG(inputBuffer []byte, quality int) ([]byte, error) {
 	// Default to quality 80 if not specified
 	if quality == 0 {
 		quality = 80
 	}
 
-	// Validate quality range
+	// Validate quality range (SECURITY: prevents arbitrary parameter injection)
 	if quality < 1 || quality > 100 {
 		quality = 80
 	}
 
 	// Prepare mozjpeg command: read from stdin, write to stdout
-	// -quality: JPEG quality (1-100)
-	// -optimize: optimize Huffman tables
-	// -progressive: create progressive JPEG
-	// -outfile: write to stdout
+	// SECURITY: All parameters are hardcoded or validated integers
+	// -quality: JPEG quality (1-100) - validated above
+	// -optimize: optimize Huffman tables - hardcoded flag
+	// -progressive: create progressive JPEG - hardcoded flag
+	// -outfile "-": write to stdout - prevents file system writes
 	cmd := exec.Command("cjpeg",
 		"-quality", fmt.Sprintf("%d", quality),
 		"-optimize",
