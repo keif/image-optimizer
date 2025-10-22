@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"math"
 	"mime/multipart"
 	"net"
 	"net/http"
@@ -20,8 +21,9 @@ import (
 
 // Security configuration
 const (
-	maxImageSize = 10 << 20        // 10 MB
-	fetchTimeout = 10 * time.Second // 10 seconds
+	maxImageSize      = 10 << 20        // 10 MB
+	fetchTimeout      = 10 * time.Second // 10 seconds
+	maxDecodedPixels  = 100_000_000     // 100 megapixels (10000x10000) - protection against decompression bombs
 )
 
 // isProduction checks if we're running in production mode
@@ -42,6 +44,36 @@ func errorResponse(c *fiber.Ctx, status int, message string, err error) error {
 	}
 
 	return c.Status(status).JSON(response)
+}
+
+// validateDecodedImageSize checks if a decoded image exceeds safe pixel limits
+// This protects against decompression bombs (small compressed files that expand to huge images)
+func validateDecodedImageSize(imgData []byte, filename string) error {
+	// Decode image to get dimensions
+	// Use bimg metadata which is faster than full decode
+	metadata, err := bimg.NewImage(imgData).Metadata()
+	if err != nil {
+		return fmt.Errorf("failed to read image metadata: %w", err)
+	}
+
+	// Calculate total pixels
+	width := metadata.Size.Width
+	height := metadata.Size.Height
+	totalPixels := int64(width) * int64(height)
+
+	// Check against maximum allowed pixels
+	if totalPixels > maxDecodedPixels {
+		return fmt.Errorf(
+			"image '%s' is %dx%d pixels (%d total), which exceeds the maximum decoded size of %d pixels (%.0fx%.0f). "+
+				"This protects against decompression bombs. Please resize the image before uploading",
+			filename,
+			width, height, totalPixels,
+			maxDecodedPixels,
+			math.Sqrt(float64(maxDecodedPixels)), math.Sqrt(float64(maxDecodedPixels)),
+		)
+	}
+
+	return nil
 }
 
 // allowedDomains is a whitelist of domains allowed for URL-based image fetching
@@ -445,6 +477,21 @@ func handleOptimize(c *fiber.Ctx) error {
 		}
 	}
 
+	// Validate decoded image size (decompression bomb protection)
+	// This must happen after we have imgData from either file upload or URL fetch
+	filename := "uploaded_image"
+	if file != nil {
+		filename = file.Filename
+	} else if imgURL := c.FormValue("url"); imgURL != "" {
+		filename = imgURL
+	}
+
+	if err := validateDecodedImageSize(imgData, filename); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
 	// Process the image
 	result, err := services.OptimizeImage(imgData, options)
 	if err != nil {
@@ -561,6 +608,13 @@ func processSingleImage(file *multipart.FileHeader, options services.OptimizeOpt
 	if len(imgData) >= int(maxImageSize) {
 		result.Success = false
 		result.Error = "File exceeds maximum size of 10MB"
+		return result
+	}
+
+	// Validate decoded image size (decompression bomb protection)
+	if err := validateDecodedImageSize(imgData, file.Filename); err != nil {
+		result.Success = false
+		result.Error = err.Error()
 		return result
 	}
 

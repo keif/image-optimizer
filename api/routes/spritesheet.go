@@ -144,6 +144,14 @@ func PackSprites(c *fiber.Ctx) error {
 			})
 		}
 
+		// Validate decoded image size (decompression bomb protection)
+		// Check this before decoding to catch issues early
+		if err := validateDecodedImageSize(data, fileHeader.Filename); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
 		// Decode image
 		img, _, err := image.Decode(bytes.NewReader(data))
 		if err != nil {
@@ -437,6 +445,13 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": "Failed to read spritesheet data",
+		})
+	}
+
+	// Validate decoded image size (decompression bomb protection)
+	if err := validateDecodedImageSize(sheetData, spritesheetFiles[0].Filename); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
 		})
 	}
 
