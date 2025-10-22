@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"math"
 	"mime/multipart"
 	"net"
@@ -432,6 +433,9 @@ func handleOptimize(c *fiber.Ctx) error {
 
 		// Check domain whitelist
 		if !isAllowedDomain(parsed) {
+			// SECURITY EVENT: SSRF attempt - blocked domain or private IP
+			log.Printf("[SECURITY] SSRF attempt blocked - IP: %s, URL: %s, Host: %s, Path: %s",
+				c.IP(), imgURL, parsed.Hostname(), c.Path())
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 				"error": "URL domain not allowed. Please contact administrator to whitelist the domain.",
 			})
@@ -487,6 +491,9 @@ func handleOptimize(c *fiber.Ctx) error {
 	}
 
 	if err := validateDecodedImageSize(imgData, filename); err != nil {
+		// SECURITY EVENT: Decompression bomb attempt
+		log.Printf("[SECURITY] Decompression bomb attempt - IP: %s, Filename: %s, Size: %d bytes, Error: %v",
+			c.IP(), filename, len(imgData), err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})
@@ -613,6 +620,9 @@ func processSingleImage(file *multipart.FileHeader, options services.OptimizeOpt
 
 	// Validate decoded image size (decompression bomb protection)
 	if err := validateDecodedImageSize(imgData, file.Filename); err != nil {
+		// SECURITY EVENT: Decompression bomb in batch processing
+		log.Printf("[SECURITY] Decompression bomb in batch - Filename: %s, Size: %d bytes, Error: %v",
+			file.Filename, len(imgData), err)
 		result.Success = false
 		result.Error = err.Error()
 		return result

@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log"
 	"os"
 	"strconv"
 	"time"
@@ -65,6 +66,9 @@ func NewRateLimiter() fiber.Handler {
 			return c.IP()
 		},
 		LimitReached: func(c *fiber.Ctx) error {
+			// SECURITY EVENT: Rate limit exceeded
+			log.Printf("[SECURITY] Rate limit exceeded - IP: %s, Path: %s, Method: %s, Limit: %d/%v",
+				c.IP(), c.Path(), c.Method(), config.Max, config.Expiration)
 			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
 				"error": "Rate limit exceeded. Please try again later.",
 			})

@@ -9,6 +9,7 @@ import (
 	_ "image/jpeg" // Register JPEG decoder
 	"image/png"
 	"io"
+	"log"
 	"strconv"
 	"strings"
 
@@ -147,6 +148,9 @@ func PackSprites(c *fiber.Ctx) error {
 		// Validate decoded image size (decompression bomb protection)
 		// Check this before decoding to catch issues early
 		if err := validateDecodedImageSize(data, fileHeader.Filename); err != nil {
+			// SECURITY EVENT: Decompression bomb in sprite packing
+			log.Printf("[SECURITY] Decompression bomb in sprite packing - IP: %s, Filename: %s, Size: %d bytes, Error: %v",
+				c.IP(), fileHeader.Filename, len(data), err)
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": err.Error(),
 			})
@@ -450,6 +454,9 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 
 	// Validate decoded image size (decompression bomb protection)
 	if err := validateDecodedImageSize(sheetData, spritesheetFiles[0].Filename); err != nil {
+		// SECURITY EVENT: Decompression bomb in spritesheet optimization
+		log.Printf("[SECURITY] Decompression bomb in spritesheet optimization - IP: %s, Filename: %s, Size: %d bytes, Error: %v",
+			c.IP(), spritesheetFiles[0].Filename, len(sheetData), err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})

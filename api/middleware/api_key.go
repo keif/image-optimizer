@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -189,6 +190,9 @@ func RequireAPIKey() fiber.Handler {
 		// Extract API key from Authorization header
 		authHeader := c.Get("Authorization")
 		if authHeader == "" {
+			// SECURITY EVENT: Missing API key
+			log.Printf("[SECURITY] Missing API key - IP: %s, Path: %s, Method: %s, Origin: %s",
+				c.IP(), c.Path(), c.Method(), c.Get("Origin"))
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Missing API key. Please provide an API key in the Authorization header.",
 			})
@@ -205,6 +209,14 @@ func RequireAPIKey() fiber.Handler {
 
 		// Validate API key
 		if !db.ValidateAPIKey(apiKey) {
+			// SECURITY EVENT: Invalid or revoked API key
+			// Log partial key for debugging (first 8 chars only)
+			keyPrefix := apiKey
+			if len(keyPrefix) > 8 {
+				keyPrefix = keyPrefix[:8] + "..."
+			}
+			log.Printf("[SECURITY] Invalid or revoked API key - IP: %s, Key: %s, Path: %s, Method: %s, Origin: %s",
+				c.IP(), keyPrefix, c.Path(), c.Method(), c.Get("Origin"))
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Invalid or revoked API key.",
 			})
