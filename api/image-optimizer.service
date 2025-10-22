@@ -1,0 +1,46 @@
+[Unit]
+Description=Image Optimizer API
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/image-optimizer
+ExecStart=/usr/local/bin/image-optimizer
+Restart=always
+RestartSec=5
+
+# Server Configuration
+Environment="PORT=8080"
+
+# Database
+Environment="DB_PATH=/opt/image-optimizer/data/api_keys.db"
+
+# Rate Limiting
+Environment="RATE_LIMIT_ENABLED=true"
+Environment="RATE_LIMIT_MAX=100"
+Environment="RATE_LIMIT_WINDOW=1m"
+
+# API Key Authentication (recommended for production)
+Environment="API_KEY_AUTH_ENABLED=true"
+
+# Public Optimization Access (disabled - use origin-based auth instead)
+Environment="PUBLIC_OPTIMIZATION_ENABLED=false"
+
+# Trusted Origins - allow your frontend to access without API keys
+# UPDATE THIS with your actual domain(s)
+Environment="TRUSTED_ORIGINS=https://sosquishy.io,https://www.sosquishy.io"
+
+# Domain Whitelist for URL-based Image Fetching
+Environment="ALLOWED_DOMAINS=cloudinary.com,imgur.com,unsplash.com,pexels.com"
+
+# CORS Configuration
+Environment="CORS_ORIGINS=https://sosquishy.io,https://www.sosquishy.io"
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=image-optimizer
+
+[Install]
+WantedBy=multi-user.target

@@ -330,3 +330,262 @@ func TestAPIKeyMiddleware_PublicOptimizationEnabled(t *testing.T) {
 		})
 	}
 }
+
+// TestAPIKeyMiddleware_TrustedOrigins tests origin-based bypass
+func TestAPIKeyMiddleware_TrustedOrigins(t *testing.T) {
+	// Set trusted origins
+	os.Setenv("TRUSTED_ORIGINS", "https://sosquishy.io,https://www.sosquishy.io,http://localhost:3000")
+	os.Setenv("API_KEY_AUTH_ENABLED", "true")
+	defer os.Unsetenv("TRUSTED_ORIGINS")
+	defer os.Unsetenv("API_KEY_AUTH_ENABLED")
+
+	os.Setenv("DB_PATH", ":memory:")
+	if err := db.Initialize(); err != nil {
+		t.Fatalf("Failed to initialize test database: %v", err)
+	}
+	defer db.Close()
+
+	app := fiber.New()
+	app.Use(RequireAPIKey())
+
+	app.Post("/optimize", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{"message": "POST /optimize"})
+	})
+
+	tests := []struct {
+		name           string
+		origin         string
+		referer        string
+		expectedStatus int
+		description    string
+	}{
+		{
+			name:           "Trusted origin exact match",
+			origin:         "https://sosquishy.io",
+			referer:        "",
+			expectedStatus: 200,
+			description:    "Exact match of trusted origin should bypass auth",
+		},
+		{
+			name:           "Trusted origin with www",
+			origin:         "https://www.sosquishy.io",
+			referer:        "",
+			expectedStatus: 200,
+			description:    "www subdomain should work if explicitly listed",
+		},
+		{
+			name:           "Localhost trusted origin",
+			origin:         "http://localhost:3000",
+			referer:        "",
+			expectedStatus: 200,
+			description:    "Localhost should work for development",
+		},
+		{
+			name:           "Untrusted origin",
+			origin:         "https://evil.com",
+			referer:        "",
+			expectedStatus: 401,
+			description:    "Untrusted origin should require API key",
+		},
+		{
+			name:           "No origin header",
+			origin:         "",
+			referer:        "",
+			expectedStatus: 401,
+			description:    "Missing origin should require API key",
+		},
+		{
+			name:           "Trusted referer",
+			origin:         "",
+			referer:        "https://sosquishy.io/page",
+			expectedStatus: 200,
+			description:    "Referer from trusted origin should bypass auth",
+		},
+		{
+			name:           "Untrusted referer",
+			origin:         "",
+			referer:        "https://evil.com/page",
+			expectedStatus: 401,
+			description:    "Referer from untrusted origin should require API key",
+		},
+		{
+			name:           "Both origin and referer trusted",
+			origin:         "https://sosquishy.io",
+			referer:        "https://sosquishy.io/page",
+			expectedStatus: 200,
+			description:    "Both trusted should bypass auth",
+		},
+		{
+			name:           "Origin trusted, referer untrusted",
+			origin:         "https://sosquishy.io",
+			referer:        "https://evil.com/page",
+			expectedStatus: 200,
+			description:    "Origin takes precedence",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest("POST", "/optimize", nil)
+			if tt.origin != "" {
+				req.Header.Set("Origin", tt.origin)
+			}
+			if tt.referer != "" {
+				req.Header.Set("Referer", tt.referer)
+			}
+
+			resp, err := app.Test(req)
+			if err != nil {
+				t.Fatalf("Request failed: %v", err)
+			}
+			defer resp.Body.Close()
+
+			if resp.StatusCode != tt.expectedStatus {
+				body, _ := io.ReadAll(resp.Body)
+				t.Errorf("%s: expected status %d, got %d\nResponse: %s",
+					tt.description, tt.expectedStatus, resp.StatusCode, string(body))
+			}
+		})
+	}
+}
+
+// TestAPIKeyMiddleware_WildcardOrigins tests wildcard subdomain support
+func TestAPIKeyMiddleware_WildcardOrigins(t *testing.T) {
+	// Set trusted origins with wildcard
+	os.Setenv("TRUSTED_ORIGINS", "https://*.sosquishy.io")
+	os.Setenv("API_KEY_AUTH_ENABLED", "true")
+	defer os.Unsetenv("TRUSTED_ORIGINS")
+	defer os.Unsetenv("API_KEY_AUTH_ENABLED")
+
+	os.Setenv("DB_PATH", ":memory:")
+	if err := db.Initialize(); err != nil {
+		t.Fatalf("Failed to initialize test database: %v", err)
+	}
+	defer db.Close()
+
+	app := fiber.New()
+	app.Use(RequireAPIKey())
+
+	app.Post("/optimize", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{"message": "POST /optimize"})
+	})
+
+	tests := []struct {
+		name           string
+		origin         string
+		expectedStatus int
+		description    string
+	}{
+		{
+			name:           "www subdomain",
+			origin:         "https://www.sosquishy.io",
+			expectedStatus: 200,
+			description:    "www subdomain should match wildcard",
+		},
+		{
+			name:           "api subdomain",
+			origin:         "https://api.sosquishy.io",
+			expectedStatus: 200,
+			description:    "api subdomain should match wildcard",
+		},
+		{
+			name:           "app subdomain",
+			origin:         "https://app.sosquishy.io",
+			expectedStatus: 200,
+			description:    "app subdomain should match wildcard",
+		},
+		{
+			name:           "bare domain",
+			origin:         "https://sosquishy.io",
+			expectedStatus: 200,
+			description:    "bare domain should match wildcard",
+		},
+		{
+			name:           "different domain",
+			origin:         "https://www.evil.com",
+			expectedStatus: 401,
+			description:    "different domain should not match wildcard",
+		},
+		{
+			name:           "different TLD",
+			origin:         "https://www.sosquishy.com",
+			expectedStatus: 401,
+			description:    "different TLD should not match wildcard",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest("POST", "/optimize", nil)
+			req.Header.Set("Origin", tt.origin)
+
+			resp, err := app.Test(req)
+			if err != nil {
+				t.Fatalf("Request failed: %v", err)
+			}
+			defer resp.Body.Close()
+
+			if resp.StatusCode != tt.expectedStatus {
+				body, _ := io.ReadAll(resp.Body)
+				t.Errorf("%s: expected status %d, got %d\nResponse: %s",
+					tt.description, tt.expectedStatus, resp.StatusCode, string(body))
+			}
+		})
+	}
+}
+
+// TestHelperFunctions tests the origin and referer matching helpers
+func TestHelperFunctions(t *testing.T) {
+	t.Run("matchesOrigin", func(t *testing.T) {
+		tests := []struct {
+			origin   string
+			trusted  string
+			expected bool
+		}{
+			{"https://sosquishy.io", "https://sosquishy.io", true},
+			{"https://www.sosquishy.io", "https://www.sosquishy.io", true},
+			{"https://sosquishy.io", "https://www.sosquishy.io", false},
+			{"", "https://sosquishy.io", false},
+			{"https://sosquishy.io", "", false},
+			{"https://evil.com", "https://sosquishy.io", false},
+			// Wildcard tests
+			{"https://www.sosquishy.io", "https://*.sosquishy.io", true},
+			{"https://api.sosquishy.io", "https://*.sosquishy.io", true},
+			{"https://sosquishy.io", "https://*.sosquishy.io", true},
+			{"https://evil.com", "https://*.sosquishy.io", false},
+		}
+
+		for _, tt := range tests {
+			result := matchesOrigin(tt.origin, tt.trusted)
+			if result != tt.expected {
+				t.Errorf("matchesOrigin(%q, %q) = %v, expected %v",
+					tt.origin, tt.trusted, result, tt.expected)
+			}
+		}
+	})
+
+	t.Run("matchesReferer", func(t *testing.T) {
+		tests := []struct {
+			referer  string
+			trusted  string
+			expected bool
+		}{
+			{"https://sosquishy.io/page", "https://sosquishy.io", true},
+			{"https://sosquishy.io/path/to/page", "https://sosquishy.io", true},
+			{"https://www.sosquishy.io/page", "https://www.sosquishy.io", true},
+			{"https://sosquishy.io", "https://sosquishy.io", true},
+			{"", "https://sosquishy.io", false},
+			{"https://sosquishy.io/page", "", false},
+			{"https://evil.com/page", "https://sosquishy.io", false},
+			{"not-a-url", "https://sosquishy.io", false},
+		}
+
+		for _, tt := range tests {
+			result := matchesReferer(tt.referer, tt.trusted)
+			if result != tt.expected {
+				t.Errorf("matchesReferer(%q, %q) = %v, expected %v",
+					tt.referer, tt.trusted, result, tt.expected)
+			}
+		}
+	})
+}

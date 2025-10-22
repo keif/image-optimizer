@@ -17,8 +17,9 @@ type BypassRule struct {
 
 // APIKeyConfig holds API key authentication configuration
 type APIKeyConfig struct {
-	Enabled      bool          // Whether API key authentication is enabled
-	BypassRules  []BypassRule  // Rules that bypass API key authentication
+	Enabled         bool          // Whether API key authentication is enabled
+	BypassRules     []BypassRule  // Rules that bypass API key authentication
+	TrustedOrigins  []string      // Origins/domains that can access without API keys
 }
 
 // GetAPIKeyConfig loads API key config from environment variables
@@ -63,7 +64,98 @@ func GetAPIKeyConfig() APIKeyConfig {
 		}
 	}
 
+	// Load trusted origins from environment
+	// Format: comma-separated list of origins (e.g., "https://sosquishy.io,https://www.sosquishy.io")
+	// Requests from these origins can access the API without API keys
+	if trustedOriginsStr := os.Getenv("TRUSTED_ORIGINS"); trustedOriginsStr != "" {
+		origins := strings.Split(trustedOriginsStr, ",")
+		for _, origin := range origins {
+			origin = strings.TrimSpace(origin)
+			if origin != "" {
+				config.TrustedOrigins = append(config.TrustedOrigins, origin)
+			}
+		}
+	}
+
 	return config
+}
+
+// matchesOrigin checks if the request Origin header matches a trusted origin
+func matchesOrigin(origin, trusted string) bool {
+	if origin == "" || trusted == "" {
+		return false
+	}
+
+	// Exact match
+	if origin == trusted {
+		return true
+	}
+
+	// Handle subdomain wildcards (e.g., trusted="https://*.sosquishy.io")
+	if strings.Contains(trusted, "*") {
+		// Convert wildcard pattern to regex-like matching
+		// "https://*.sosquishy.io" should match "https://www.sosquishy.io", "https://api.sosquishy.io", etc.
+		pattern := strings.ReplaceAll(trusted, ".", "\\.")
+		pattern = strings.ReplaceAll(pattern, "*", ".*")
+		// Simple contains check for basic wildcard support
+		baseDomain := strings.TrimPrefix(trusted, "https://*.")
+		baseDomain = strings.TrimPrefix(baseDomain, "http://*.")
+		if strings.HasSuffix(origin, baseDomain) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// matchesReferer checks if the request Referer header matches a trusted origin
+func matchesReferer(referer, trusted string) bool {
+	if referer == "" || trusted == "" {
+		return false
+	}
+
+	// Referer is a full URL, extract the origin
+	if strings.HasPrefix(referer, "http://") || strings.HasPrefix(referer, "https://") {
+		// Find the end of the origin (scheme + host)
+		schemeEnd := strings.Index(referer, "://")
+		if schemeEnd == -1 {
+			return false
+		}
+
+		remainder := referer[schemeEnd+3:]
+		pathStart := strings.Index(remainder, "/")
+
+		var refererOrigin string
+		if pathStart == -1 {
+			// No path, entire remainder is the host
+			refererOrigin = referer
+		} else {
+			// Extract scheme + host only
+			refererOrigin = referer[:schemeEnd+3+pathStart]
+		}
+
+		return matchesOrigin(refererOrigin, trusted)
+	}
+
+	return false
+}
+
+// isTrustedOrigin checks if the request comes from a trusted origin
+func isTrustedOrigin(c *fiber.Ctx, trustedOrigins []string) bool {
+	if len(trustedOrigins) == 0 {
+		return false
+	}
+
+	origin := c.Get("Origin")
+	referer := c.Get("Referer")
+
+	for _, trusted := range trustedOrigins {
+		if matchesOrigin(origin, trusted) || matchesReferer(referer, trusted) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // RequireAPIKey is a middleware that validates API keys
@@ -73,6 +165,11 @@ func RequireAPIKey() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// If API key auth is disabled, allow all requests
 		if !config.Enabled {
+			return c.Next()
+		}
+
+		// Check if request comes from a trusted origin (bypass API key requirement)
+		if isTrustedOrigin(c, config.TrustedOrigins) {
 			return c.Next()
 		}
 

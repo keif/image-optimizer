@@ -18,6 +18,8 @@ services:
       # For production: enable with PUBLIC_OPTIMIZATION_ENABLED=true for web UI access
       - API_KEY_AUTH_ENABLED=false
       - PUBLIC_OPTIMIZATION_ENABLED=true
+      # Trusted Origins - allow localhost frontend to access API without keys
+      - TRUSTED_ORIGINS=http://localhost:3000,http://localhost:8080
       - ALLOWED_DOMAINS=cloudinary.com,imgur.com,unsplash.com,pexels.com,localhost
     volumes:
       - api-data:/app/data
