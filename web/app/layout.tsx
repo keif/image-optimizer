@@ -77,6 +77,12 @@ export default function RootLayout({
                     >
                       Spritesheet
                     </Link>
+                    <Link
+                      href="/articles"
+                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                    >
+                      Articles
+                    </Link>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">

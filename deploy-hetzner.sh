@@ -42,23 +42,67 @@ cd /tmp/api-build
 # Install dependencies if missing
 echo "Checking dependencies..."
 
-# Install oxipng for PNG optimization
+# Check and install Go if missing
+if ! command -v go &> /dev/null; then
+    echo "Go not found, installing Go 1.23..."
+    apt-get update
+    apt-get install -y wget
+    wget -q https://go.dev/dl/go1.23.2.linux-amd64.tar.gz
+    rm -rf /usr/local/go
+    tar -C /usr/local -xzf go1.23.2.linux-amd64.tar.gz
+    rm go1.23.2.linux-amd64.tar.gz
+    export PATH=\$PATH:/usr/local/go/bin
+    echo "✓ Go installed: \$(go version)"
+else
+    echo "✓ Go already installed: \$(go version)"
+fi
+
+# Ensure Go is in PATH for this session
+export PATH=\$PATH:/usr/local/go/bin
+
+# Install oxipng for PNG optimization (pre-compiled binary approach)
 if ! command -v oxipng &> /dev/null; then
-    echo "Installing oxipng..."
-    cargo install oxipng || {
-        echo "Warning: Failed to install oxipng via cargo, trying apt..."
-        apt-get update && apt-get install -y oxipng || echo "Warning: oxipng not available, PNG optimization will be limited"
-    }
+    echo "Installing oxipng (pre-compiled)..."
+    ARCH=\$(uname -m)
+    if [ "\$ARCH" = "x86_64" ]; then
+        OXIPNG_URL="https://github.com/shssoichiro/oxipng/releases/download/v9.1.5/oxipng-9.1.5-x86_64-unknown-linux-musl.tar.gz"
+    elif [ "\$ARCH" = "aarch64" ]; then
+        OXIPNG_URL="https://github.com/shssoichiro/oxipng/releases/download/v9.1.5/oxipng-9.1.5-aarch64-unknown-linux-musl.tar.gz"
+    else
+        echo "Warning: Unsupported architecture \$ARCH for oxipng"
+        OXIPNG_URL=""
+    fi
+
+    if [ -n "\$OXIPNG_URL" ]; then
+        wget -q \$OXIPNG_URL -O oxipng.tar.gz || {
+            echo "Warning: Failed to download oxipng, PNG optimization will be limited"
+        }
+        if [ -f oxipng.tar.gz ]; then
+            tar -xzf oxipng.tar.gz
+            mv oxipng-*/oxipng /usr/local/bin/ 2>/dev/null || echo "Warning: Failed to extract oxipng"
+            rm -rf oxipng.tar.gz oxipng-*
+            chmod +x /usr/local/bin/oxipng 2>/dev/null
+            if command -v oxipng &> /dev/null; then
+                echo "✓ oxipng installed: \$(oxipng --version)"
+            fi
+        fi
+    fi
+else
+    echo "✓ oxipng already installed: \$(oxipng --version)"
 fi
 
 # Install mozjpeg for JPEG optimization
 if ! command -v cjpeg &> /dev/null || ! cjpeg -version 2>&1 | grep -q "mozjpeg"; then
     echo "Installing mozjpeg..."
-    apt-get update && apt-get install -y mozjpeg || {
-        echo "Warning: mozjpeg not available via apt, trying manual install..."
-        # Fallback: download pre-compiled binary or build from source
-        echo "Warning: mozjpeg not available, JPEG optimization will use standard libjpeg"
+    apt-get update && apt-get install -y mozjpeg 2>/dev/null || {
+        echo "Note: mozjpeg not in apt repos, checking for libjpeg-turbo..."
+        apt-get install -y libjpeg-turbo-progs 2>/dev/null || echo "Note: Using system libjpeg"
     }
+    if command -v cjpeg &> /dev/null; then
+        echo "✓ JPEG tools installed: \$(cjpeg -version 2>&1 | head -n1)"
+    fi
+else
+    echo "✓ mozjpeg already installed"
 fi
 
 # Build with version info from local git
@@ -74,11 +118,11 @@ go build -v \
 
 # Verify it's a Linux binary
 echo "Verifying binary..."
-BINARY_TYPE=$(file image-optimizer)
-if [[ $BINARY_TYPE == *"ELF 64-bit"* ]]; then
+BINARY_TYPE=\$(file image-optimizer)
+if [[ \$BINARY_TYPE == *"ELF 64-bit"* ]]; then
     echo "✓ Binary is correct (Linux ELF 64-bit)"
 else
-    echo "✗ ERROR: Binary is not Linux ELF! Got: $BINARY_TYPE"
+    echo "✗ ERROR: Binary is not Linux ELF! Got: \$BINARY_TYPE"
     exit 1
 fi
 

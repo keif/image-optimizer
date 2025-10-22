@@ -30,13 +30,17 @@ RUN OXIPNG_VERSION=9.1.5 && \
         OXIPNG_ARCH="aarch64-unknown-linux-musl"; \
     else \
         echo "Warning: Unsupported architecture for oxipng: $ARCH (will use libvips only)"; \
+        echo '#!/bin/sh' > /usr/local/bin/oxipng && \
+        echo 'echo "oxipng not available on this architecture"' >> /usr/local/bin/oxipng && \
+        echo 'exit 1' >> /usr/local/bin/oxipng && \
+        chmod +x /usr/local/bin/oxipng && \
         exit 0; \
     fi && \
     wget -q "https://github.com/shssoichiro/oxipng/releases/download/v${OXIPNG_VERSION}/oxipng-${OXIPNG_VERSION}-${OXIPNG_ARCH}.tar.gz" && \
     tar -xzf "oxipng-${OXIPNG_VERSION}-${OXIPNG_ARCH}.tar.gz" && \
-    mv oxipng /usr/local/bin/oxipng && \
+    find . -name oxipng -type f -executable -exec mv {} /usr/local/bin/oxipng \; && \
     chmod +x /usr/local/bin/oxipng && \
-    rm "oxipng-${OXIPNG_VERSION}-${OXIPNG_ARCH}.tar.gz" && \
+    rm -rf "oxipng-${OXIPNG_VERSION}-${OXIPNG_ARCH}.tar.gz" oxipng-* && \
     oxipng --version
 
 # Note: MozJPEG is not included in Docker image due to complexity
@@ -71,8 +75,8 @@ WORKDIR /app
 
 # Copy binaries from builder
 COPY --from=builder /app/main .
-# Copy oxipng if it was successfully built (may not exist on all architectures)
-COPY --from=builder /usr/local/bin/oxipng* /usr/local/bin/ || true
+# Copy oxipng (always exists, may be dummy script on unsupported architectures)
+COPY --from=builder /usr/local/bin/oxipng /usr/local/bin/oxipng
 
 # Create data directory for SQLite database
 RUN mkdir -p /app/data
