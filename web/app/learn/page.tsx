@@ -28,10 +28,10 @@ export default function LearnPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-center lg:text-left space-y-6">
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white drop-shadow-lg leading-tight">
-                We&apos;re all about joy, softness, and small smiles.
+                Optimize your images and sprite sheets with ease and speed.
               </h1>
               <p className="text-xl sm:text-2xl text-sky-100 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                SoSquishy is a cozy corner of the web that celebrates cute, squishy design and good vibes.
+                SoSquishy is your go-to service for lightweight, efficient image optimization that keeps your web and game projects fast and visually delightful.
               </p>
             </div>
 
@@ -65,20 +65,16 @@ export default function LearnPage() {
             </h2>
             <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
               <p>
-                Once upon a time, in a tiny corner of the internet, a single drop of imagination fell from the clouds.
-                It landed softly, bounced twice, and said, &quot;I think I&apos;ll stay here.&quot;
+                In the fast-paced world of web and game development, every byte counts. SoSquishy was born from a simple idea: make image and sprite sheet optimization effortless, effective, and accessible.
               </p>
               <p>
-                That little drop became <span className="font-bold text-blue-600">Squish</span> — our adorable blue mascot who believes
-                that the world could use a little more softness, a few more smiles, and way more squishy hugs.
+                Our mascot, <span className="font-bold text-blue-600">Squish</span>, embodies the perfect balance of performance and charm — a little drop that keeps your visuals crisp while keeping file sizes light.
               </p>
               <p>
-                From that moment, SoSquishy was born. We started with a simple idea: create a space where people could
-                find joy in the little things. Whether it&apos;s optimizing images to make websites faster, sharing cute designs,
-                or just spreading good vibes — we&apos;re here to make the web a little more wonderful.
+                With a focus on clean compression and smart optimization, SoSquishy helps developers and creators deliver faster-loading, visually delightful experiences without the hassle.
               </p>
               <p className="text-xl font-medium text-center text-blue-600 pt-4">
-                And honestly? We&apos;re just getting started. 💙
+                Fast, simple, and a bit playful — that’s the SoSquishy way. 💙
               </p>
             </div>
           </div>
@@ -93,33 +89,30 @@ export default function LearnPage() {
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Stay Soft */}
+            {/* Stay Efficient */}
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-sky-300/30 p-8 hover:-translate-y-2 hover:shadow-2xl hover:shadow-sky-400/40 transition-all duration-300">
               <div className="text-6xl mb-4 text-center">🫧</div>
-              <h3 className="text-2xl font-bold text-blue-600 mb-4 text-center">Stay Soft</h3>
+              <h3 className="text-2xl font-bold text-blue-600 mb-4 text-center">Stay Efficient</h3>
               <p className="text-gray-700 leading-relaxed text-center">
-                In a world that can feel sharp and fast, we choose empathy and kindness.
-                Being soft isn&apos;t weakness — it&apos;s strength wrapped in a warm hug.
+                Clean compression techniques that reduce file size without sacrificing quality, ensuring your projects run smoothly and look great.
               </p>
             </div>
 
-            {/* Spread Joy */}
+            {/* Go Fast */}
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-sky-300/30 p-8 hover:-translate-y-2 hover:shadow-2xl hover:shadow-sky-400/40 transition-all duration-300">
-              <div className="text-6xl mb-4 text-center">🌈</div>
-              <h3 className="text-2xl font-bold text-purple-600 mb-4 text-center">Spread Joy</h3>
+              <div className="text-6xl mb-4 text-center">⚡</div>
+              <h3 className="text-2xl font-bold text-purple-600 mb-4 text-center">Go Fast</h3>
               <p className="text-gray-700 leading-relaxed text-center">
-                Through art, design, and positivity, we aim to brighten your day.
-                Every pixel matters. Every smile counts. Let&apos;s make the internet a happier place.
+                Speed matters. We optimize images and sprite sheets to load lightning-fast, improving user experience and performance metrics.
               </p>
             </div>
 
-            {/* Be Yourself */}
+            {/* Keep It Playful */}
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-sky-300/30 p-8 hover:-translate-y-2 hover:shadow-2xl hover:shadow-sky-400/40 transition-all duration-300">
               <div className="text-6xl mb-4 text-center">💧</div>
-              <h3 className="text-2xl font-bold text-cyan-600 mb-4 text-center">Be Yourself</h3>
+              <h3 className="text-2xl font-bold text-cyan-600 mb-4 text-center">Keep It Playful</h3>
               <p className="text-gray-700 leading-relaxed text-center">
-                You&apos;re perfectly squishy just the way you are. Embrace your quirks, your colors,
-                and your inner droplet. There&apos;s only one you, and that&apos;s your superpower.
+                Optimization doesn’t have to be boring. We bring a fun, creative spirit to making your assets shine while staying lightweight.
               </p>
             </div>
           </div>
@@ -143,15 +136,13 @@ export default function LearnPage() {
           </h2>
           <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl shadow-sky-300/30 p-8 sm:p-12">
             <p className="text-xl text-gray-700 leading-relaxed mb-6">
-              We&apos;re dreaming big! In the coming months, we&apos;re planning to build a vibrant community
-              where fellow squish-lovers can share art, optimize their images for free, and celebrate creativity together.
+              We&apos;re building smarter optimization tools that adapt to your needs, whether you&apos;re working on web projects or game assets.
             </p>
             <p className="text-xl text-gray-700 leading-relaxed mb-6">
-              Plus, we&apos;re working on adorable stickers, cozy merch, and maybe even a Squish plushie or two.
-              (Yes, you read that right — huggable Squish is coming!)
+              Expect enhanced compression algorithms, seamless export options, and integrations designed to keep your workflows fast and simple.
             </p>
             <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-              Stay tuned, stay squishy, and thanks for being here. 💙
+              Stay tuned for a faster, lighter, and more playful web. 💙
             </p>
           </div>
         </div>
