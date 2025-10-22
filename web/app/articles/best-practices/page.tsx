@@ -40,23 +40,25 @@ export default function BestPracticesGuide() {
           <AdBanner placeholderId={120} variant="banner" />
         </div>
 
-        <h2>Introduction</h2>
-        <p>
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Introduction</h2>
+        <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           Image optimization is not a single action—it's a comprehensive strategy covering
           format selection, compression, delivery, and monitoring. This complete checklist
           provides actionable best practices for every stage of the image optimization process,
           from initial creation to ongoing maintenance.
         </p>
-        <p>
+        <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           Follow this guide to implement a robust image optimization strategy that reduces page
           weight by 60-80%, improves Core Web Vitals, and enhances user experience across all
           devices and network conditions.
         </p>
 
-        <h2>Phase 1: Image Creation and Preparation</h2>
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Phase 1: Image Creation and Preparation</h2>
 
-        <h3>✓ Start with the Right Source</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Start with the Right Source</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Use the highest quality source available</strong> as your starting point—you
             can always compress down, but you can't add quality back
@@ -74,8 +76,8 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h3>✓ Choose the Right Dimensions</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Choose the Right Dimensions</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Never upload images larger than their display size</strong>—a 400px wide
             thumbnail should not be a 2000px image scaled down with CSS
@@ -94,8 +96,8 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h3>✓ Optimize Before Uploading</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Optimize Before Uploading</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Remove unnecessary metadata</strong> like EXIF data, camera settings, and GPS
             coordinates (unless needed)
@@ -117,10 +119,11 @@ export default function BestPracticesGuide() {
           <AdBanner placeholderId={121} variant="banner" />
         </div>
 
-        <h2>Phase 2: Format Selection</h2>
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Phase 2: Format Selection</h2>
 
-        <h3>✓ Choose the Right Format for Each Image Type</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Choose the Right Format for Each Image Type</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Photographs:</strong> Use JPEG, WebP (lossy), or AVIF
           </li>
@@ -141,8 +144,8 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h3>✓ Implement Modern Format Delivery</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Implement Modern Format Delivery</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Serve AVIF to supporting browsers</strong> (Chrome, Edge, Opera, Firefox)
           </li>
@@ -165,10 +168,11 @@ export default function BestPracticesGuide() {
 </picture>`}</code>
         </pre>
 
-        <h2>Phase 3: Compression and Optimization</h2>
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Phase 3: Compression and Optimization</h2>
 
-        <h3>✓ Apply Appropriate Compression</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Apply Appropriate Compression</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>JPEG quality 80-85</strong> for most photographs
           </li>
@@ -186,8 +190,8 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h3>✓ Use Advanced Compression Tools</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Use Advanced Compression Tools</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>MozJPEG</strong> for JPEGs—achieves 5-10% better compression than standard
             encoders
@@ -208,8 +212,8 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h3>✓ Automate Optimization</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Automate Optimization</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Integrate optimization into your build pipeline</strong> so images are
             automatically processed
@@ -231,10 +235,11 @@ export default function BestPracticesGuide() {
           <AdBanner placeholderId={122} variant="banner" />
         </div>
 
-        <h2>Phase 4: Responsive Images</h2>
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Phase 4: Responsive Images</h2>
 
-        <h3>✓ Implement srcset for Different Screen Sizes</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Implement srcset for Different Screen Sizes</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Generate multiple sizes</strong> for each image (at minimum: 400px, 800px,
             1200px, 1600px, 2000px)
@@ -271,8 +276,8 @@ export default function BestPracticesGuide() {
 >`}</code>
         </pre>
 
-        <h3>✓ Use Art Direction When Needed</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Use Art Direction When Needed</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Create different crops</strong> for different screen sizes using picture element
           </li>
@@ -293,10 +298,11 @@ export default function BestPracticesGuide() {
 </picture>`}</code>
         </pre>
 
-        <h2>Phase 5: Loading Strategies</h2>
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Phase 5: Loading Strategies</h2>
 
-        <h3>✓ Implement Lazy Loading</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Implement Lazy Loading</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Use native lazy loading</strong> for all below-the-fold images: <code>loading="lazy"</code>
           </li>
@@ -314,8 +320,8 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h3>✓ Prioritize Critical Images</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Prioritize Critical Images</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Preload your LCP image</strong> to ensure it starts loading immediately
           </li>
@@ -338,8 +344,8 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h3>✓ Prevent Layout Shifts</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Prevent Layout Shifts</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Always include width and height attributes</strong> on img elements
           </li>
@@ -358,10 +364,11 @@ export default function BestPracticesGuide() {
           <AdBanner placeholderId={123} variant="banner" />
         </div>
 
-        <h2>Phase 6: Delivery and Caching</h2>
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Phase 6: Delivery and Caching</h2>
 
-        <h3>✓ Use a CDN</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Use a CDN</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Serve images from a CDN</strong> to reduce latency for global users
           </li>
@@ -378,8 +385,8 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h3>✓ Set Optimal Cache Headers</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Set Optimal Cache Headers</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Cache images for 1 year</strong>: <code>Cache-Control: public, max-age=31536000, immutable</code>
           </li>
@@ -394,8 +401,8 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h3>✓ Enable Compression</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Enable Compression</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Enable Brotli compression</strong> for HTML/CSS/JS (not images—they're
             already compressed)
@@ -409,10 +416,11 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h2>Phase 7: Accessibility and SEO</h2>
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Phase 7: Accessibility and SEO</h2>
 
-        <h3>✓ Provide Descriptive Alt Text</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Provide Descriptive Alt Text</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Write meaningful alt text</strong> that describes the image content and context
           </li>
@@ -428,8 +436,8 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h3>✓ Optimize for SEO</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Optimize for SEO</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Use descriptive filenames</strong> (red-running-shoes.jpg, not IMG_1234.jpg)
           </li>
@@ -445,8 +453,8 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h3>✓ Support Dark Mode</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Support Dark Mode</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Provide dark mode alternatives</strong> for images with light backgrounds
           </li>
@@ -466,10 +474,11 @@ export default function BestPracticesGuide() {
           <AdBanner placeholderId={124} variant="banner" />
         </div>
 
-        <h2>Phase 8: Monitoring and Maintenance</h2>
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Phase 8: Monitoring and Maintenance</h2>
 
-        <h3>✓ Monitor Performance Metrics</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Monitor Performance Metrics</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Track Core Web Vitals</strong> in Google Search Console and real user
             monitoring tools
@@ -488,8 +497,8 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h3>✓ Regular Audits</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Regular Audits</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Run monthly performance audits</strong> with Google PageSpeed Insights
           </li>
@@ -507,8 +516,8 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h3>✓ Continuous Improvement</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Continuous Improvement</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>Stay updated on new formats</strong> and techniques (AVIF, JPEG XL)
           </li>
@@ -523,10 +532,11 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h2>Phase 9: Common Pitfalls to Avoid</h2>
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Phase 9: Common Pitfalls to Avoid</h2>
 
-        <h3>⚠️ Don't Make These Mistakes</h3>
-        <ul>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">⚠️ Don't Make These Mistakes</h3>
+        <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
             <strong>❌ Using PNG for photographs</strong> → Use JPEG, WebP, or AVIF instead
           </li>
@@ -560,7 +570,8 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <h2>Quick Reference Checklist</h2>
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Quick Reference Checklist</h2>
 
         <div className="not-prose my-8 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 border border-blue-200 dark:border-gray-700">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
@@ -618,20 +629,21 @@ export default function BestPracticesGuide() {
           </div>
         </div>
 
-        <h2>Conclusion</h2>
-        <p>
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Conclusion</h2>
+        <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           Image optimization is a continuous process, not a one-time task. By following these
           best practices—from initial creation through delivery and ongoing monitoring—you can
           maintain a fast, efficient website that provides excellent user experience while
           minimizing bandwidth costs.
         </p>
-        <p>
+        <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           Start with the quick wins: compression, lazy loading, and proper dimensions. Then
           progressively implement modern formats, responsive images, and advanced optimization
           techniques. Every improvement compounds, and even small optimizations across many
           images can dramatically impact your website's overall performance.
         </p>
-        <p>
+        <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           Remember that image optimization directly affects your bottom line through improved
           Core Web Vitals, better SEO rankings, faster load times, and higher conversion rates.
           The time invested in proper image optimization consistently delivers exceptional ROI.
