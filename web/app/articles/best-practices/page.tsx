@@ -43,15 +43,10 @@ export default function BestPracticesGuide() {
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Introduction</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Image optimization is not a single action—it's a comprehensive strategy covering
-          format selection, compression, delivery, and monitoring. This complete checklist
-          provides actionable best practices for every stage of the image optimization process,
-          from initial creation to ongoing maintenance.
+          Image optimization isn’t a one-time fix—it’s an ongoing process that spans everything from choosing the right format and compression to delivery and monitoring. This checklist walks you through practical best practices for every step, from creating images to long-term site maintenance.
         </p>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Follow this guide to implement a robust image optimization strategy that reduces page
-          weight by 60-80%, improves Core Web Vitals, and enhances user experience across all
-          devices and network conditions.
+          Use this guide to build a solid image optimization workflow. You’ll cut page weight by 60–80%, boost Core Web Vitals, and deliver a faster, smoother experience for every user, on any device or connection.
         </p>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -60,58 +55,48 @@ export default function BestPracticesGuide() {
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Start with the Right Source</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Use the highest quality source available</strong> as your starting point—you
-            can always compress down, but you can't add quality back
+            <strong>Begin with the highest quality source</strong>—you can always compress later, but lost quality can’t be restored.
           </li>
           <li>
-            <strong>Shoot photos in RAW format</strong> when possible for maximum editing flexibility
+            <strong>Capture photos in RAW</strong> when possible for more editing flexibility.
           </li>
           <li>
-            <strong>Create graphics as vectors</strong> (SVG) whenever feasible—they scale
-            perfectly and have tiny file sizes
+            <strong>Design graphics as vectors (SVG)</strong> whenever you can—they scale cleanly and keep file sizes small.
           </li>
           <li>
-            <strong>Maintain an organized asset library</strong> with original, uncompressed
-            versions separate from web-optimized versions
+            <strong>Keep your asset library organized</strong> by storing originals separately from optimized versions.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Choose the Right Dimensions</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Never upload images larger than their display size</strong>—a 400px wide
-            thumbnail should not be a 2000px image scaled down with CSS
+            <strong>Only upload images at their display size</strong>—for example, don’t upload a 2000px image for a 400px-wide thumbnail.
           </li>
           <li>
-            <strong>Account for retina displays</strong> by providing 1.5x or 2x resolution
-            versions for high-DPI screens
+            <strong>Support retina screens</strong> by providing 1.5x or 2x versions for high-DPI devices.
           </li>
           <li>
-            <strong>Create multiple sizes for responsive images:</strong> thumbnail (150-300px),
-            small (400-600px), medium (800-1000px), large (1200-1600px), xlarge (1920-2400px)
+            <strong>Export images at multiple sizes</strong> for responsive layouts: thumbnail (150–300px), small (400–600px), medium (800–1000px), large (1200–1600px), xlarge (1920–2400px).
           </li>
           <li>
-            <strong>Crop strategically</strong> to show the most important part of the image at
-            each size
+            <strong>Crop images thoughtfully</strong> so the most important content is visible at every size.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Optimize Before Uploading</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Remove unnecessary metadata</strong> like EXIF data, camera settings, and GPS
-            coordinates (unless needed)
+            <strong>Strip unnecessary metadata</strong> such as EXIF, camera info, and GPS coordinates (unless you need them).
           </li>
           <li>
-            <strong>Crop tightly</strong> to remove unnecessary background or empty space
+            <strong>Crop images closely</strong> to remove empty space and focus on the subject.
           </li>
           <li>
-            <strong>Adjust color profiles</strong>—convert to sRGB for web use unless you
-            specifically need wide color gamut
+            <strong>Convert to sRGB color profile</strong> for web, unless you require a wider gamut.
           </li>
           <li>
-            <strong>Apply sharpening carefully</strong>—over-sharpened images compress poorly and
-            show artifacts more easily
+            <strong>Sharpen images lightly</strong>—over-sharpening introduces artifacts and hurts compression.
           </li>
         </ul>
 
@@ -125,38 +110,38 @@ export default function BestPracticesGuide() {
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Choose the Right Format for Each Image Type</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Photographs:</strong> Use JPEG, WebP (lossy), or AVIF
+            <strong>Photographs:</strong> Choose JPEG, WebP (lossy), or AVIF.
           </li>
           <li>
-            <strong>Graphics with few colors:</strong> Use PNG-8 or WebP (lossless)
+            <strong>Graphics with few colors:</strong> Choose PNG-8 or WebP (lossless).
           </li>
           <li>
-            <strong>Graphics with many colors:</strong> Use PNG-24 or WebP (lossless)
+            <strong>Graphics with many colors:</strong> Choose PNG-24 or WebP (lossless).
           </li>
           <li>
-            <strong>Logos and icons:</strong> Use SVG when possible, otherwise PNG
+            <strong>Logos and icons:</strong> Use SVG whenever possible, or fallback to PNG.
           </li>
           <li>
-            <strong>Images with transparency:</strong> Use PNG or WebP with alpha channel
+            <strong>Images with transparency:</strong> Choose PNG or WebP with alpha channel.
           </li>
           <li>
-            <strong>Simple animations:</strong> Use MP4/WebM video, or WebP animation (avoid GIF)
+            <strong>Simple animations:</strong> Use MP4/WebM video or WebP animation (avoid GIF).
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Implement Modern Format Delivery</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Serve AVIF to supporting browsers</strong> (Chrome, Edge, Opera, Firefox)
+            <strong>Serve AVIF</strong> to browsers that support it (Chrome, Edge, Opera, Firefox).
           </li>
           <li>
-            <strong>Serve WebP to supporting browsers</strong> (95%+ of users)
+            <strong>Serve WebP</strong> for most users (over 95% browser support).
           </li>
           <li>
-            <strong>Provide JPEG/PNG fallbacks</strong> for older browsers
+            <strong>Offer JPEG/PNG as fallbacks</strong> for older browsers.
           </li>
           <li>
-            <strong>Use the picture element</strong> for format-based selection
+            <strong>Use the <code>picture</code> element</strong> to deliver the best format based on browser support.
           </li>
         </ul>
 
@@ -174,60 +159,54 @@ export default function BestPracticesGuide() {
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Apply Appropriate Compression</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>JPEG quality 80-85</strong> for most photographs
+            <strong>Set JPEG quality to 80–85</strong> for most photos.
           </li>
           <li>
-            <strong>JPEG quality 85-90</strong> for hero images and product photos
+            <strong>Use JPEG quality 85–90</strong> for hero or product images.
           </li>
           <li>
-            <strong>JPEG quality 70-75</strong> for thumbnails and background images
+            <strong>Lower JPEG quality to 70–75</strong> for thumbnails and backgrounds.
           </li>
           <li>
-            <strong>Use lossless compression</strong> for logos, screenshots, and graphics
+            <strong>Use lossless compression</strong> for logos, screenshots, and graphics.
           </li>
           <li>
-            <strong>Never save JPEG multiple times</strong>—quality degrades with each save
+            <strong>Always export JPEGs only once</strong>—repeated saves degrade quality.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Use Advanced Compression Tools</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>MozJPEG</strong> for JPEGs—achieves 5-10% better compression than standard
-            encoders
+            <strong>MozJPEG</strong> for JPEGs—usually gets 5–10% smaller files than standard encoders.
           </li>
           <li>
-            <strong>oxipng or pngquant</strong> for PNGs—can reduce file size by 30-70%
+            <strong>oxipng or pngquant</strong> for PNGs—often shrinks files by 30–70%.
           </li>
           <li>
-            <strong>cwebp</strong> for WebP—Google's official encoder with excellent quality
-            tuning
+            <strong>cwebp</strong> for WebP—Google’s encoder with flexible quality settings.
           </li>
           <li>
-            <strong>avifenc</strong> for AVIF—though encoding is slow, results are worth it for
-            critical images
+            <strong>avifenc</strong> for AVIF—encoding can be slow but is ideal for key images.
           </li>
           <li>
-            <strong>SVGO</strong> for SVG—removes unnecessary code and optimizes paths
+            <strong>SVGO</strong> for SVG—removes extra code and optimizes paths.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Automate Optimization</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Integrate optimization into your build pipeline</strong> so images are
-            automatically processed
+            <strong>Add optimization to your build pipeline</strong> so images are processed automatically.
           </li>
           <li>
-            <strong>Use image CDNs</strong> like Cloudinary or Cloudflare Images for automatic
-            optimization
+            <strong>Leverage image CDNs</strong> like Cloudinary or Cloudflare Images for on-the-fly optimization.
           </li>
           <li>
-            <strong>Set up CI/CD checks</strong> to prevent oversized images from being deployed
+            <strong>Set up CI/CD checks</strong> to block oversized images from being deployed.
           </li>
           <li>
-            <strong>Create presets for different image types</strong> (hero, product, thumbnail)
-            with appropriate settings
+            <strong>Create presets for each image type</strong> (hero, product, thumbnail) with the right settings.
           </li>
         </ul>
 
@@ -241,17 +220,16 @@ export default function BestPracticesGuide() {
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Implement srcset for Different Screen Sizes</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Generate multiple sizes</strong> for each image (at minimum: 400px, 800px,
-            1200px, 1600px, 2000px)
+            <strong>Export several sizes for each image</strong> (at least 400px, 800px, 1200px, 1600px, 2000px).
           </li>
           <li>
-            <strong>Use srcset attribute</strong> to let browsers choose the appropriate size
+            <strong>Use the <code>srcset</code> attribute</strong> so browsers pick the best size automatically.
           </li>
           <li>
-            <strong>Include sizes attribute</strong> to help browsers make better decisions
+            <strong>Add the <code>sizes</code> attribute</strong> to help browsers choose more efficiently.
           </li>
           <li>
-            <strong>Provide 1x and 2x versions</strong> for retina displays
+            <strong>Offer 1x and 2x versions</strong> for retina and high-DPI screens.
           </li>
         </ul>
 
@@ -279,14 +257,13 @@ export default function BestPracticesGuide() {
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Use Art Direction When Needed</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Create different crops</strong> for different screen sizes using picture element
+            <strong>Provide different crops for different screens</strong> using the <code>picture</code> element.
           </li>
           <li>
-            <strong>Show portrait crops on mobile</strong>, landscape on desktop
+            <strong>Show portrait crops on mobile</strong> and landscape crops on desktop.
           </li>
           <li>
-            <strong>Emphasize different subjects</strong> at different sizes (e.g., zoom in on
-            faces for mobile)
+            <strong>Highlight key content at each size</strong> (for example, zoom in on faces for mobile).
           </li>
         </ul>
 
@@ -304,26 +281,26 @@ export default function BestPracticesGuide() {
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Implement Lazy Loading</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Use native lazy loading</strong> for all below-the-fold images: <code>loading="lazy"</code>
+            <strong>Use native lazy loading</strong> (<code>loading="lazy"</code>) for all images below the fold.
           </li>
           <li>
-            <strong>Never lazy load above-the-fold images</strong>—especially your LCP element
+            <strong>Don’t lazy load above-the-fold images</strong>—especially your LCP (Largest Contentful Paint) image.
           </li>
           <li>
-            <strong>Set loading="eager"</strong> explicitly for critical images to ensure priority
+            <strong>Set <code>loading="eager"</code></strong> for critical images to prioritize them.
           </li>
           <li>
-            <strong>Consider IntersectionObserver</strong> for more control over lazy loading behavior
+            <strong>Try IntersectionObserver</strong> if you want more control over lazy loading.
           </li>
           <li>
-            <strong>Provide placeholder images</strong> or skeleton screens while lazy images load
+            <strong>Show placeholders or skeletons</strong> while lazy images load.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Prioritize Critical Images</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Preload your LCP image</strong> to ensure it starts loading immediately
+            <strong>Preload your LCP image</strong> so it starts loading right away.
           </li>
         </ul>
 
@@ -333,30 +310,29 @@ export default function BestPracticesGuide() {
 
         <ul className="mt-4">
           <li>
-            <strong>Use fetchpriority="high"</strong> on critical images
+            <strong>Add <code>fetchpriority="high"</code></strong> to important images.
           </li>
           <li>
-            <strong>Avoid hiding above-the-fold images</strong> with CSS or JavaScript initially
+            <strong>Don’t hide above-the-fold images</strong> with CSS or JavaScript at first load.
           </li>
           <li>
-            <strong>Place critical image tags early in HTML</strong> so the parser discovers them
-            quickly
+            <strong>Place critical image tags early in your HTML</strong> for faster discovery.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Prevent Layout Shifts</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Always include width and height attributes</strong> on img elements
+            <strong>Always set width and height attributes</strong> on <code>img</code> tags.
           </li>
           <li>
-            <strong>Use aspect-ratio CSS</strong> for maintaining proportions with responsive sizing
+            <strong>Use CSS <code>aspect-ratio</code></strong> to keep image proportions with responsive layouts.
           </li>
           <li>
-            <strong>Reserve space for images</strong> even before they load
+            <strong>Reserve space for images</strong> before they load, to avoid shifting content.
           </li>
           <li>
-            <strong>Avoid adding images dynamically</strong> without reserved space
+            <strong>Don’t add images dynamically</strong> unless you’ve reserved space for them.
           </li>
         </ul>
 
@@ -370,49 +346,45 @@ export default function BestPracticesGuide() {
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Use a CDN</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Serve images from a CDN</strong> to reduce latency for global users
+            <strong>Serve images from a CDN</strong> to lower latency for users worldwide.
           </li>
           <li>
-            <strong>Choose an image-optimized CDN</strong> that can automatically resize and
-            convert formats
+            <strong>Pick a CDN with image optimization features</strong>—automatic resizing and format conversion saves time.
           </li>
           <li>
-            <strong>Enable HTTP/2 or HTTP/3</strong> for better performance with multiple image
-            requests
+            <strong>Enable HTTP/2 or HTTP/3</strong> for faster loading of many images.
           </li>
           <li>
-            <strong>Use a separate domain for images</strong> to enable cookie-less requests
+            <strong>Consider a separate domain for images</strong> to avoid sending cookies.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Set Optimal Cache Headers</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Cache images for 1 year</strong>: <code>Cache-Control: public, max-age=31536000, immutable</code>
+            <strong>Cache images for one year</strong>: <code>Cache-Control: public, max-age=31536000, immutable</code>.
           </li>
           <li>
-            <strong>Use immutable directive</strong> to prevent revalidation requests
+            <strong>Add the <code>immutable</code> directive</strong> to avoid unnecessary revalidation.
           </li>
           <li>
-            <strong>Include version numbers or hashes</strong> in filenames for cache busting
+            <strong>Use version numbers or hashes</strong> in filenames for easy cache busting.
           </li>
           <li>
-            <strong>Leverage browser caching</strong> by serving the same URLs consistently
+            <strong>Keep image URLs consistent</strong> to maximize browser caching.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Enable Compression</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Enable Brotli compression</strong> for HTML/CSS/JS (not images—they're
-            already compressed)
+            <strong>Enable Brotli compression</strong> for HTML, CSS, and JS (not for images—they’re already compressed).
           </li>
           <li>
-            <strong>Don't re-compress images</strong> with gzip or Brotli—it increases CPU usage
-            without benefits
+            <strong>Don’t re-compress images</strong> with gzip or Brotli—it wastes CPU and doesn’t help.
           </li>
           <li>
-            <strong>Serve pre-compressed assets</strong> when possible to reduce server CPU load
+            <strong>Serve pre-compressed assets</strong> when you can to lighten server load.
           </li>
         </ul>
 
@@ -422,44 +394,42 @@ export default function BestPracticesGuide() {
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Provide Descriptive Alt Text</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Write meaningful alt text</strong> that describes the image content and context
+            <strong>Write clear, meaningful alt text</strong> that describes the image and its context.
           </li>
           <li>
-            <strong>Keep alt text concise</strong> (under 125 characters for screen readers)
+            <strong>Keep alt text short</strong> (under 125 characters for screen readers).
           </li>
           <li>
-            <strong>Use empty alt=""</strong> for purely decorative images
+            <strong>Use empty <code>alt=""</code></strong> for purely decorative images.
           </li>
           <li>
-            <strong>Don't start with "image of"</strong>—screen readers already announce it's an
-            image
+            <strong>Avoid starting with "image of"</strong>—screen readers already announce images.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Optimize for SEO</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Use descriptive filenames</strong> (red-running-shoes.jpg, not IMG_1234.jpg)
+            <strong>Use descriptive filenames</strong> (e.g., <code>red-running-shoes.jpg</code> instead of <code>IMG_1234.jpg</code>).
           </li>
           <li>
-            <strong>Add structured data</strong> for product images using schema.org markup
+            <strong>Add structured data</strong> (schema.org) for product images.
           </li>
           <li>
-            <strong>Create an image sitemap</strong> to help search engines discover your images
+            <strong>Create an image sitemap</strong> to help search engines find your images.
           </li>
           <li>
-            <strong>Use descriptive page context</strong> around images to help search engines
-            understand them
+            <strong>Include descriptive text around images</strong> to give search engines more context.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Support Dark Mode</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Provide dark mode alternatives</strong> for images with light backgrounds
+            <strong>Offer dark mode versions</strong> for images with light backgrounds.
           </li>
           <li>
-            <strong>Use the picture element</strong> with prefers-color-scheme media query
+            <strong>Use the <code>picture</code> element</strong> with <code>prefers-color-scheme</code> to switch images automatically.
           </li>
         </ul>
 
@@ -480,55 +450,54 @@ export default function BestPracticesGuide() {
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Monitor Performance Metrics</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Track Core Web Vitals</strong> in Google Search Console and real user
-            monitoring tools
+            <strong>Track Core Web Vitals</strong> using Google Search Console and real user monitoring tools.
           </li>
           <li>
-            <strong>Monitor LCP</strong>—your Largest Contentful Paint should be under 2.5 seconds
+            <strong>Keep LCP (Largest Contentful Paint)</strong> under 2.5 seconds.
           </li>
           <li>
-            <strong>Track CLS</strong>—Cumulative Layout Shift should be under 0.1
+            <strong>Keep CLS (Cumulative Layout Shift)</strong> under 0.1.
           </li>
           <li>
-            <strong>Measure total page weight</strong> and track image contribution
+            <strong>Measure total page weight</strong> and see how much is from images.
           </li>
           <li>
-            <strong>Set up alerts</strong> for pages exceeding weight thresholds
+            <strong>Set up alerts</strong> if pages exceed your weight targets.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Regular Audits</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Run monthly performance audits</strong> with Google PageSpeed Insights
+            <strong>Run monthly audits</strong> with Google PageSpeed Insights.
           </li>
           <li>
-            <strong>Check for unoptimized images</strong> in your CMS or upload directories
+            <strong>Look for unoptimized images</strong> in your CMS or upload folders.
           </li>
           <li>
-            <strong>Identify format upgrade opportunities</strong> (old JPEGs that could be WebP)
+            <strong>Spot opportunities to upgrade formats</strong> (like converting old JPEGs to WebP).
           </li>
           <li>
-            <strong>Review new content</strong> to ensure it follows optimization guidelines
+            <strong>Check new content</strong> for compliance with your optimization guidelines.
           </li>
           <li>
-            <strong>Test on real devices</strong> and network conditions periodically
+            <strong>Test on real devices and networks</strong> regularly.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">✓ Continuous Improvement</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Stay updated on new formats</strong> and techniques (AVIF, JPEG XL)
+            <strong>Keep up with new formats</strong> and techniques (like AVIF, JPEG XL).
           </li>
           <li>
-            <strong>Test new optimization tools</strong> as they become available
+            <strong>Try new optimization tools</strong> as they’re released.
           </li>
           <li>
-            <strong>Experiment with different quality settings</strong> and measure impact
+            <strong>Experiment with quality settings</strong> and monitor the results.
           </li>
           <li>
-            <strong>A/B test image optimization</strong> to measure business impact
+            <strong>Run A/B tests on image optimization</strong> to see real business impact.
           </li>
         </ul>
 
@@ -538,35 +507,34 @@ export default function BestPracticesGuide() {
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">⚠️ Don't Make These Mistakes</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>❌ Using PNG for photographs</strong> → Use JPEG, WebP, or AVIF instead
+            <strong>❌ Using PNG for photographs</strong> → Choose JPEG, WebP, or AVIF instead.
           </li>
           <li>
-            <strong>❌ Using JPEG for logos/graphics</strong> → Use PNG, SVG, or WebP lossless
+            <strong>❌ Using JPEG for logos/graphics</strong> → Choose PNG, SVG, or WebP lossless.
           </li>
           <li>
-            <strong>❌ Scaling images with CSS/HTML</strong> → Resize images to their display size
+            <strong>❌ Scaling images with CSS/HTML</strong> → Resize images to match their display size.
           </li>
           <li>
-            <strong>❌ Lazy loading above-the-fold images</strong> → Never lazy load your LCP element
+            <strong>❌ Lazy loading above-the-fold images</strong> → Never lazy load your LCP image.
           </li>
           <li>
-            <strong>❌ Omitting width/height attributes</strong> → Always specify dimensions to
-            prevent CLS
+            <strong>❌ Omitting width/height attributes</strong> → Always specify dimensions to prevent layout shifts.
           </li>
           <li>
-            <strong>❌ Over-compressing product images</strong> → Quality below 75 hurts conversions
+            <strong>❌ Over-compressing product images</strong> → Quality below 75 can hurt conversions.
           </li>
           <li>
-            <strong>❌ Serving only modern formats</strong> → Always provide fallbacks
+            <strong>❌ Serving only modern formats</strong> → Always provide fallbacks for older browsers.
           </li>
           <li>
-            <strong>❌ Not testing on mobile</strong> → 60%+ of traffic is mobile, test there first
+            <strong>❌ Not testing on mobile</strong> → With 60%+ of traffic on mobile, always test there first.
           </li>
           <li>
-            <strong>❌ Forgetting about accessibility</strong> → Alt text is required, not optional
+            <strong>❌ Skipping accessibility</strong> → Alt text is essential, not optional.
           </li>
           <li>
-            <strong>❌ Using GIF for animations</strong> → Use MP4/WebM video or WebP animation
+            <strong>❌ Using GIF for animations</strong> → Use MP4/WebM video or WebP animation instead.
           </li>
         </ul>
 
@@ -632,22 +600,62 @@ export default function BestPracticesGuide() {
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Conclusion</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Image optimization is a continuous process, not a one-time task. By following these
-          best practices—from initial creation through delivery and ongoing monitoring—you can
-          maintain a fast, efficient website that provides excellent user experience while
-          minimizing bandwidth costs.
+          Image optimization is an ongoing journey. By applying these best practices—from the moment you create an image to delivery and regular monitoring—you’ll keep your site fast, user-friendly, and cost-effective.
         </p>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Start with the quick wins: compression, lazy loading, and proper dimensions. Then
-          progressively implement modern formats, responsive images, and advanced optimization
-          techniques. Every improvement compounds, and even small optimizations across many
-          images can dramatically impact your website's overall performance.
+          Start with the basics: compression, lazy loading, and using the correct dimensions. Then layer on modern formats, responsive images, and automation. Each improvement adds up, and even small tweaks across many images can make a big difference in performance.
         </p>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Remember that image optimization directly affects your bottom line through improved
-          Core Web Vitals, better SEO rankings, faster load times, and higher conversion rates.
-          The time invested in proper image optimization consistently delivers exceptional ROI.
+          Optimizing images pays off in better Core Web Vitals, improved SEO, faster load times, and higher conversions. Invest the time—it's one of the best returns you'll see for your website.
         </p>
+
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Sources and References</h2>
+        <div className="not-prose">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              This checklist references industry best practices and authoritative guidelines:
+            </p>
+            <ol className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+              <li>
+                <strong>Google Developers (2024).</strong> "Core Web Vitals." Official documentation for LCP, CLS, and INP optimization.{" "}
+                <a href="https://web.dev/articles/vitals" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  web.dev/articles/vitals
+                </a>
+              </li>
+              <li>
+                <strong>MDN Web Docs (2024).</strong> "Responsive images." Technical guide for srcset and picture element implementation.{" "}
+                <a href="https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Responsive_images" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  developer.mozilla.org
+                </a>
+              </li>
+              <li>
+                <strong>HTTP Archive (2024).</strong> "Page Weight Report." Statistics on image contribution to page weight.{" "}
+                <a href="https://almanac.httparchive.org/en/2024/page-weight" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  almanac.httparchive.org
+                </a>
+              </li>
+              <li>
+                <strong>Mozilla ImageOptim (2024).</strong> "MozJPEG." Open-source JPEG encoder achieving 5-10% better compression.{" "}
+                <a href="https://github.com/mozilla/mozjpeg" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  github.com/mozilla/mozjpeg
+                </a>
+              </li>
+              <li>
+                <strong>Cloudinary (2024).</strong> "Image Optimization Best Practices." Comprehensive industry guide to image optimization techniques.{" "}
+                <a href="https://cloudinary.com/blog/image-optimization" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  cloudinary.com
+                </a>
+              </li>
+              <li>
+                <strong>Can I Use (2024).</strong> Browser support data for modern image formats and loading attributes.{" "}
+                <a href="https://caniuse.com/" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  caniuse.com
+                </a>
+              </li>
+            </ol>
+          </div>
+        </div>
 
         <div className="not-prose my-12">
           <AdBanner placeholderId={125} variant="banner" />

@@ -9,6 +9,30 @@ export const metadata: Metadata = {
 
 const articles = [
   {
+    slug: "what-are-sprite-sheets",
+    title: "What Are Sprite Sheets? Complete Guide for Web & Game Developers",
+    excerpt: "Discover how sprite sheets revolutionize both web performance and game development, from reducing HTTP requests to enabling smooth character animations.",
+    date: "2024-10-22",
+    readTime: "9 min read",
+    category: "Sprite Sheets"
+  },
+  {
+    slug: "sprite-sheets-vs-individual-images",
+    title: "Sprite Sheets vs Individual Images: Performance Analysis",
+    excerpt: "Data-driven comparison of sprite sheets versus individual images for web apps and games. Includes HTTP/2 benchmarks and memory analysis.",
+    date: "2024-10-22",
+    readTime: "11 min read",
+    category: "Performance"
+  },
+  {
+    slug: "sprite-sheet-optimization",
+    title: "Sprite Sheet Optimization Best Practices",
+    excerpt: "Master sprite sheet optimization with packing algorithms, format selection, compression techniques, and workflow automation.",
+    date: "2024-10-22",
+    readTime: "10 min read",
+    category: "Optimization"
+  },
+  {
     slug: "image-formats-explained",
     title: "Image Formats Explained: JPEG, PNG, WebP, AVIF",
     excerpt: "A comprehensive guide to understanding different image formats, their strengths, weaknesses, and when to use each one for optimal results.",
@@ -48,11 +72,11 @@ export default function BlogPage() {
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-          Image Optimization Articles
+          Image & Sprite Sheet Optimization Articles
         </h1>
         <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-          Expert guides, tips, and best practices for optimizing images on the web.
-          Learn how to reduce file sizes, improve performance, and choose the right formats.
+          Expert guides for web developers and game developers. Learn image optimization,
+          sprite sheets, compression techniques, and performance best practices.
         </p>
       </div>
 

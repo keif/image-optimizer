@@ -41,38 +41,26 @@ export default function CompressionGuide() {
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
-        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">What is Image Compression?</h2>
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">What Is Image Compression?</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Image compression is the process of reducing the file size of an image while maintaining
-          acceptable quality. At its core, compression works by finding patterns and redundancy in
-          image data and representing that data more efficiently. Without compression, a simple
-          1920×1080 pixel photo would be over 6 MB—far too large for practical web use.
+          Image compression reduces the size of an image file without sacrificing too much quality. It does this by finding patterns and redundant data in an image and storing that information more efficiently. Without it, even a standard 1080p photo could weigh in at more than 6 MB—far too heavy for a fast-loading website.
         </p>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          There are two fundamentally different approaches to compression: lossy and lossless.
-          Understanding the difference between these methods is crucial for choosing the right
-          strategy for each image on your website.
+          There are two main types of image compression—lossy and lossless. Knowing the difference between them helps you choose the right balance between speed, quality, and file size for every image on your site.
         </p>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
-        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Lossless Compression: Perfect Quality, Larger Files</h2>
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Lossless Compression: Flawless Quality, Bigger Files</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Lossless compression reduces file size without discarding any image data. When you
-          decompress a lossless image, you get back exactly the original—pixel for pixel, bit for
-          bit. Think of it like zipping a text file: when you unzip it, you get the exact same
-          file back.
+          Lossless compression shrinks image files without throwing away any data. When you decompress a lossless image, you get an exact replica of the original—every pixel and every bit is preserved. Think of it like zipping a file: once unzipped, nothing is missing or changed.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">How Lossless Compression Works</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Lossless algorithms achieve compression by identifying patterns and redundancy in the
-          data. For example, if your image has a large area of solid blue sky, instead of storing
-          "blue, blue, blue, blue..." thousands of times, the algorithm stores "blue repeated
-          2,500 times." This technique is called run-length encoding, and it's just one of many
-          lossless compression methods.
+          Lossless algorithms work by spotting repetition and patterns in your image data. For example, if a sky is a single shade of blue, instead of saving “blue, blue, blue…” thousands of times, the algorithm simply notes “blue, 2,500 times.” This is called run-length encoding, but there are many more advanced methods at play.
         </p>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Modern lossless compression uses sophisticated techniques like:
+          Today’s lossless compression relies on a mix of clever techniques, such as:
         </p>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
@@ -92,36 +80,32 @@ export default function CompressionGuide() {
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Formats That Use Lossless Compression</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>PNG:</strong> The most common lossless format for web images
+            <strong>PNG:</strong> The go-to lossless format for web images
           </li>
           <li>
-            <strong>WebP (lossless mode):</strong> Modern format offering better compression than PNG
+            <strong>WebP (lossless mode):</strong> A newer option that usually outperforms PNG in file size
           </li>
           <li>
-            <strong>AVIF (lossless mode):</strong> Cutting-edge format with excellent lossless compression
+            <strong>AVIF (lossless mode):</strong> State-of-the-art format, offering excellent compression
           </li>
           <li>
-            <strong>GIF:</strong> Older format with lossless compression but limited to 256 colors
+            <strong>GIF:</strong> Classic format with lossless compression, but limited to 256 colors
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Typical Compression Ratios for Lossless</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Lossless compression typically achieves 2:1 to 3:1 compression ratios, though this
-          varies greatly based on image content:
+          Lossless compression usually cuts file sizes by about half or two-thirds, but results vary depending on the type of image:
         </p>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Simple graphics/screenshots:</strong> 3:1 to 5:1 (excellent compression due
-            to large areas of solid color)
+            <strong>Simple graphics/screenshots:</strong> 3:1 to 5:1 (huge savings thanks to big areas of solid color)
           </li>
           <li>
-            <strong>Photographs:</strong> 1.5:1 to 2:1 (poor compression due to complex detail
-            and little repetition)
+            <strong>Photographs:</strong> 1.5:1 to 2:1 (less savings due to complex details)
           </li>
           <li>
-            <strong>Text and diagrams:</strong> 5:1 to 10:1 (exceptional compression from
-            repetitive patterns)
+            <strong>Text and diagrams:</strong> 5:1 to 10:1 (extremely efficient—lots of repeated patterns)
           </li>
         </ul>
 
@@ -131,7 +115,7 @@ export default function CompressionGuide() {
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">When to Use Lossless Compression</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Choose lossless compression when:
+          Lossless compression is your best bet when:
         </p>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
@@ -157,83 +141,70 @@ export default function CompressionGuide() {
         </ul>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
-        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Lossy Compression: Smaller Files, Some Quality Loss</h2>
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Lossy Compression: Tiny Files, Some Quality Tradeoff</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Lossy compression achieves much smaller file sizes by permanently discarding some image
-          data. The key is discarding information that's less perceptually important—details that
-          human eyes are less sensitive to. When done well, lossy compression can reduce file size
-          by 10-20x while maintaining visually acceptable quality.
+          Lossy compression slashes file sizes by permanently removing some image information. The secret is to throw away details your viewers won’t notice—subtle textures or colors our eyes aren’t sensitive to. Done right, lossy compression can shrink images by 10 to 20 times while keeping them looking great.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">How Lossy Compression Works</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Lossy algorithms exploit the limitations and characteristics of human vision. Our eyes
-          are more sensitive to changes in brightness than changes in color, and we're better at
-          perceiving large structures than fine details. Lossy compression takes advantage of
-          these traits:
+          Lossy algorithms take advantage of how our eyes work. We’re more sensitive to shifts in brightness than in color, and we notice big shapes more than tiny details. Lossy compression leans into these quirks:
         </p>
 
         <h4 className="text-xl font-semibold mt-6 mb-2 text-gray-800 dark:text-gray-200">JPEG's Approach</h4>
         <ol className="list-decimal ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Color space conversion:</strong> Convert from RGB to YCbCr (separating brightness
-            from color)
+            <strong>Color space conversion:</strong> Switches from RGB to YCbCr to separate lightness from color.
           </li>
           <li>
-            <strong>Chroma subsampling:</strong> Reduce color detail (which eyes are less sensitive to)
-            while maintaining brightness detail
+            <strong>Chroma subsampling:</strong> Reduces color information (which we notice less), but keeps brightness detail sharp.
           </li>
           <li>
-            <strong>Frequency analysis:</strong> Break the image into 8×8 blocks and analyze frequency
-            components using Discrete Cosine Transform (DCT)
+            <strong>Frequency analysis:</strong> Splits the image into 8×8 blocks and analyzes patterns using the Discrete Cosine Transform (DCT).
           </li>
           <li>
-            <strong>Quantization:</strong> Aggressively discard high-frequency detail (fine texture)
-            that eyes are less sensitive to
+            <strong>Quantization:</strong> Discards the fine-grained details our eyes usually miss, especially in texture and noise.
           </li>
           <li>
-            <strong>Entropy coding:</strong> Apply lossless compression to the remaining data
+            <strong>Entropy coding:</strong> Uses lossless compression on the remaining data for extra savings.
           </li>
         </ol>
 
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          The quality setting in JPEG controls how aggressively the quantization step discards
-          data. Higher quality means less data is thrown away (and larger file sizes). Lower
-          quality means more aggressive discarding (and smaller files, but more visible artifacts).
+          JPEG’s quality setting controls how much detail gets tossed out during quantization. A higher setting keeps more detail (and results in a bigger file), while a lower setting dials up the compression but can introduce visible artifacts.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Formats That Use Lossy Compression</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>JPEG:</strong> The standard lossy format, optimized for photographs
+            <strong>JPEG:</strong> The classic lossy format, perfect for photos
           </li>
           <li>
-            <strong>WebP (lossy mode):</strong> 25-35% better compression than JPEG
+            <strong>WebP (lossy mode):</strong> Delivers 25–35% smaller files than JPEG at similar quality
           </li>
           <li>
-            <strong>AVIF (lossy mode):</strong> 40-50% better compression than JPEG
+            <strong>AVIF (lossy mode):</strong> Can shrink files by 40–50% more than JPEG, with impressive quality
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Typical Compression Ratios for Lossy</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Lossy compression achieves dramatically better compression ratios than lossless:
+          Lossy compression can shrink images far more than lossless:
         </p>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>High quality (JPEG 85-95):</strong> 5:1 to 10:1 compression
+            <strong>High quality (JPEG 85–95):</strong> 5:1 to 10:1 reduction
           </li>
           <li>
-            <strong>Medium quality (JPEG 75-85):</strong> 10:1 to 20:1 compression
+            <strong>Medium quality (JPEG 75–85):</strong> 10:1 to 20:1 reduction
           </li>
           <li>
-            <strong>Low quality (JPEG 60-75):</strong> 20:1 to 40:1 compression
+            <strong>Low quality (JPEG 60–75):</strong> 20:1 to 40:1 reduction
           </li>
         </ul>
 
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          For most web photographs, quality settings between 75-85 provide an excellent balance,
-          achieving 10-15x compression while maintaining good visual quality.
+          For most web photos, a quality setting between 75 and 85 strikes a great balance—delivering 10–15x smaller files with little visible difference.
         </p>
 
         <div className="not-prose my-12">
@@ -242,37 +213,32 @@ export default function CompressionGuide() {
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Common Lossy Compression Artifacts</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Understanding lossy artifacts helps you identify when compression is too aggressive:
+          Recognizing the side effects of lossy compression helps you avoid pushing file sizes too low:
         </p>
 
         <h4 className="text-xl font-semibold mt-6 mb-2 text-gray-800 dark:text-gray-200">1. Blocking Artifacts</h4>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          JPEG's 8×8 block structure becomes visible as a grid pattern, especially in areas with
-          smooth gradients or solid colors. This is the most recognizable JPEG artifact and
-          appears when quality is set too low.
+          JPEG divides images into 8×8 blocks, and when compression is heavy, these blocks can show up as a visible grid—especially in smooth areas or gradients.
         </p>
 
         <h4 className="text-xl font-semibold mt-6 mb-2 text-gray-800 dark:text-gray-200">2. Ringing and Halos</h4>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          High-contrast edges (like text on a background) can develop "ringing"—ripple-like
-          patterns around the edges. This is why JPEG is poor for screenshots and text-heavy images.
+          Strong edges (such as text on a background) can develop “ringing” or halo effects—wavy patterns around the edge. That’s why JPEG isn’t ideal for screenshots or images with lots of text.
         </p>
 
         <h4 className="text-xl font-semibold mt-6 mb-2 text-gray-800 dark:text-gray-200">3. Color Bleeding</h4>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Chroma subsampling can cause colors to bleed slightly across boundaries, making sharp
-          color transitions look blurry. This is most visible on red text against white backgrounds.
+          Reducing color detail (chroma subsampling) can cause colors to blur into each other, making sharp color transitions look fuzzy. This is most obvious with red text on white.
         </p>
 
         <h4 className="text-xl font-semibold mt-6 mb-2 text-gray-800 dark:text-gray-200">4. Loss of Fine Detail</h4>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Aggressive compression discards fine textures and details. Hair, grass, fabric texture,
-          and similar complex patterns can become blurry or "smeary" with heavy compression.
+          Heavy compression can blur away fine textures—think hair, grass, or fabric—leaving images looking soft or “smeared.”
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">When to Use Lossy Compression</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Choose lossy compression when:
+          Lossy compression is ideal when:
         </p>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
@@ -294,10 +260,9 @@ export default function CompressionGuide() {
         </ul>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
-        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Finding the Sweet Spot: Quality vs File Size</h2>
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Finding the Sweet Spot: Quality vs. File Size</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          The most common question with lossy compression is: "What quality setting should I use?"
-          The answer depends on your use case, but here are evidence-based guidelines:
+          The big question with lossy compression: “What quality setting should I pick?” The answer depends on your needs, but these research-backed guidelines will help you decide:
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Quality Guidelines by Use Case</h3>
@@ -353,16 +318,15 @@ export default function CompressionGuide() {
           </table>
         </div>
 
-        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">The 80-85 Rule</h3>
+        <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">The 80–85 Rule</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Research has shown that JPEG quality of 80-85 provides the optimal balance for most
-          web images:
+          Studies show that JPEG quality levels of 80–85 are the “sweet spot” for most web images:
         </p>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
-          <li>Most viewers cannot distinguish quality 85 from quality 100</li>
-          <li>Quality 80 is typically 50-60% smaller than quality 95</li>
-          <li>Quality 85 provides a 40-50% size reduction with imperceptible quality loss</li>
-          <li>Below quality 75, artifacts become noticeable on larger screens</li>
+          <li>Most people can’t tell the difference between quality 85 and quality 100</li>
+          <li>Quality 80 images are about 50–60% smaller than quality 95</li>
+          <li>Quality 85 cuts file size by 40–50% with almost no visible loss</li>
+          <li>Going below 75 can introduce obvious artifacts, especially on big screens</li>
         </ul>
 
         <div className="not-prose my-12">
@@ -372,26 +336,22 @@ export default function CompressionGuide() {
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Hybrid Approach: Using Both Methods</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          The most effective strategy often combines both lossy and lossless techniques:
+          The smartest workflow often blends both lossy and lossless compression:
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">1. Modern Formats with Dual Modes</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          WebP and AVIF support both lossy and lossless compression. Use lossy mode for
-          photographs and lossless mode for graphics and illustrations—all within the same format.
+          WebP and AVIF can do both lossy and lossless compression. Use lossy for photos, lossless for graphics—all in one format.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">2. Lossless Optimization of Lossy Files</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          After applying lossy compression to a JPEG, you can still apply lossless optimization
-          to the resulting file. Tools like MozJPEG can reduce JPEG file size by an additional
-          10-20% without any quality loss by optimizing the entropy coding and removing unnecessary
-          metadata.
+          Even after lossy compression, you can squeeze files smaller using lossless tools. For example, MozJPEG can shrink JPEGs by another 10–20% by optimizing how the data is stored and stripping unneeded metadata.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">3. Format Selection Based on Content</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Analyze each image's content to choose the best format and compression method:
+          Pick the format and compression method that matches the image type:
         </p>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>Photographs → Lossy (JPEG/WebP/AVIF)</li>
@@ -405,73 +365,58 @@ export default function CompressionGuide() {
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Perceptual Encoding</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Advanced compression tools use perceptual metrics (like SSIM and Butteraugli) to
-          optimize compression for human perception rather than mathematical accuracy. These tools
-          analyze how humans will perceive the compressed image and adjust compression
-          accordingly, often achieving 15-25% better compression than standard methods at the
-          same perceived quality.
+          Cutting-edge compression tools use perceptual metrics (like SSIM and Butteraugli) to optimize for what people actually see—not just pixel math. By tuning compression based on human vision, these tools can deliver 15–25% smaller files at the same perceived quality compared to older methods.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Content-Aware Compression</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Some tools analyze image content and apply different compression levels to different
-          regions. Important regions (faces, text, sharp edges) receive higher quality, while
-          less important regions (backgrounds, out-of-focus areas) receive more aggressive
-          compression. This maximizes file size savings while maintaining quality where it matters.
+          Some tools are smart enough to treat different parts of an image differently. Faces, text, and sharp edges get higher quality, while backgrounds or blurry areas are compressed more aggressively. This approach maximizes savings without sacrificing important details.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Chroma Subsampling Options</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          JPEG supports different chroma subsampling ratios:
+          JPEG allows for different levels of color data reduction (chroma subsampling):
         </p>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>4:4:4:</strong> No subsampling (largest files, best quality)
+            <strong>4:4:4:</strong> No color reduction (biggest files, sharpest colors)
           </li>
           <li>
-            <strong>4:2:2:</strong> 2:1 horizontal subsampling (good balance)
+            <strong>4:2:2:</strong> Reduces color horizontally (good compromise)
           </li>
           <li>
-            <strong>4:2:0:</strong> 2:1 horizontal and vertical subsampling (smallest files,
-            standard for web)
+            <strong>4:2:0:</strong> Reduces color both horizontally and vertically (smallest files, standard for the web)
           </li>
         </ul>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Most web images use 4:2:0 subsampling, which provides excellent file size reduction
-          with minimal perceptual impact for most photographs.
+          Most images online use 4:2:0, which keeps file sizes low without noticeably affecting photo quality.
         </p>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Testing and Measuring Compression Quality</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Don't rely solely on visual inspection. Use these tools to objectively measure
-          compression quality:
+          Don’t just trust your eyes—objective tools help you measure compression quality accurately:
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Metrics to Track</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>File size:</strong> The most obvious metric—smaller is better (to a point)
+            <strong>File size:</strong> The simplest measure—smaller is usually better, but don’t go too far
           </li>
           <li>
-            <strong>PSNR (Peak Signal-to-Noise Ratio):</strong> Mathematical measure of quality;
-            higher is better (but doesn't always correlate with perceived quality)
+            <strong>PSNR (Peak Signal-to-Noise Ratio):</strong> A mathematical score; higher is better, but not always aligned with what people see
           </li>
           <li>
-            <strong>SSIM (Structural Similarity Index):</strong> Better correlates with human
-            perception; closer to 1.0 is better
+            <strong>SSIM (Structural Similarity Index):</strong> Closer to 1.0 is better; this metric matches human perception more closely
           </li>
           <li>
-            <strong>Butteraugli:</strong> Google's perceptual metric designed to match human
-            vision; lower scores are better
+            <strong>Butteraugli:</strong> Google’s perceptual metric; lower numbers mean better visual similarity
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">A/B Testing</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          For critical images (like e-commerce product photos), consider A/B testing different
-          quality levels to measure impact on conversion rates. A 20% smaller file might load
-          faster and improve conversions, even if technical quality is slightly lower.
+          For important images (such as product photos), try A/B testing different quality settings to see how they affect conversions. Sometimes, a 20% smaller file that loads faster can boost sales, even if the image is technically a bit lower quality.
         </p>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -480,65 +425,91 @@ export default function CompressionGuide() {
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">For Website Owners</h3>
         <ol className="list-decimal ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Save originals in lossless format</strong> (PNG or lossless WebP) for future
-            editing
+            <strong>Always keep originals in a lossless format</strong> (like PNG or lossless WebP) for future editing or re-exporting.
           </li>
           <li>
-            <strong>Export photographs at quality 80-85</strong> as JPEG or WebP
+            <strong>Export photos at quality 80–85</strong> in JPEG or WebP—this gives you great quality at a fraction of the size.
           </li>
           <li>
-            <strong>Keep graphics and logos in lossless formats</strong> (PNG or WebP lossless)
+            <strong>Store graphics and logos in lossless formats</strong> (PNG or WebP lossless) to preserve sharpness.
           </li>
           <li>
-            <strong>Use optimization tools</strong> like Squish Image Optimizer to automatically
-            apply appropriate compression
+            <strong>Use optimization tools</strong> (such as Squish Image Optimizer) to automate the right settings for every image.
           </li>
           <li>
-            <strong>Implement responsive images</strong> with different quality levels for
-            different sizes
+            <strong>Use responsive images</strong> and adjust quality for each size to keep your site fast on every device.
           </li>
         </ol>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">For Developers</h3>
         <ol className="list-decimal ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Automate compression in your build pipeline</strong> using tools like
-            sharp or imagemin
+            <strong>Automate image compression in your build pipeline</strong> with tools like sharp or imagemin.
           </li>
           <li>
-            <strong>Serve modern formats</strong> (WebP/AVIF) with fallbacks to older formats
+            <strong>Serve modern formats</strong> (WebP/AVIF) with fallbacks for older browsers.
           </li>
           <li>
-            <strong>Implement quality tiers</strong> for different image types and use cases
+            <strong>Use quality tiers</strong> for different image types and scenarios.
           </li>
           <li>
-            <strong>Monitor file sizes</strong> and set CI/CD checks to prevent oversized images
-            from being deployed
+            <strong>Monitor file sizes</strong> and add CI/CD checks to prevent oversized images from sneaking into production.
           </li>
         </ol>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Conclusion</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Understanding the difference between lossy and lossless compression is fundamental to
-          effective image optimization. Lossless compression is perfect for graphics, logos, and
-          images requiring pixel-perfect quality, while lossy compression is ideal for photographs
-          where some imperceptible quality loss is acceptable in exchange for dramatic file size
-          reductions.
+          Mastering the difference between lossy and lossless compression is the foundation of smart image optimization. Use lossless for graphics, logos, and anything that needs pixel-perfect clarity. Turn to lossy for photographs, where a little invisible quality loss can mean massive file size savings.
         </p>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          The key is choosing the right method for each image type and finding the sweet spot
-          between quality and file size. For most web photographs, lossy compression at quality
-          80-85 provides an excellent balance, achieving 10-15x compression while maintaining
-          visually acceptable quality. For graphics and logos, lossless formats like PNG or WebP
-          lossless ensure perfect quality with reasonable file sizes.
+          The trick is to match the right method to your image and find that sweet spot between quality and speed. For most web photos, lossy compression at quality 80–85 is ideal—delivering dramatic size reductions with no obvious drop in appearance. For graphics, stick to lossless formats like PNG or WebP lossless for crisp, clean results.
         </p>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Modern formats like WebP and AVIF offer both lossy and lossless modes, providing
-          flexibility and better compression efficiency than traditional formats. By understanding
-          these compression methods and applying them appropriately, you can significantly reduce
-          your website's image payload while maintaining the visual quality your users expect.
+          Modern formats like WebP and AVIF give you the flexibility to use both approaches and achieve even better compression. By understanding and applying these techniques, you'll keep your site fast and your images looking their best.
         </p>
+
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Sources and References</h2>
+        <div className="not-prose">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              This article references technical documentation and research on image compression:
+            </p>
+            <ol className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+              <li>
+                <strong>MDN Web Docs (2024).</strong> "Image file type and format guide." Technical reference for image compression methods.{" "}
+                <a href="https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  developer.mozilla.org
+                </a>
+              </li>
+              <li>
+                <strong>Smashing Magazine (2021).</strong> "Using Modern Image Formats: AVIF And WebP." Comprehensive comparison of lossy and lossless compression.{" "}
+                <a href="https://www.smashingmagazine.com/2021/09/modern-image-formats-avif-webp/" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  smashingmagazine.com
+                </a>
+              </li>
+              <li>
+                <strong>Ctrl blog (2024).</strong> "Comparing AVIF vs WebP file sizes." Data on compression efficiency across formats.{" "}
+                <a href="https://www.ctrl.blog/entry/webp-avif-comparison.html" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  ctrl.blog
+                </a>
+              </li>
+              <li>
+                <strong>Cloudinary (2024).</strong> "Image Optimization: Lossy vs Lossless." Industry guide to compression techniques.{" "}
+                <a href="https://cloudinary.com/guides/image-optimization/lossy-vs-lossless-image-compression" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  cloudinary.com
+                </a>
+              </li>
+              <li>
+                <strong>Mozilla ImageOptim (2024).</strong> "MozJPEG." Documentation for advanced JPEG optimization.{" "}
+                <a href="https://github.com/mozilla/mozjpeg" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  github.com/mozilla/mozjpeg
+                </a>
+              </li>
+            </ol>
+          </div>
+        </div>
 
         <div className="not-prose my-12">
           <AdBanner placeholderId={119} variant="banner" />

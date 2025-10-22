@@ -29,8 +29,7 @@ export default function ImageFormatsGuide() {
             Image Formats Explained: JPEG, PNG, WebP, AVIF & GIF
           </h1>
           <p className="text-xl text-gray-300 dark:text-gray-300">
-            A comprehensive guide to understanding different image formats, their strengths,
-            weaknesses, and when to use each one for optimal web performance.
+            Let’s break down the most popular image formats for the web—what they’re good at, where they fall short, and how to pick the right one for your project.
           </p>
           <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
             Published on October 22, 2024
@@ -44,82 +43,62 @@ export default function ImageFormatsGuide() {
 
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Introduction</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Choosing the right image format is one of the most important decisions you'll make when
-          optimizing your website's performance. Different formats use different compression
-          algorithms, support different features, and excel in different use cases. Using the
-          wrong format can result in unnecessarily large file sizes, poor visual quality, or
-          missing features like transparency.
+          Picking the right image format is essential for fast, beautiful websites. Each format has its own way of compressing images, its own strengths, and its own quirks. Choose poorly, and you might end up with slow load times, blurry pictures, or missing features like transparency.
         </p>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          In this comprehensive guide, we'll explore the five most common image formats used on
-          the web today: JPEG, PNG, WebP, AVIF, and GIF. You'll learn how each format works,
-          what makes them unique, and most importantly, when to use each one.
+          In this guide, we’ll walk through the five formats you’ll see most often on the web: JPEG, PNG, WebP, AVIF, and GIF. You’ll see what makes each one tick, where it shines, and when it’s the right tool for the job.
         </p>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        {/* Let’s dive into each format and see how they compare. */}
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">JPEG: The Classic Photo Format</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          JPEG is the most widely-used image format on the web, and for good reason. Developed
-          in 1992, it's been the go-to format for photographs and complex images for over three
-          decades.
+          JPEG is everywhere. Since 1992, it’s been the standard for web photos and images with lots of color and detail. If you’ve ever uploaded a picture online, chances are it was a JPEG.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">How JPEG Works</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          JPEG uses lossy compression, which means it achieves smaller file sizes by permanently
-          discarding some image data. The format works by breaking the image into 8×8 pixel
-          blocks and applying a mathematical transformation (Discrete Cosine Transform) to remove
-          visual information that human eyes are less sensitive to.
+          JPEG uses lossy compression to shrink file sizes, which means it throws away some data for good. It chops images into 8×8 pixel blocks and uses math (the Discrete Cosine Transform) to toss details our eyes won’t miss.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Strengths of JPEG</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
           <li>
-            <strong>Excellent compression for photos:</strong> JPEG can reduce photograph file
-            sizes by 10-20x while maintaining good visual quality
+            <strong>Great for photos:</strong> JPEG can shrink photo files by 10–20x and still look good.
           </li>
           <li>
-            <strong>Universal browser support:</strong> Every browser, device, and platform
-            supports JPEG without exception
+            <strong>Works everywhere:</strong> Every browser and device supports JPEG, no questions asked.
           </li>
           <li>
-            <strong>Adjustable quality:</strong> You can choose the compression level (1-100) to
-            balance file size against visual quality
+            <strong>Quality control:</strong> You can dial in the compression level to balance size and appearance.
           </li>
           <li>
-            <strong>Progressive rendering:</strong> Progressive JPEGs load gradually, showing a
-            low-quality preview that improves as more data arrives
+            <strong>Progressive loading:</strong> Progressive JPEGs show a blurry preview first, then sharpen as the image loads.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Weaknesses of JPEG</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
           <li>
-            <strong>No transparency support:</strong> JPEG cannot have transparent backgrounds,
-            limiting its use for logos and graphics
+            <strong>No transparency:</strong> JPEG can’t do transparent backgrounds, so it’s a no-go for logos or overlays.
           </li>
           <li>
-            <strong>Lossy compression artifacts:</strong> Heavy compression creates visible
-            "blocking" artifacts, especially around sharp edges
+            <strong>Compression artifacts:</strong> Crank up the compression and you’ll spot blocky “artifacts,” especially around edges.
           </li>
           <li>
-            <strong>Poor for text and graphics:</strong> The lossy algorithm makes sharp lines and
-            text look blurry or distorted
+            <strong>Not for sharp graphics:</strong> Text and crisp lines get blurry or messy in JPEG.
           </li>
           <li>
-            <strong>Quality degrades with re-saving:</strong> Each time you edit and save a JPEG,
-            it loses more quality
+            <strong>Quality loss on every save:</strong> Each time you re-save a JPEG, you lose a little more quality.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">When to Use JPEG</h3>
         <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4">
-          <p><strong>Pro Tip:</strong> Choose based on content type, not habit — photos vs graphics often demand very different formats.</p>
+          <p><strong>Pro Tip:</strong> Let the content decide the format—photos and graphics have different needs.</p>
         </blockquote>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Use JPEG for photographs, complex images with many colors and gradients, and any content
-          where some quality loss is acceptable in exchange for smaller file sizes. JPEG is ideal
-          for hero images, product photos, user-uploaded content, and background images.
+          JPEG is perfect for photos, images with lots of colors or gradients, and anything where a bit of quality loss is worth the smaller size. Reach for JPEG with hero images, product shots, user uploads, or backgrounds.
         </p>
 
         <div className="not-prose my-12">
@@ -127,135 +106,109 @@ export default function ImageFormatsGuide() {
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        {/* Next up: PNG, for when you need sharpness or transparency. */}
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">PNG: Sharp Graphics and Transparency</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          PNG was created in 1996 as a patent-free alternative to GIF. It quickly became the
-          standard for web graphics requiring transparency or lossless quality.
+          PNG arrived in 1996 as a free alternative to GIF, and quickly took over as the go-to for graphics that need transparency or perfect quality.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">How PNG Works</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          PNG uses lossless compression, meaning the decompressed image is pixel-perfect identical
-          to the original. It uses the DEFLATE compression algorithm (the same one used in ZIP
-          files) combined with filtering techniques that prepare the image data for better
-          compression.
+          PNG uses lossless compression, so your image comes out exactly the same as it went in—no data lost. It relies on the DEFLATE algorithm (the same as ZIP files), plus some clever filtering to boost compression.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">PNG-8 vs PNG-24</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          PNG comes in two main variants. PNG-8 supports up to 256 colors (like GIF) and includes
-          binary transparency (fully transparent or fully opaque). PNG-24 supports millions of
-          colors and alpha channel transparency with 256 levels of opacity, allowing for smooth
-          transparency gradients.
+          There are two main flavors of PNG. PNG-8 handles up to 256 colors (like GIF) and offers on/off transparency. PNG-24 supports millions of colors and smooth, gradient transparency thanks to its alpha channel.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Strengths of PNG</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
           <li>
-            <strong>Lossless compression:</strong> Perfect quality preservation with no compression
-            artifacts
+            <strong>Lossless compression:</strong> Keeps your image pixel-perfect—no artifacts, ever.
           </li>
           <li>
-            <strong>Alpha channel transparency:</strong> Smooth, gradient transparency with 256
-            levels of opacity
+            <strong>Alpha transparency:</strong> Supports smooth, variable transparency for beautiful overlays.
           </li>
           <li>
-            <strong>Excellent for graphics:</strong> Sharp, crisp edges make it perfect for logos,
-            icons, and illustrations
+            <strong>Great for graphics:</strong> Delivers razor-sharp edges, ideal for logos, icons, and illustrations.
           </li>
           <li>
-            <strong>Universal support:</strong> Like JPEG, PNG is supported everywhere
+            <strong>Universal support:</strong> PNG works in every browser and on every device.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Weaknesses of PNG</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
           <li>
-            <strong>Large file sizes for photos:</strong> Lossless compression means photos are
-            often 2-5x larger than equivalent JPEGs
+            <strong>Big files for photos:</strong> Photos saved as PNG can be 2–5x larger than JPEG.
           </li>
           <li>
-            <strong>No animation support:</strong> PNG cannot create animated images (though APNG
-            exists, it has limited support)
+            <strong>No animation:</strong> PNG isn’t for animations (APNG exists, but isn’t widely supported).
           </li>
           <li>
-            <strong>Slower compression:</strong> Creating highly optimized PNGs takes longer than
-            other formats
+            <strong>Slower to compress:</strong> Creating small, optimized PNGs can take extra time.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">When to Use PNG</h3>
         <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4">
-          <p><strong>Pro Tip:</strong> PNG is best for crisp lines, text, and transparency — not for photos!</p>
+          <p><strong>Pro Tip:</strong> PNG shines with crisp graphics and transparency—not with photos.</p>
         </blockquote>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Use PNG for logos, icons, graphics with text, screenshots, illustrations, and any image
-          requiring transparency or pixel-perfect quality. PNG is essential for images that will
-          be edited multiple times, as it doesn't degrade with re-saving.
+          Reach for PNG with logos, icons, screenshots, illustrations, or any image that needs transparency or perfect quality. If you’ll be editing an image repeatedly, PNG is a safe bet—it never loses quality.
         </p>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        {/* Now, let’s look at the new kids on the block: WebP and AVIF. */}
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">WebP: Modern and Efficient</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          WebP is a modern image format developed by Google in 2010. It was designed specifically
-          for the web, offering both lossy and lossless compression with better efficiency than
-          JPEG and PNG.
+          WebP is Google’s answer to web images. Launched in 2010, it was built for the web from the ground up, offering both lossy and lossless compression—usually beating JPEG and PNG in file size.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">How WebP Works</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          WebP uses predictive coding to compress images. For lossy compression, it uses techniques
-          similar to the VP8 video codec. For lossless compression, it uses entropy coding with
-          a dictionary of recently seen pixel values. This allows WebP to achieve smaller file
-          sizes than both JPEG and PNG.
+          WebP compresses images with predictive coding. For lossy images, it borrows from the VP8 video codec. For lossless, it uses entropy coding and a dictionary of pixel values. The result? Smaller files than JPEG or PNG for most images.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Strengths of WebP</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
           <li>
-            <strong>Superior compression:</strong> WebP images are typically 25-35% smaller than
-            equivalent JPEG images
+            <strong>High-efficiency compression:</strong> WebP images are usually 25–35% smaller than JPEG at the same quality.
           </li>
           <li>
-            <strong>Supports both lossy and lossless:</strong> One format can replace both JPEG
-            and PNG in many cases
+            <strong>Lossy and lossless:</strong> One format can handle both photos and graphics.
           </li>
           <li>
-            <strong>Alpha channel transparency:</strong> Like PNG, but with smaller file sizes
+            <strong>Alpha transparency:</strong> Supports full transparency, just like PNG—but smaller.
           </li>
           <li>
-            <strong>Animation support:</strong> Can create animated images more efficiently than
-            GIF
+            <strong>Animation support:</strong> Can handle animations better than GIF.
           </li>
           <li>
-            <strong>Wide browser support:</strong> Supported by all modern browsers (95%+ of users)
+            <strong>Modern browser support:</strong> Works in almost every browser (over 95% of users).
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Weaknesses of WebP</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
           <li>
-            <strong>Limited legacy browser support:</strong> Internet Explorer and very old Safari
-            versions don't support WebP
+            <strong>Not for old browsers:</strong> Internet Explorer and some ancient Safari versions can’t display WebP.
           </li>
           <li>
-            <strong>Encoding complexity:</strong> Requires modern tools and libraries for creation
-            and optimization
+            <strong>Needs modern tools:</strong> You’ll need up-to-date software to create and optimize WebP images.
           </li>
           <li>
-            <strong>Less tooling support:</strong> Not all image editing applications support WebP
-            natively
+            <strong>Editing support is spotty:</strong> Not every image editor supports WebP out of the box.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">When to Use WebP</h3>
         <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4">
-          <p><strong>Pro Tip:</strong> WebP can replace both JPEG and PNG for most web images — just remember to provide fallbacks!</p>
+          <p><strong>Pro Tip:</strong> WebP can often replace both JPEG and PNG—just remember to provide fallbacks for older browsers!</p>
         </blockquote>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Use WebP as your primary format for modern websites, with JPEG/PNG fallbacks for older
-          browsers. It's excellent for all types of content: photos, graphics, illustrations, and
-          images with transparency. Always serve WebP when browser support allows.
+          Use WebP as your go-to format for most modern sites. It works for photos, graphics, illustrations, and images with transparency. Just make sure to serve JPEG or PNG as a backup for browsers that don’t support it.
         </p>
 
         <div className="not-prose my-12">
@@ -263,122 +216,104 @@ export default function ImageFormatsGuide() {
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        {/* Ready to push compression even further? Meet AVIF. */}
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">AVIF: The Future of Image Compression</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          AVIF is the newest major image format, released in 2019. Based on the AV1 video codec,
-          it offers the best compression efficiency of any format discussed here.
+          AVIF is the latest major format, arriving in 2019 and based on the AV1 video codec. It’s designed to deliver the smallest files at high quality—better than anything before it.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">How AVIF Works</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          AVIF uses compression techniques from the AV1 video codec, applying intra-frame video
-          compression to still images. This allows for incredibly efficient compression with
-          excellent quality retention, but requires more computational power for encoding and
-          decoding.
+          AVIF borrows its compression tricks from the AV1 video codec, using advanced video compression for still images. This means ultra-efficient file sizes and great image quality—but it’s more demanding on computers when encoding and decoding.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Strengths of AVIF</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
           <li>
-            <strong>Best-in-class compression:</strong> AVIF files are typically 50% smaller than
-            JPEG at the same visual quality
+            <strong>Top-tier compression:</strong> AVIF files can be 50% smaller than JPEG at the same quality.
           </li>
           <li>
-            <strong>High bit depth support:</strong> Supports HDR and wide color gamut for premium
-            displays
+            <strong>HDR and wide color:</strong> Supports high bit depth and wide color for stunning visuals.
           </li>
           <li>
-            <strong>Superior quality at low bitrates:</strong> Maintains visual quality even with
-            aggressive compression
+            <strong>Great quality at tiny sizes:</strong> Keeps images looking sharp, even with heavy compression.
           </li>
           <li>
-            <strong>Modern features:</strong> Supports transparency, animation, and lossless
-            compression
+            <strong>Modern features:</strong> Handles transparency, animation, and even lossless compression.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Weaknesses of AVIF</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
           <li>
-            <strong>Limited browser support:</strong> Only ~85% of browsers support AVIF (as of
-            2024)
+            <strong>Not universal yet:</strong> About 85% of browsers support AVIF as of 2024.
           </li>
           <li>
-            <strong>Slow encoding:</strong> Creating AVIF images takes significantly longer than
-            other formats
+            <strong>Slow to encode:</strong> Creating AVIF images takes more time than other formats.
           </li>
           <li>
-            <strong>Slower decoding:</strong> Some devices struggle to decode AVIF quickly,
-            potentially affecting user experience
+            <strong>Slower to decode:</strong> Some devices may struggle to display AVIF instantly, especially on mobile.
           </li>
           <li>
-            <strong>Minimal tooling:</strong> Few image editors support AVIF natively
+            <strong>Limited editing support:</strong> Few image editors support AVIF natively.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">When to Use AVIF</h3>
         <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4">
-          <p><strong>Pro Tip:</strong> AVIF offers top-notch compression, but always provide WebP/JPEG fallbacks for best compatibility.</p>
+          <p><strong>Pro Tip:</strong> AVIF gives you the smallest files, but always offer WebP or JPEG as a fallback for full compatibility.</p>
         </blockquote>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Use AVIF as a progressive enhancement for users with modern browsers. Always provide
-          WebP and JPEG fallbacks. AVIF is particularly valuable for high-quality photography,
-          hero images, and bandwidth-constrained scenarios like mobile networks.
+          Use AVIF for users with modern browsers—especially for high-quality photos, hero images, or when bandwidth is tight. Always provide WebP or JPEG as a backup so everyone gets a great experience.
         </p>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        {/* Finally, let’s look at GIF—still hanging on after all these years. */}
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">GIF: The Animated Veteran</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          GIF is one of the oldest image formats still in use, created in 1987. While it's largely
-          been superseded by better formats, it remains popular for simple animations.
+          GIF has been around since 1987, making it one of the oldest formats still in use. While newer formats have taken over most tasks, GIF sticks around for simple animations.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">How GIF Works</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          GIF uses lossless LZW compression and is limited to a 256-color palette. For animation,
-          it stores multiple frames sequentially, with each frame showing for a specified duration.
+          GIF uses lossless LZW compression, but it’s limited to just 256 colors. For animations, it strings together multiple frames, each displaying for a set amount of time.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Strengths of GIF</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
           <li>
-            <strong>Simple animation:</strong> Easy to create and widely supported animated images
+            <strong>Easy animation:</strong> Simple to make and universally supported for basic animations.
           </li>
           <li>
-            <strong>Universal support:</strong> Works everywhere, even on very old systems
+            <strong>Works everywhere:</strong> Even the oldest browsers and devices can show GIFs.
           </li>
           <li>
-            <strong>Binary transparency:</strong> Supports transparent pixels (though not alpha
-            channel)
+            <strong>Basic transparency:</strong> Supports on/off transparent pixels (but not full alpha transparency).
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Weaknesses of GIF</h3>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
           <li>
-            <strong>Limited color palette:</strong> Only 256 colors maximum, causing visible
-            banding in photos
+            <strong>Color limits:</strong> Only 256 colors, so photos look banded or posterized.
           </li>
           <li>
-            <strong>Large file sizes:</strong> Animations can be enormous compared to modern video
-            formats
+            <strong>Large file sizes:</strong> GIF animations are much bigger than modern videos or animated WebP.
           </li>
           <li>
-            <strong>No audio support:</strong> Cannot include sound with animations
+            <strong>No audio:</strong> GIFs can’t include sound.
           </li>
           <li>
-            <strong>Outdated compression:</strong> Much less efficient than modern alternatives
+            <strong>Old-school compression:</strong> Much less efficient than today’s formats.
           </li>
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">When to Use GIF</h3>
         <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4">
-          <p><strong>Pro Tip:</strong> Prefer modern animation formats (WebP, MP4) — use GIF only when nothing else works.</p>
+          <p><strong>Pro Tip:</strong> Use modern animation formats (WebP, MP4) whenever possible—save GIF for when nothing else will do.</p>
         </blockquote>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Use GIF only for simple animations when video formats aren't suitable. For most use
-          cases, consider MP4 video, WebP animation, or APNG instead. GIF is best for simple
-          graphics with few colors and short animation loops.
+          Only use GIF for simple, low-color animations when video or animated WebP aren’t an option. For most cases, MP4, WebP, or APNG will give you better quality and smaller files. If you need a quick, looping animation with few colors, GIF can still do the job.
         </p>
 
         <div className="not-prose my-12">
@@ -386,6 +321,7 @@ export default function ImageFormatsGuide() {
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        {/* Let’s pull it all together with a side-by-side comparison. */}
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Format Comparison Table</h2>
         <div className="not-prose my-8 overflow-x-auto">
           <table className="min-w-full text-sm text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
@@ -445,79 +381,79 @@ export default function ImageFormatsGuide() {
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        {/* So, how do you actually choose? Here’s a quick guide. */}
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Choosing the Right Format</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Here's a practical decision tree to help you choose the right format for your images:
+          Not sure which format to use? Here’s a quick cheat sheet for picking the best one for your images:
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">For Photographs and Complex Images</h3>
         <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4">
-          <p><strong>Pro Tip:</strong> For photos, prioritize modern formats (AVIF, WebP) — but always check browser support!</p>
+          <p><strong>Pro Tip:</strong> For photos, use the newest formats you can—but always double-check browser support!</p>
         </blockquote>
         <ol className="list-decimal ml-6 space-y-2 text-gray-700 dark:text-gray-300">
           <li>
-            <strong>Best:</strong> Serve AVIF to supporting browsers (50% smaller than JPEG)
+            <strong>Best:</strong> Use AVIF for browsers that support it (files are up to 50% smaller than JPEG).
           </li>
           <li>
-            <strong>Better:</strong> Serve WebP to supporting browsers (25-35% smaller than JPEG)
+            <strong>Better:</strong> Use WebP for browsers that don’t support AVIF (25–35% smaller than JPEG).
           </li>
           <li>
-            <strong>Good:</strong> Serve optimized JPEG as fallback (universal support)
+            <strong>Good:</strong> Use optimized JPEG as a fallback (works everywhere).
           </li>
         </ol>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">For Graphics, Logos, and Illustrations</h3>
         <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4">
-          <p><strong>Pro Tip:</strong> Use SVG for vectors, PNG/WebP for crisp raster graphics — never JPEG for logos!</p>
+          <p><strong>Pro Tip:</strong> Use SVG for anything vector; for crisp raster graphics, stick to WebP or PNG. Never use JPEG for logos!</p>
         </blockquote>
         <ol className="list-decimal ml-6 space-y-2 text-gray-700 dark:text-gray-300">
           <li>
-            <strong>Best:</strong> Use SVG for vector graphics (scalable and tiny file size)
+            <strong>Best:</strong> SVG for vector graphics (scales perfectly and tiny files).
           </li>
           <li>
-            <strong>Better:</strong> Use WebP lossless for raster graphics (smaller than PNG)
+            <strong>Better:</strong> WebP lossless for raster graphics (smaller than PNG).
           </li>
           <li>
-            <strong>Good:</strong> Use PNG-8 or PNG-24 as fallback (universal support)
+            <strong>Good:</strong> PNG-8 or PNG-24 as a fallback (supported everywhere).
           </li>
         </ol>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">For Images with Transparency</h3>
         <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4">
-          <p><strong>Pro Tip:</strong> Need transparency? Use PNG or WebP — JPEG can't do it!</p>
+          <p><strong>Pro Tip:</strong> If you need transparency, WebP or PNG are your friends—JPEG can’t do it!</p>
         </blockquote>
         <ol className="list-decimal ml-6 space-y-2 text-gray-700 dark:text-gray-300">
           <li>
-            <strong>Best:</strong> Use WebP with alpha channel (much smaller than PNG)
+            <strong>Best:</strong> WebP with alpha channel (much smaller than PNG).
           </li>
           <li>
-            <strong>Better:</strong> Use PNG-24 with alpha channel (universal support)
+            <strong>Better:</strong> PNG-24 with alpha channel (supported everywhere).
           </li>
           <li>
-            <strong>Avoid:</strong> Don't use JPEG (no transparency support)
+            <strong>Avoid:</strong> Don’t use JPEG (no transparency support).
           </li>
         </ol>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">For Simple Animations</h3>
         <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4">
-          <p><strong>Pro Tip:</strong> Use video or animated WebP for smooth, efficient animation — GIF is a last resort.</p>
+          <p><strong>Pro Tip:</strong> Go for video or animated WebP for smooth, efficient animations—leave GIF for last.</p>
         </blockquote>
         <ol className="list-decimal ml-6 space-y-2 text-gray-700 dark:text-gray-300">
           <li>
-            <strong>Best:</strong> Use MP4/WebM video with looping (smallest size, best quality)
+            <strong>Best:</strong> MP4/WebM video with looping (tiny files, great quality).
           </li>
           <li>
-            <strong>Better:</strong> Use WebP animation (better than GIF)
+            <strong>Better:</strong> Animated WebP (beats GIF in most ways).
           </li>
           <li>
-            <strong>Acceptable:</strong> Use GIF only for simple, low-color animations
+            <strong>Acceptable:</strong> GIF, but only for simple, low-color animations.
           </li>
         </ol>
 
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Implementing Format Selection</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Modern HTML provides the <code>&lt;picture&gt;</code> element and <code>srcset</code>{" "}
-          attribute to serve different formats based on browser support. Here's an example:
+          Thankfully, modern HTML makes serving multiple image formats a breeze. Use the <code>&lt;picture&gt;</code> element and <code>srcset</code> to automatically give each browser the best image it can handle. Here’s how:
         </p>
 
         <pre className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 p-4 rounded-lg overflow-x-auto mb-6">
@@ -529,23 +465,64 @@ export default function ImageFormatsGuide() {
         </pre>
 
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          The browser will automatically select the first format it supports, falling back to
-          JPEG if necessary. This approach ensures optimal file size for modern browsers while
-          maintaining compatibility with older ones.
+          The browser picks the first format it supports, falling back to JPEG if needed. This way, modern browsers get the smallest files, but everyone sees your images.
         </p>
 
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Conclusion</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Understanding image formats is crucial for web performance optimization. While JPEG
-          and PNG remain important for universal compatibility, modern formats like WebP and
-          AVIF offer significant file size reductions without compromising quality.
+          Knowing your image formats is a huge win for web performance. JPEG and PNG are still important for compatibility, but formats like WebP and AVIF can dramatically cut file sizes without losing quality.
         </p>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          The best strategy is to use a progressive enhancement approach: serve cutting-edge
-          formats to modern browsers while providing fallbacks for older ones. Tools like the
-          Squish Image Optimizer can automatically convert your images to multiple formats,
-          making it easy to implement this strategy across your entire website.
+          The smartest approach? Use progressive enhancement: serve the latest formats to browsers that support them, and reliable fallbacks for the rest. Image optimization tools (like Squish Image Optimizer) can automate this, converting your images to all the right formats with minimal effort.
         </p>
+
+        <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+        <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Sources and References</h2>
+        <div className="not-prose">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              This article references the following authoritative sources for image format specifications and comparisons:
+            </p>
+            <ol className="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+              <li>
+                <strong>MDN Web Docs (2024).</strong> "Image file type and format guide." Comprehensive reference for web image formats.{" "}
+                <a href="https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  developer.mozilla.org
+                </a>
+              </li>
+              <li>
+                <strong>Can I Use (2024).</strong> "WebP image format." Browser support data showing ~95% global support.{" "}
+                <a href="https://caniuse.com/webp" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  caniuse.com/webp
+                </a>
+              </li>
+              <li>
+                <strong>Can I Use (2024).</strong> "AVIF image format." Browser support data showing ~85-88% global support.{" "}
+                <a href="https://caniuse.com/avif" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  caniuse.com/avif
+                </a>
+              </li>
+              <li>
+                <strong>Ctrl blog (2024).</strong> "Comparing AVIF vs WebP file sizes at the same DSSIM." Detailed technical comparison showing WebP 25-35% smaller than JPEG, AVIF 50% smaller.{" "}
+                <a href="https://www.ctrl.blog/entry/webp-avif-comparison.html" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  ctrl.blog
+                </a>
+              </li>
+              <li>
+                <strong>Smashing Magazine (2021).</strong> "Using Modern Image Formats: AVIF And WebP." Comprehensive guide to modern image format adoption.{" "}
+                <a href="https://www.smashingmagazine.com/2021/09/modern-image-formats-avif-webp/" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  smashingmagazine.com
+                </a>
+              </li>
+              <li>
+                <strong>Cloudinary (2024).</strong> "Advanced Image Formats and When to Use Them." Industry guide covering WebP, AVIF, HEIC, and JPEG XL.{" "}
+                <a href="https://cloudinary.com/blog/advanced-image-formats-and-when-to-use-them" target="_blank" rel="noopener noreferrer" className="text-purple-600 dark:text-purple-400 hover:underline">
+                  cloudinary.com
+                </a>
+              </li>
+            </ol>
+          </div>
+        </div>
 
         {/* Bottom Banner Ad */}
         <div className="not-prose my-12">
