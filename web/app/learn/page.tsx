@@ -158,7 +158,7 @@ export default function LearnPage() {
           {/* Social Media Links */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <a
-              href="https://www.facebook.com/profile.php?id=61582866203089"
+              href="https://www.facebook.com/SoSquishy.io/"
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl font-bold text-center shadow-lg shadow-blue-300/50 hover:shadow-2xl hover:shadow-blue-400/60 hover:-translate-y-1 transition-all duration-300"
