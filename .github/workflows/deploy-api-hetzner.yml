@@ -145,6 +145,9 @@ jobs:
           echo "Building Docker images..."
           docker-compose -f $DOCKER_COMPOSE_FILE build --no-cache
 
+          echo "Stopping old containers..."
+          docker-compose -f $DOCKER_COMPOSE_FILE down || true
+
           echo "Deploying containers..."
           docker-compose -f $DOCKER_COMPOSE_FILE up -d
 

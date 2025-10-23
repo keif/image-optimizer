@@ -103,13 +103,13 @@ if [ -f "Caddyfile.prod" ]; then
     echo "✓ Caddyfile updated and reloaded"
 fi
 
+# Stop old containers first (prevents recreation issues)
+echo "Stopping old containers..."
+docker-compose -f ${COMPOSE_FILE} down || true
+
 # Build the Docker images (no cache to ensure latest code)
 echo "Building Docker images..."
 docker-compose -f ${COMPOSE_FILE} build --no-cache
-
-# Stop old containers
-echo "Stopping old containers..."
-docker-compose -f ${COMPOSE_FILE} down || true
 
 # Start new containers
 echo "Starting new containers..."
