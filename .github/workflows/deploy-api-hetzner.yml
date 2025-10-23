@@ -118,8 +118,10 @@ jobs:
             echo "Updating Caddyfile..."
             cp Caddyfile.prod /etc/caddy/Caddyfile
             caddy validate --config /etc/caddy/Caddyfile
-            systemctl reload caddy
-            echo "✓ Caddyfile updated and reloaded"
+            # Reload Caddy in background to avoid SSH disconnection
+            nohup systemctl reload caddy > /dev/null 2>&1 &
+            sleep 2
+            echo "✓ Caddyfile updated and Caddy reload triggered"
           fi
 
           # Build and deploy with docker-compose
