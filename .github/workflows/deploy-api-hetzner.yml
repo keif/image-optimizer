@@ -48,8 +48,15 @@ jobs:
           BUILD_TIME: ${{ steps.version.outputs.BUILD_TIME }}
         run: |
           # SSH into server and execute deployment
-          ssh -o StrictHostKeyChecking=no ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_HOST }} "bash -s" << 'ENDSSH'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_HOST }} "bash -s" << ENDSSH
           set -e
+
+          # Set variables for deployment
+          DEPLOY_PATH="/opt/image-optimizer-docker"
+          DOCKER_COMPOSE_FILE="docker-compose.prod.yml"
+          APP_VERSION="${{ steps.version.outputs.APP_VERSION }}"
+          GIT_COMMIT="${{ steps.version.outputs.GIT_COMMIT }}"
+          BUILD_TIME="${{ steps.version.outputs.BUILD_TIME }}"
 
           echo "🚀 Starting deployment..."
 
