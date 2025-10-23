@@ -46,6 +46,7 @@ jobs:
           APP_VERSION: ${{ steps.version.outputs.APP_VERSION }}
           GIT_COMMIT: ${{ steps.version.outputs.GIT_COMMIT }}
           BUILD_TIME: ${{ steps.version.outputs.BUILD_TIME }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # SSH into server and execute deployment
           ssh -o StrictHostKeyChecking=no ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_HOST }} "bash -s" << ENDSSH
@@ -57,6 +58,8 @@ jobs:
           APP_VERSION="${{ steps.version.outputs.APP_VERSION }}"
           GIT_COMMIT="${{ steps.version.outputs.GIT_COMMIT }}"
           BUILD_TIME="${{ steps.version.outputs.BUILD_TIME }}"
+          GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          REPO_URL="https://x-access-token:\${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
 
           echo "🚀 Starting deployment..."
 
@@ -83,14 +86,22 @@ jobs:
               cd $DEPLOY_PATH
               find . -mindepth 1 -maxdepth 1 ! -name 'data' -exec rm -rf {} +
             fi
-            git clone https://github.com/${{ github.repository }}.git $DEPLOY_PATH-tmp
+            git clone "\${REPO_URL}" $DEPLOY_PATH-tmp
             rsync -a $DEPLOY_PATH-tmp/ $DEPLOY_PATH/
             rm -rf $DEPLOY_PATH-tmp
+
+            # Remove token from git config for security
+            cd $DEPLOY_PATH
+            git remote set-url origin https://github.com/${{ github.repository }}.git
           else
             echo "Pulling latest changes..."
             cd $DEPLOY_PATH
+            # Update remote URL with token for this pull
+            git remote set-url origin "\${REPO_URL}"
             git fetch origin
             git reset --hard origin/main
+            # Remove token from git config for security
+            git remote set-url origin https://github.com/${{ github.repository }}.git
           fi
 
           cd $DEPLOY_PATH
