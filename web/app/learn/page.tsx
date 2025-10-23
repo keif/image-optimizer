@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import SocialLinks, { socialLinks } from "@/components/SocialLinks";
 
 export const metadata: Metadata = {
   title: "Learn More - SoSquishy",
@@ -151,37 +150,19 @@ export default function LearnPage() {
 
       {/* Call to Action */}
       <section className="relative py-16 px-4 sm:px-6 lg:px-8 pb-24">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg mb-8 text-center">
-            Stay Connected
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl sm:text-5xl font-bold text-white drop-shadow-lg mb-8">
+            Ready to Optimize?
           </h2>
-
-          {/* Social Media Links with Icons */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {socialLinks.map((social) => {
-              const Icon = social.icon;
-              return (
-                <a
-                  key={social.name}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`px-6 py-4 bg-gradient-to-r ${social.bgColor} text-white rounded-2xl font-bold text-center shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2`}
-                >
-                  <Icon size={20} />
-                  <span>{social.name}</span>
-                </a>
-              );
-            })}
-          </div>
-
-          {/* Home Button */}
+          <p className="text-xl text-sky-100 mb-8 max-w-2xl mx-auto">
+            Start compressing images and sprite sheets with Squish. Fast, simple, and free.
+          </p>
           <div className="flex justify-center">
             <Link
               href="/"
               className="px-12 py-5 bg-white text-blue-600 rounded-full font-bold text-xl shadow-lg shadow-blue-300/50 hover:shadow-2xl hover:shadow-blue-400/60 hover:-translate-y-1 transition-all duration-300"
             >
-              Go Home
+              Get Started
             </Link>
           </div>
         </div>
