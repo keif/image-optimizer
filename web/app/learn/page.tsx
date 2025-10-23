@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import SocialLinks, { socialLinks } from "@/components/SocialLinks";
 
 export const metadata: Metadata = {
   title: "Learn More - SoSquishy",
@@ -155,43 +156,23 @@ export default function LearnPage() {
             Stay Connected
           </h2>
 
-          {/* Social Media Links */}
+          {/* Social Media Links with Icons */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <a
-              href="https://www.facebook.com/SoSquishy.io/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl font-bold text-center shadow-lg shadow-blue-300/50 hover:shadow-2xl hover:shadow-blue-400/60 hover:-translate-y-1 transition-all duration-300"
-            >
-              Facebook
-            </a>
-
-            <a
-              href="https://x.com/SoSquishyIO"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-4 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-2xl font-bold text-center shadow-lg shadow-gray-300/50 hover:shadow-2xl hover:shadow-gray-400/60 hover:-translate-y-1 transition-all duration-300"
-            >
-              X (Twitter)
-            </a>
-
-            <a
-              href="https://bsky.app/profile/sosquishy.bsky.social"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-4 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-2xl font-bold text-center shadow-lg shadow-sky-300/50 hover:shadow-2xl hover:shadow-sky-400/60 hover:-translate-y-1 transition-all duration-300"
-            >
-              Bluesky
-            </a>
-
-            <a
-              href="https://instagram.com/sosquishyio"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 text-white rounded-2xl font-bold text-center shadow-lg shadow-purple-300/50 hover:shadow-2xl hover:shadow-purple-400/60 hover:-translate-y-1 transition-all duration-300"
-            >
-              Instagram
-            </a>
+            {socialLinks.map((social) => {
+              const Icon = social.icon;
+              return (
+                <a
+                  key={social.name}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`px-6 py-4 bg-gradient-to-r ${social.bgColor} text-white rounded-2xl font-bold text-center shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2`}
+                >
+                  <Icon size={20} />
+                  <span>{social.name}</span>
+                </a>
+              );
+            })}
           </div>
 
           {/* Home Button */}

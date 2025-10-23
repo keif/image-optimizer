@@ -3,6 +3,7 @@ import Script from "next/script";
 import Link from "next/link";
 import "./globals.css";
 import SupportBanner from "@/components/SupportBanner";
+import SocialLinks from "@/components/SocialLinks";
 
 export const metadata: Metadata = {
   title: "Squish - Image Optimizer",
@@ -19,29 +20,45 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        {/* Ezoic Meta Tags - Required for proper integration */}
+        {isProduction && (
+          <>
+            <meta name="ezoic-site-verification" content="sosquishy.io" />
+            <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+            {/* Content Security Policy for Ezoic and Analytics */}
+            <meta
+              httpEquiv="Content-Security-Policy"
+              content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' *.ezojs.com *.ezoic.net *.gatekeeperconsent.com *.id5-sync.com gc.zgo.at goatcounter.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' *.ezoic.net *.ezojs.com *.gatekeeperconsent.com *.id5-sync.com gc.zgo.at goatcounter.com https://api.sosquishy.io http://localhost:8080; frame-src 'self' *.ezoic.net *.ezojs.com *.gatekeeperconsent.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self';"
+            />
+          </>
+        )}
+      </head>
       <body className="antialiased">
         {/* Ezoic Privacy Scripts - Only in production */}
         {isProduction && (
           <>
+            {/* Consent Management Platform Scripts */}
             <Script
               src="https://cmp.gatekeeperconsent.com/min.js"
-              strategy="beforeInteractive"
+              strategy="afterInteractive"
               data-cfasync="false"
             />
             <Script
               src="https://the.gatekeeperconsent.com/cmp.min.js"
-              strategy="beforeInteractive"
+              strategy="afterInteractive"
               data-cfasync="false"
             />
-            {/* Ezoic Header Script - Main ad system initialization */}
+            {/* Ezoic Main Script - Standalone ad system */}
             <Script
-              src="//www.ezojs.com/ezoic/sa.min.js"
-              strategy="beforeInteractive"
-              async
+              src="https://www.ezojs.com/ezoic/sa.min.js"
+              strategy="afterInteractive"
+              data-cfasync="false"
             />
+            {/* Ezoic Initialization */}
             <Script
               id="ezoic-init"
-              strategy="beforeInteractive"
+              strategy="afterInteractive"
               dangerouslySetInnerHTML={{
                 __html: `
                   window.ezstandalone = window.ezstandalone || {};
@@ -108,14 +125,26 @@ export default function RootLayout({
           </nav>
           <main>{children}</main>
           <footer className="border-t border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm mt-auto">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-              <div className="flex justify-center items-center">
-                <Link
-                  href="/privacy"
-                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-                >
-                  Privacy Policy
-                </Link>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                {/* Links Section */}
+                <div className="flex items-center gap-6">
+                  <Link
+                    href="/learn"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                  >
+                    Learn More
+                  </Link>
+                  <Link
+                    href="/privacy"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                  >
+                    Privacy Policy
+                  </Link>
+                </div>
+
+                {/* Social Media Links */}
+                <SocialLinks size={20} variant="footer" />
               </div>
             </div>
           </footer>
