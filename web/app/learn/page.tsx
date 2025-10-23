@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { Sparkles, Gauge, Code2, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Learn More - SoSquishy",
@@ -81,40 +82,76 @@ export default function LearnPage() {
         </div>
       </section>
 
-      {/* The Squish Philosophy */}
+      {/* The Squish Philosophy - REDESIGNED */}
       <section className="relative py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl sm:text-5xl font-bold text-white drop-shadow-lg mb-12 text-center">
-            The Squish Philosophy
-          </h2>
+          {/* Header with subtitle */}
+          <div className="text-center mb-12 space-y-4">
+            <h2 className="text-4xl sm:text-5xl font-bold text-white drop-shadow-lg">
+              The Squish Philosophy
+            </h2>
+            <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+              At SoSquishy, performance and personality go hand in hand. We believe optimization should be smart, measurable, and never boring.
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Stay Efficient */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-sky-300/30 p-8 hover:-translate-y-2 hover:shadow-2xl hover:shadow-sky-400/40 transition-all duration-300">
-              <div className="text-6xl mb-4 text-center">🫧</div>
-              <h3 className="text-2xl font-bold text-blue-600 mb-4 text-center">Stay Efficient</h3>
-              <p className="text-gray-700 leading-relaxed text-center">
-                Clean compression techniques that reduce file size without sacrificing quality, ensuring your projects run smoothly and look great.
+          {/* Three Philosophy Cards */}
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            {/* Smart Compression */}
+            <div className="group relative bg-gradient-to-b from-slate-50 to-white dark:from-slate-800/60 dark:to-slate-900/70 backdrop-blur-sm rounded-2xl shadow-md hover:shadow-xl border border-white/20 p-8 transition-all duration-300 hover:-translate-y-1">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 group-hover:from-blue-600 group-hover:to-cyan-600 transition-all duration-300 group-hover:scale-110">
+                  <Sparkles className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Smart Compression
+                </h3>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                Advanced image techniques powered by WebP, AVIF, and intelligent sprite merging. Clean, efficient optimization that preserves visual quality while dramatically reducing file sizes.
               </p>
             </div>
 
-            {/* Go Fast */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-sky-300/30 p-8 hover:-translate-y-2 hover:shadow-2xl hover:shadow-sky-400/40 transition-all duration-300">
-              <div className="text-6xl mb-4 text-center">⚡</div>
-              <h3 className="text-2xl font-bold text-purple-600 mb-4 text-center">Go Fast</h3>
-              <p className="text-gray-700 leading-relaxed text-center">
-                Speed matters. We optimize images and sprite sheets to load lightning-fast, improving user experience and performance metrics.
+            {/* Performance First */}
+            <div className="group relative bg-gradient-to-b from-slate-50 to-white dark:from-slate-800/60 dark:to-slate-900/70 backdrop-blur-sm rounded-2xl shadow-md hover:shadow-xl border border-white/20 p-8 transition-all duration-300 hover:-translate-y-1">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 group-hover:from-purple-600 group-hover:to-pink-600 transition-all duration-300 group-hover:scale-110">
+                  <Gauge className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Performance First
+                </h3>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                Real speed improvements you can measure. Achieve 50-70% faster load times with optimized assets that improve Core Web Vitals and user experience metrics.
               </p>
             </div>
 
-            {/* Keep It Playful */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-sky-300/30 p-8 hover:-translate-y-2 hover:shadow-2xl hover:shadow-sky-400/40 transition-all duration-300">
-              <div className="text-6xl mb-4 text-center">💧</div>
-              <h3 className="text-2xl font-bold text-cyan-600 mb-4 text-center">Keep It Playful</h3>
-              <p className="text-gray-700 leading-relaxed text-center">
-                Optimization doesn’t have to be boring. We bring a fun, creative spirit to making your assets shine while staying lightweight.
+            {/* Designed for Developers */}
+            <div className="group relative bg-gradient-to-b from-slate-50 to-white dark:from-slate-800/60 dark:to-slate-900/70 backdrop-blur-sm rounded-2xl shadow-md hover:shadow-xl border border-white/20 p-8 transition-all duration-300 hover:-translate-y-1">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 group-hover:from-emerald-600 group-hover:to-teal-600 transition-all duration-300 group-hover:scale-110">
+                  <Code2 className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Designed for Developers
+                </h3>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                RESTful APIs, CLI tools, and seamless integrations that fit into your workflow. Optimization should be effortless, not an engineering project.
               </p>
             </div>
+          </div>
+
+          {/* Section Footer CTA */}
+          <div className="flex justify-center">
+            <Link
+              href="/articles"
+              className="group inline-flex items-center gap-2 text-white/90 hover:text-white text-lg font-medium transition-colors"
+            >
+              <span>Explore the technical details</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
         </div>
       </section>
@@ -123,7 +160,7 @@ export default function LearnPage() {
       <div className="relative py-8 px-4">
         <div className="max-w-4xl mx-auto flex items-center justify-center space-x-4">
           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
-          <div className="text-4xl animate-pulse">✨</div>
+          <Sparkles className="w-8 h-8 text-white/80 animate-pulse" />
           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
         </div>
       </div>
