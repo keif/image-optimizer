@@ -110,7 +110,21 @@ echo "✓ Systemd service stopped and disabled (binary will no longer run on boo
 echo "  Note: You can still manually run the binary if needed"
 
 echo ""
-echo -e "${BLUE}Step 5: Updating Caddy configuration...${NC}"
+echo -e "${BLUE}Step 5: Setting up Caddy log directory...${NC}"
+
+# Create Caddy log directory if it doesn't exist
+if [ ! -d "/var/log/caddy" ]; then
+    echo "Creating Caddy log directory..."
+    mkdir -p /var/log/caddy
+    chown -R caddy:caddy /var/log/caddy
+    chmod 755 /var/log/caddy
+    echo "✓ Caddy log directory created"
+else
+    echo "✓ Caddy log directory already exists"
+fi
+
+echo ""
+echo -e "${BLUE}Step 6: Updating Caddy configuration...${NC}"
 
 # Check if Caddy is configured correctly
 if [ -f /etc/caddy/Caddyfile ]; then

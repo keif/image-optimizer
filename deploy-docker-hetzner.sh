@@ -77,12 +77,29 @@ if [ ! -d "${DEPLOY_PATH}/data" ]; then
     fi
 fi
 
+# Stop old systemd service if running (prevents port conflicts)
+if systemctl is-active --quiet image-optimizer; then
+    echo "Stopping old systemd service..."
+    systemctl stop image-optimizer
+    systemctl disable image-optimizer
+    echo "✓ Old service stopped"
+fi
+
+# Ensure Caddy log directory exists
+if [ ! -d "/var/log/caddy" ]; then
+    echo "Creating Caddy log directory..."
+    mkdir -p /var/log/caddy
+    chown -R caddy:caddy /var/log/caddy
+    chmod 755 /var/log/caddy
+    echo "✓ Log directory created"
+fi
+
 # Update Caddyfile if it exists
 if [ -f "Caddyfile.prod" ]; then
     echo "Updating Caddyfile..."
-    sudo cp Caddyfile.prod /etc/caddy/Caddyfile
-    sudo caddy validate --config /etc/caddy/Caddyfile
-    sudo systemctl reload caddy
+    cp Caddyfile.prod /etc/caddy/Caddyfile
+    caddy validate --config /etc/caddy/Caddyfile
+    systemctl reload caddy
     echo "✓ Caddyfile updated and reloaded"
 fi
 
