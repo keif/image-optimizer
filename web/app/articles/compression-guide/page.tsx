@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Metadata } from "next";
-import AdBanner from "@/components/AdBanner";
 
 export const metadata: Metadata = {
   title: "Understanding Lossy vs Lossless Compression - Image Optimization Guide",
@@ -36,8 +35,6 @@ export default function CompressionGuide() {
           </div>
         </header>
 
-        <div className="not-prose mb-12">
-          <AdBanner placeholderId={115} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -109,8 +106,6 @@ export default function CompressionGuide() {
           </li>
         </ul>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={116} variant="banner" />
         </div>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">When to Use Lossless Compression</h3>
@@ -207,8 +202,6 @@ export default function CompressionGuide() {
           For most web photos, a quality setting between 75 and 85 strikes a great balance—delivering 10–15x smaller files with little visible difference.
         </p>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={117} variant="banner" />
         </div>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Common Lossy Compression Artifacts</h3>
@@ -329,8 +322,6 @@ export default function CompressionGuide() {
           <li>Going below 75 can introduce obvious artifacts, especially on big screens</li>
         </ul>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={118} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -511,8 +502,6 @@ export default function CompressionGuide() {
           </div>
         </div>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={119} variant="banner" />
         </div>
 
         <div className="not-prose mt-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white text-center">

@@ -15,59 +15,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Only load Ezoic scripts in production (not localhost)
-  const isProduction = process.env.NODE_ENV === 'production';
-
   return (
     <html lang="en">
-      <head>
-        {/* Ezoic Meta Tags - Required for proper integration */}
-        {isProduction && (
-          <>
-            <meta name="ezoic-site-verification" content="sosquishy.io" />
-            <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-            {/* Content Security Policy for Ezoic and Analytics */}
-            <meta
-              httpEquiv="Content-Security-Policy"
-              content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' *.ezojs.com *.ezoic.net *.gatekeeperconsent.com *.id5-sync.com gc.zgo.at goatcounter.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' *.ezoic.net *.ezojs.com *.gatekeeperconsent.com *.id5-sync.com gc.zgo.at goatcounter.com https://api.sosquishy.io http://localhost:8080; frame-src 'self' *.ezoic.net *.ezojs.com *.gatekeeperconsent.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self';"
-            />
-          </>
-        )}
-      </head>
       <body className="antialiased">
-        {/* Ezoic Privacy Scripts - Only in production */}
-        {isProduction && (
-          <>
-            {/* Consent Management Platform Scripts */}
-            <Script
-              src="https://cmp.gatekeeperconsent.com/min.js"
-              strategy="afterInteractive"
-              data-cfasync="false"
-            />
-            <Script
-              src="https://the.gatekeeperconsent.com/cmp.min.js"
-              strategy="afterInteractive"
-              data-cfasync="false"
-            />
-            {/* Ezoic Main Script - Standalone ad system */}
-            <Script
-              src="https://www.ezojs.com/ezoic/sa.min.js"
-              strategy="afterInteractive"
-              data-cfasync="false"
-            />
-            {/* Ezoic Initialization */}
-            <Script
-              id="ezoic-init"
-              strategy="afterInteractive"
-              dangerouslySetInnerHTML={{
-                __html: `
-                  window.ezstandalone = window.ezstandalone || {};
-                  ezstandalone.cmd = ezstandalone.cmd || [];
-                `
-              }}
-            />
-          </>
-        )}
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
           <nav className="border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

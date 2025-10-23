@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Metadata } from "next";
-import AdBanner from "@/components/AdBanner";
 
 export const metadata: Metadata = {
   title: "How Image Optimization Improves Website Performance - Complete Guide",
@@ -42,8 +41,6 @@ export default function WebPerformanceGuide() {
           This is your complete guide to mastering image optimization — with real metrics, actionable techniques, and proof that small changes can lead to massive performance gains.
         </p>
 
-        <div className="not-prose mb-12">
-          <AdBanner placeholderId={110} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -96,8 +93,6 @@ export default function WebPerformanceGuide() {
           This one’s simple: smaller images mean less to download, so your site loads faster. A typical product page might have 2-3 MB of images—enough to stall a moderate 3G connection for 3-5 seconds. Trim that to 500-800 KB, and you’re looking at sub-second load times. That’s the difference between a user who stays and one who bounces.
         </p>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={111} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -179,8 +174,6 @@ export default function WebPerformanceGuide() {
           the biggest benefits, with load time improvements of 2-4 seconds on product pages.
         </p>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={112} variant="banner" />
         </div>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">4. Lazy Loading (Immediate perceived performance improvement)</h3>
@@ -343,8 +336,6 @@ export default function WebPerformanceGuide() {
           </li>
         </ul>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={113} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -496,8 +487,6 @@ export default function WebPerformanceGuide() {
           </div>
         </div>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={114} variant="banner" />
         </div>
 
         <div className="not-prose mt-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white text-center">

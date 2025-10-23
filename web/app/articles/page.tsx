@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Metadata } from "next";
-import AdBanner from "@/components/AdBanner";
 import { Zap, TrendingUp, DollarSign } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -81,11 +80,6 @@ export default function BlogPage() {
         </p>
       </div>
 
-      {/* Top Banner Ad */}
-      <div className="mb-12">
-        <AdBanner placeholderId={103} variant="banner" />
-      </div>
-
       {/* Articles Grid */}
       <div className="grid md:grid-cols-2 gap-8 mb-12">
         {articles.map((post) => (
@@ -160,11 +154,6 @@ export default function BlogPage() {
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Middle Banner Ad */}
-      <div className="mb-12">
-        <AdBanner placeholderId={104} variant="banner" />
       </div>
 
       {/* Getting Started Section */}

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Metadata } from "next";
-import AdBanner from "@/components/AdBanner";
 
 export const metadata: Metadata = {
   title: "Image Optimization Best Practices: Complete Checklist 2024",
@@ -36,8 +35,6 @@ export default function BestPracticesGuide() {
           </div>
         </header>
 
-        <div className="not-prose mb-12">
-          <AdBanner placeholderId={120} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -100,8 +97,6 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={121} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -210,8 +205,6 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={122} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -336,8 +329,6 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={123} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -440,8 +431,6 @@ export default function BestPracticesGuide() {
 </picture>`}</code>
         </pre>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={124} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -657,8 +646,6 @@ export default function BestPracticesGuide() {
           </div>
         </div>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={125} variant="banner" />
         </div>
 
         <div className="not-prose mt-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white text-center">

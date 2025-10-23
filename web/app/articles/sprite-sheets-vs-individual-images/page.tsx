@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Metadata } from "next";
-import AdBanner from "@/components/AdBanner";
 export const metadata: Metadata = {
   title: "Sprite Sheets vs Individual Images: Performance Analysis for Web & Games",
   description: "Comprehensive performance comparison of sprite sheets vs individual images for web development and game development. Includes real benchmarks, memory analysis, and modern HTTP/2 considerations.",
@@ -32,8 +31,6 @@ export default function SpriteSheetVsIndividualImages() {
             Published on October 22, 2024
           </div>
         </header>
-        <div className="not-prose mb-12">
-          <AdBanner placeholderId={132} variant="banner" />
         </div>
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">The Great Sprite Sheet Debate</h2>
@@ -109,8 +106,6 @@ export default function SpriteSheetVsIndividualImages() {
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           <strong>Key Insight:</strong> HTTP/2 reduces but doesn't eliminate the sprite sheet advantage. For 30+ images or game assets, sprite sheets still load 2-3x faster.
         </p>
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={133} variant="banner" />
         </div>
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Mobile Networks: Sprite Sheets Still Crucial</h3>
         <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-6">
@@ -170,8 +165,6 @@ export default function SpriteSheetVsIndividualImages() {
           A sprite sheet has one set of headers. For small icons where the header overhead might
           be 30% of the payload, this matters significantly.
         </p>
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={134} variant="banner" />
         </div>
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Runtime Memory: Where the Savings Really Show</h2>
@@ -239,8 +232,6 @@ export default function SpriteSheetVsIndividualImages() {
           <li>Use content hashing in filenames (spritesheet-a3f8b2.png)</li>
           <li>Implement versioning for sprite sheet updates</li>
         </ul>
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={135} variant="banner" />
         </div>
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Rendering and GPU Performance: The Visual Frontier</h2>
@@ -320,8 +311,6 @@ export default function SpriteSheetVsIndividualImages() {
           <li>Debugging is harder (must map coordinates to sprites)</li>
           <li>Learning curve for sprite sheet tools</li>
         </ul>
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={136} variant="banner" />
         </div>
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Real-World Case Studies</h2>
@@ -435,8 +424,6 @@ export default function SpriteSheetVsIndividualImages() {
             </tbody>
           </table>
         </div>
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={137} variant="banner" />
         </div>
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Final Verdict: It Depends—And That’s Okay</h2>

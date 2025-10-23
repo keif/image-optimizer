@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Metadata } from "next";
-import AdBanner from "@/components/AdBanner";
 
 export const metadata: Metadata = {
   title: "Sprite Sheet Optimization Best Practices for Web & Game Development",
@@ -37,8 +36,6 @@ export default function SpriteSheetOptimization() {
           </div>
         </header>
 
-        <div className="not-prose mb-12">
-          <AdBanner placeholderId={138} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />

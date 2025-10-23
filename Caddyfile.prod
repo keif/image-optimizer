@@ -7,9 +7,6 @@ sosquishy.io {
     @www host www.sosquishy.io
     redir @www https://sosquishy.io{uri} permanent
 
-    # ads.txt redirect to Ezoic manager
-    redir /ads.txt https://srv.adstxtmanager.com/19390/sosquishy.io 301
-
     # Reverse proxy to Next.js Docker container
     reverse_proxy localhost:3000 {
         # Health check

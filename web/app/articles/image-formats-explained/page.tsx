@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Metadata } from "next";
-import AdBanner from "@/components/AdBanner";
 
 export const metadata: Metadata = {
   title: "Image Formats Explained: JPEG, PNG, WebP, AVIF & GIF - Complete Guide",
@@ -37,8 +36,6 @@ export default function ImageFormatsGuide() {
         </header>
 
         {/* Top Banner Ad */}
-        <div className="not-prose mb-12">
-          <AdBanner placeholderId={105} variant="banner" />
         </div>
 
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Introduction</h2>
@@ -101,8 +98,6 @@ export default function ImageFormatsGuide() {
           JPEG is perfect for photos, images with lots of colors or gradients, and anything where a bit of quality loss is worth the smaller size. Reach for JPEG with hero images, product shots, user uploads, or backgrounds.
         </p>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={106} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -211,8 +206,6 @@ export default function ImageFormatsGuide() {
           Use WebP as your go-to format for most modern sites. It works for photos, graphics, illustrations, and images with transparency. Just make sure to serve JPEG or PNG as a backup for browsers that don’t support it.
         </p>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={107} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -316,8 +309,6 @@ export default function ImageFormatsGuide() {
           Only use GIF for simple, low-color animations when video or animated WebP aren’t an option. For most cases, MP4, WebP, or APNG will give you better quality and smaller files. If you need a quick, looping animation with few colors, GIF can still do the job.
         </p>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={108} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -525,8 +516,6 @@ export default function ImageFormatsGuide() {
         </div>
 
         {/* Bottom Banner Ad */}
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={109} variant="banner" />
         </div>
 
         {/* CTA */}

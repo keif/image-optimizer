@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Metadata } from "next";
-import AdBanner from "@/components/AdBanner";
 
 export const metadata: Metadata = {
   title: "What Are Sprite Sheets? Complete Guide for Web & Game Developers",
@@ -35,8 +34,6 @@ export default function WhatAreSpriteSheets() {
           </div>
         </header>
 
-        <div className="not-prose mb-12">
-          <AdBanner placeholderId={126} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -85,8 +82,6 @@ export default function WhatAreSpriteSheets() {
           <strong>Pro Tip:</strong> Even in the HTTP/2 and HTTP/3 era, sprite sheets still outperform multiple requests when you're dealing with large icon sets.
         </blockquote>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={127} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -149,8 +144,6 @@ export default function WhatAreSpriteSheets() {
           This metadata tells your code exactly where to find each sprite. Game engines and tools read it so you can grab the right chunk of pixels, instantly.
         </p>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={128} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -287,8 +280,6 @@ function animate() {
           <li><strong>Babylon.js:</strong> Sprite sheet support for particle systems and UI</li>
         </ul>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={129} variant="banner" />
         </div>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Tile Maps and Sprite Sheets</h3>
@@ -350,8 +341,6 @@ function animate() {
           <strong>Pro Tip:</strong> Sprite sheets are unbeatable for large sets of static assets. For just a few big images or anything user-uploaded, skip them.
         </blockquote>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={130} variant="banner" />
         </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -422,8 +411,6 @@ function animate() {
           </div>
         </div>
 
-        <div className="not-prose my-12">
-          <AdBanner placeholderId={131} variant="banner" />
         </div>
 
         <div className="not-prose mt-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white text-center">
