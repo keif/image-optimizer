@@ -1,0 +1,185 @@
+name: Deploy Full Stack to Hetzner (Docker)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'api/**'
+      - 'web/**'
+      - 'docker-compose.prod.yml'
+      - 'Caddyfile.prod'
+      - '.github/workflows/deploy-api-hetzner.yml'
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  DEPLOY_PATH: /opt/image-optimizer-docker
+  DOCKER_COMPOSE_FILE: docker-compose.prod.yml
+
+jobs:
+  deploy:
+    name: Deploy to Hetzner
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for git describe
+
+      - name: Get version info
+        id: version
+        run: |
+          echo "APP_VERSION=$(git describe --tags --always)" >> $GITHUB_OUTPUT
+          echo "GIT_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HETZNER_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.HETZNER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to Hetzner
+        env:
+          APP_VERSION: ${{ steps.version.outputs.APP_VERSION }}
+          GIT_COMMIT: ${{ steps.version.outputs.GIT_COMMIT }}
+          BUILD_TIME: ${{ steps.version.outputs.BUILD_TIME }}
+        run: |
+          # SSH into server and execute deployment
+          ssh -o StrictHostKeyChecking=no ${{ secrets.HETZNER_USER }}@${{ secrets.HETZNER_HOST }} "bash -s" << 'ENDSSH'
+          set -e
+
+          echo "🚀 Starting deployment..."
+
+          # Create deployment directory if it doesn't exist
+          if [ ! -d "$DEPLOY_PATH" ]; then
+            echo "Creating deployment directory: $DEPLOY_PATH"
+            mkdir -p $DEPLOY_PATH/data
+            # If migrating from binary deployment, copy database
+            if [ -f /opt/image-optimizer/data/api_keys.db ]; then
+              echo "Migrating existing database..."
+              cp /opt/image-optimizer/data/api_keys.db $DEPLOY_PATH/data/
+              chown -R $USER:$USER $DEPLOY_PATH/data
+            fi
+          fi
+
+          cd $DEPLOY_PATH
+
+          # Clone or pull latest code
+          if [ ! -d ".git" ]; then
+            echo "Cloning repository..."
+            git clone https://github.com/${{ github.repository }}.git .
+          else
+            echo "Pulling latest changes..."
+            git fetch origin
+            git reset --hard origin/main
+          fi
+
+          # Export version info for docker-compose
+          export APP_VERSION="${{ steps.version.outputs.APP_VERSION }}"
+          export GIT_COMMIT="${{ steps.version.outputs.GIT_COMMIT }}"
+          export BUILD_TIME="${{ steps.version.outputs.BUILD_TIME }}"
+
+          echo "Building with version: $APP_VERSION"
+
+          # Update Caddyfile if it exists in repo
+          if [ -f "Caddyfile.prod" ]; then
+            echo "Updating Caddyfile..."
+            sudo cp Caddyfile.prod /etc/caddy/Caddyfile
+            sudo caddy validate --config /etc/caddy/Caddyfile
+            sudo systemctl reload caddy
+            echo "✓ Caddyfile updated and reloaded"
+          fi
+
+          # Build and deploy with docker-compose
+          echo "Building Docker images..."
+          docker-compose -f $DOCKER_COMPOSE_FILE build --no-cache
+
+          echo "Deploying containers..."
+          docker-compose -f $DOCKER_COMPOSE_FILE up -d
+
+          # Wait for health checks
+          echo "Waiting for services to be healthy..."
+          sleep 10
+
+          # Check container status
+          docker-compose -f $DOCKER_COMPOSE_FILE ps
+
+          # Verify both services are healthy
+          if ! docker ps | grep -q "squish-api.*healthy"; then
+            echo "❌ API container is not healthy!"
+            docker logs squish-api --tail=50
+            exit 1
+          fi
+
+          if ! docker ps | grep -q "squish-web.*healthy"; then
+            echo "❌ Web container is not healthy!"
+            docker logs squish-web --tail=50
+            exit 1
+          fi
+
+          echo "✓ All containers are healthy"
+
+          # Cleanup old images
+          echo "Cleaning up old Docker images..."
+          docker image prune -f
+
+          echo "✅ Deployment complete!"
+          ENDSSH
+
+      - name: Verify deployment
+        run: |
+          echo "Verifying deployments..."
+          sleep 5
+
+          # Check API
+          echo "Checking API..."
+          API_RESPONSE=$(curl -s https://api.sosquishy.io/health || echo '{"status":"error"}')
+          echo "API health: $API_RESPONSE"
+
+          if echo "$API_RESPONSE" | grep -q '"status":"ok"'; then
+            echo "✅ API is healthy"
+            API_VERSION=$(echo $API_RESPONSE | grep -o '"version":"[^"]*"' | cut -d'"' -f4)
+            echo "  Version: $API_VERSION"
+          else
+            echo "❌ API health check failed!"
+            exit 1
+          fi
+
+          # Check Frontend
+          echo "Checking Frontend..."
+          FRONTEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://sosquishy.io)
+          echo "Frontend status code: $FRONTEND_STATUS"
+
+          if [ "$FRONTEND_STATUS" = "200" ]; then
+            echo "✅ Frontend is serving correctly"
+          else
+            echo "❌ Frontend check failed (HTTP $FRONTEND_STATUS)"
+            exit 1
+          fi
+
+          # Check ads.txt redirect
+          echo "Checking ads.txt redirect..."
+          ADS_REDIRECT=$(curl -s -o /dev/null -w "%{http_code}|%{redirect_url}" https://sosquishy.io/ads.txt)
+          ADS_CODE=$(echo $ADS_REDIRECT | cut -d'|' -f1)
+          ADS_URL=$(echo $ADS_REDIRECT | cut -d'|' -f2)
+
+          if [ "$ADS_CODE" = "301" ]; then
+            echo "✅ ads.txt redirect working (301 → $ADS_URL)"
+          else
+            echo "⚠️  ads.txt redirect returned HTTP $ADS_CODE"
+          fi
+
+          echo ""
+          echo "✅ All deployments verified successfully!"
+
+      - name: Notification
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "🎉 Deployment successful: ${{ steps.version.outputs.APP_VERSION }}"
+          else
+            echo "❌ Deployment failed"
+          fi

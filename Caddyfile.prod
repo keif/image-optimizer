@@ -1,0 +1,117 @@
+# Caddyfile for Full Stack Docker Deployment on Hetzner
+# Serves both sosquishy.io (frontend) and api.sosquishy.io (API)
+
+# Main domain - Frontend (Next.js)
+sosquishy.io {
+    # Redirect www to non-www
+    @www host www.sosquishy.io
+    redir @www https://sosquishy.io{uri} permanent
+
+    # ads.txt redirect to Ezoic manager
+    redir /ads.txt https://srv.adstxtmanager.com/19390/sosquishy.io 301
+
+    # Reverse proxy to Next.js Docker container
+    reverse_proxy localhost:3000 {
+        # Health check
+        health_uri /
+        health_interval 30s
+        health_timeout 5s
+
+        # Headers
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    # Enable gzip compression
+    encode gzip
+
+    # Logging
+    log {
+        output file /var/log/caddy/sosquishy.io.log {
+            roll_size 100mb
+            roll_keep 5
+            roll_keep_for 720h
+        }
+        format json
+        level INFO
+    }
+
+    # Security headers
+    header {
+        # Prevent clickjacking
+        X-Frame-Options "SAMEORIGIN"
+        # XSS protection
+        X-Content-Type-Options "nosniff"
+        # Enable HSTS (1 year)
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        # Remove Server header
+        -Server
+    }
+}
+
+# www redirect helper
+www.sosquishy.io {
+    redir https://sosquishy.io{uri} permanent
+}
+
+# API subdomain
+api.sosquishy.io {
+    # Reverse proxy to Go API Docker container
+    reverse_proxy localhost:8080 {
+        # Health check
+        health_uri /health
+        health_interval 30s
+        health_timeout 5s
+
+        # Headers
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    # Enable gzip compression
+    encode gzip
+
+    # Logging
+    log {
+        output file /var/log/caddy/api.sosquishy.io.log {
+            roll_size 100mb
+            roll_keep 5
+            roll_keep_for 720h
+        }
+        format json
+        level INFO
+    }
+
+    # Security headers
+    header {
+        # Prevent clickjacking
+        X-Frame-Options "SAMEORIGIN"
+        # XSS protection
+        X-Content-Type-Options "nosniff"
+        # Enable HSTS (1 year)
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        # Remove Server header
+        -Server
+    }
+
+    # CORS headers (handled by API, but can add backup here)
+    @options {
+        method OPTIONS
+    }
+    header @options {
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+        Access-Control-Max-Age "3600"
+    }
+    respond @options 204
+}
+
+# Optional: www.api redirect
+www.api.sosquishy.io {
+    redir https://api.sosquishy.io{uri} permanent
+}

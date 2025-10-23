@@ -43,6 +43,20 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    // Note: redirects() only works in standalone mode, not in static export
+    // For GitHub Pages (static export), use the static ads.txt file instead
+    if (process.env.GITHUB_ACTIONS) {
+      return [];
+    }
+    return [
+      {
+        source: '/ads.txt',
+        destination: 'https://srv.adstxtmanager.com/19390/sosquishy.io',
+        permanent: true,  // 301 redirect
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+      args:
+        APP_VERSION: "${APP_VERSION:-dev}"
+        GIT_COMMIT: "${GIT_COMMIT:-unknown}"
+        BUILD_TIME: "${BUILD_TIME:-unknown}"
+    image: squish-api:${APP_VERSION:-latest}
+    container_name: squish-api
+    restart: unless-stopped
+    ports:
+      # Only bind to localhost - Caddy will reverse proxy from outside
+      - "127.0.0.1:8080:8080"
+    environment:
+      - PORT=8080
+      - DB_PATH=/app/data/api_keys.db
+      - RATE_LIMIT_ENABLED=true
+      - RATE_LIMIT_MAX=100
+      - RATE_LIMIT_WINDOW=1m
+      # Production settings
+      - API_KEY_AUTH_ENABLED=true
+      - PUBLIC_OPTIMIZATION_ENABLED=true
+      # Trusted Origins - production domains
+      - TRUSTED_ORIGINS=https://sosquishy.io,https://www.sosquishy.io
+      - ALLOWED_DOMAINS=cloudinary.com,imgur.com,unsplash.com,pexels.com,localhost
+    volumes:
+      # Persist database
+      - api-data:/app/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 3G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        # API URL will be the public domain since Next.js runs in browser
+        NEXT_PUBLIC_API_URL: "https://api.sosquishy.io"
+    image: squish-web:${APP_VERSION:-latest}
+    container_name: squish-web
+    restart: unless-stopped
+    ports:
+      # Only bind to localhost - Caddy will reverse proxy from outside
+      - "127.0.0.1:3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://api.sosquishy.io
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+volumes:
+  api-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/image-optimizer-docker/data
+
+networks:
+  app-network:
+    driver: bridge
