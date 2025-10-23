@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Metadata } from "next";
 import AdBanner from "@/components/AdBanner";
+import { Zap, TrendingUp, DollarSign } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Image Optimization Articles - Tips, Guides & Best Practices",
@@ -132,8 +133,8 @@ export default function BlogPage() {
         </h2>
         <div className="grid md:grid-cols-3 gap-6">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
-            <div className="text-4xl mb-3">⚡</div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+              <Zap className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               Faster Load Times
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
@@ -141,8 +142,8 @@ export default function BlogPage() {
             </p>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
-            <div className="text-4xl mb-3">📈</div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+              <TrendingUp className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               Better SEO
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
@@ -150,8 +151,8 @@ export default function BlogPage() {
             </p>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
-            <div className="text-4xl mb-3">💰</div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+              <DollarSign className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               Lower Costs
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
