@@ -56,26 +56,37 @@ jobs:
           # Create deployment directory if it doesn't exist
           if [ ! -d "$DEPLOY_PATH" ]; then
             echo "Creating deployment directory: $DEPLOY_PATH"
-            mkdir -p $DEPLOY_PATH/data
-            # If migrating from binary deployment, copy database
-            if [ -f /opt/image-optimizer/data/api_keys.db ]; then
-              echo "Migrating existing database..."
-              cp /opt/image-optimizer/data/api_keys.db $DEPLOY_PATH/data/
-              chown -R $USER:$USER $DEPLOY_PATH/data
-            fi
+            mkdir -p $DEPLOY_PATH
           fi
 
-          cd $DEPLOY_PATH
+          # Migrate database if needed (before cloning)
+          if [ ! -f "$DEPLOY_PATH/data/api_keys.db" ] && [ -f /opt/image-optimizer/data/api_keys.db ]; then
+            echo "Migrating existing database..."
+            mkdir -p $DEPLOY_PATH/data
+            cp /opt/image-optimizer/data/api_keys.db $DEPLOY_PATH/data/
+            chown -R $USER:$USER $DEPLOY_PATH/data
+          fi
 
           # Clone or pull latest code
-          if [ ! -d ".git" ]; then
+          if [ ! -d "$DEPLOY_PATH/.git" ]; then
             echo "Cloning repository..."
-            git clone https://github.com/${{ github.repository }}.git .
+            # If directory is not empty, remove non-essential files first
+            if [ "$(ls -A $DEPLOY_PATH 2>/dev/null | grep -v '^data$')" ]; then
+              echo "Cleaning deployment directory (preserving data/)..."
+              cd $DEPLOY_PATH
+              find . -mindepth 1 -maxdepth 1 ! -name 'data' -exec rm -rf {} +
+            fi
+            git clone https://github.com/${{ github.repository }}.git $DEPLOY_PATH-tmp
+            rsync -a $DEPLOY_PATH-tmp/ $DEPLOY_PATH/
+            rm -rf $DEPLOY_PATH-tmp
           else
             echo "Pulling latest changes..."
+            cd $DEPLOY_PATH
             git fetch origin
             git reset --hard origin/main
           fi
+
+          cd $DEPLOY_PATH
 
           # Export version info for docker-compose
           export APP_VERSION="${{ steps.version.outputs.APP_VERSION }}"
