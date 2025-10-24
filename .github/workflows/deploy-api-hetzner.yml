@@ -10,6 +10,13 @@ on:
       - 'docker-compose.prod.yml'
       - 'Caddyfile.prod'
       - '.github/workflows/deploy-api-hetzner.yml'
+      # Exclude development-only files
+      - '!api/Dockerfile.dev'
+      - '!Tiltfile'
+      - '!**/*.sh'
+      - '!**/*_test.go'
+      - '!**/testdata/**'
+      - '!**/*.md'
   workflow_dispatch:  # Allow manual trigger
 
 env:
