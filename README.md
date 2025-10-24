@@ -27,6 +27,7 @@ An API-first image optimization service built with Go and Fiber. Squish is desig
 - **OpenAPI/Swagger**: Interactive API documentation at `/swagger`
 - **API Key Authentication**: Secure API access with SQLite-backed key management
 - **Rate Limiting**: Configurable request limits to prevent abuse
+- **Usage Metrics & Analytics**: Track optimization performance with time-series aggregated data
 - **CLI Tool**: Command-line interface for batch processing and automation
 - **Containerized**: Docker-ready for consistent deployment
 - **Performance**: Built with Go and Fiber for high throughput
@@ -811,6 +812,144 @@ curl -X POST "http://localhost:8080/optimize?format=webp" \
 - `POST /api/keys` - API key creation only (for bootstrapping)
   - **Note**: `GET /api/keys` (list) and `DELETE /api/keys/:id` (revoke) require authentication
 
+### Usage Metrics & Analytics
+
+The API includes comprehensive usage metrics and analytics to track optimization performance and usage patterns. Metrics are automatically collected and aggregated hourly to preserve privacy while providing valuable insights.
+
+**Privacy-First Design:**
+- Time-series aggregation only (hourly buckets)
+- No individual request tracking
+- No PII (personally identifiable information) stored
+- Configurable retention policy
+
+#### Get Metrics Summary
+
+```bash
+GET /metrics/summary?days=30
+```
+
+Returns aggregated metrics for a specified time range.
+
+**Query Parameters:**
+- `days` (integer, optional): Number of days to look back (default: 30, max: 365)
+
+**Response:**
+```json
+{
+  "time_range": {
+    "start_time": "2025-10-01T00:00:00Z",
+    "end_time": "2025-10-24T00:00:00Z",
+    "days": 30
+  },
+  "metrics": {
+    "total_requests": 15420,
+    "successful_requests": 15180,
+    "failed_requests": 240,
+    "total_bytes_original": 1024000000,
+    "total_bytes_optimized": 614400000,
+    "total_bytes_saved": 409600000,
+    "average_savings_percent": 40.0,
+    "avg_processing_time_ms": 127.5
+  }
+}
+```
+
+#### Get Format Conversion Statistics
+
+```bash
+GET /metrics/formats?days=30
+```
+
+Returns detailed statistics about format conversions.
+
+**Query Parameters:**
+- `days` (integer, optional): Number of days to look back (default: 30, max: 365)
+
+**Response:**
+```json
+{
+  "time_range": {
+    "start_time": "2025-10-01T00:00:00Z",
+    "end_time": "2025-10-24T00:00:00Z",
+    "days": 30
+  },
+  "conversions": [
+    {
+      "input_format": "jpeg",
+      "output_format": "webp",
+      "conversion_count": 8520,
+      "total_bytes_original": 680000000,
+      "total_bytes_optimized": 408000000,
+      "total_bytes_saved": 272000000,
+      "average_savings_percent": 40.0
+    },
+    {
+      "input_format": "png",
+      "output_format": "avif",
+      "conversion_count": 3200,
+      "total_bytes_original": 256000000,
+      "total_bytes_optimized": 128000000,
+      "total_bytes_saved": 128000000,
+      "average_savings_percent": 50.0
+    }
+  ]
+}
+```
+
+#### Get Time-Series Data
+
+```bash
+GET /metrics/timeline?days=7&interval=hour
+```
+
+Returns time-series data for charting and trend analysis.
+
+**Query Parameters:**
+- `days` (integer, optional): Number of days to look back (default: 7, max: 365)
+- `interval` (string, optional): Time interval - `hour` or `day` (default: `hour`)
+
+**Response:**
+```json
+{
+  "time_range": {
+    "start_time": "2025-10-17T00:00:00Z",
+    "end_time": "2025-10-24T00:00:00Z",
+    "days": 7
+  },
+  "interval": "hour",
+  "data": [
+    {
+      "timestamp": "2025-10-24T08:00:00Z",
+      "request_count": 142,
+      "success_count": 140,
+      "error_count": 2,
+      "bytes_original": 8960000,
+      "bytes_optimized": 5376000,
+      "bytes_saved": 3584000,
+      "avg_processing_time_ms": 125.4
+    }
+  ]
+}
+```
+
+**Key Metrics Tracked:**
+- Request counts (total, successful, failed)
+- File size metrics (original, optimized, savings)
+- Format conversions (input/output format pairs)
+- Processing time statistics
+- API key usage (if enabled)
+
+**Configuration:**
+- `METRICS_ENABLED`: Enable/disable metrics collection (default: true)
+
+**Data Retention:**
+Metrics are stored indefinitely by default. To enable automatic cleanup, add a cron job or scheduled task to call the cleanup function:
+
+```go
+// Clean up metrics older than 90 days
+db.CleanupOldMetrics(90)
+```
+
 ## Configuration
 
 The service can be configured using environment variables. See `.env.example` for all available options.
@@ -830,6 +969,9 @@ The service can be configured using environment variables. See `.env.example` fo
 
 **API Key Authentication:**
 - `API_KEY_AUTH_ENABLED`: Enable/disable API key auth (default: true)
+
+**Metrics & Analytics:**
+- `METRICS_ENABLED`: Enable/disable metrics collection (default: true)
 
 **URL Fetching:**
 - `ALLOWED_DOMAINS`: Comma-separated list of allowed domains for URL fetching
@@ -958,7 +1100,7 @@ View the workflow at `.github/workflows/test.yml`
 - [x] OpenAPI/Swagger documentation
 - [x] API key authentication
 - [x] Rate limiting
-- [ ] Usage metrics and analytics (deferred to Phase 5.1)
+- [x] Usage metrics and analytics
 
 ### Phase 6: Web Interface ✅ COMPLETED
 - [x] Next.js frontend for drag-and-drop optimization

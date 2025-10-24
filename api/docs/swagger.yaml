@@ -13,6 +13,25 @@ definitions:
       revoked_at:
         type: string
     type: object
+  db.MetricsSummary:
+    properties:
+      average_savings_percent:
+        type: number
+      avg_processing_time_ms:
+        type: number
+      failed_requests:
+        type: integer
+      successful_requests:
+        type: integer
+      total_bytes_optimized:
+        type: integer
+      total_bytes_original:
+        type: integer
+      total_bytes_saved:
+        type: integer
+      total_requests:
+        type: integer
+    type: object
   routes.BatchImageResult:
     properties:
       error:
@@ -58,6 +77,21 @@ definitions:
             type: string
         type: object
     type: object
+  routes.HealthResponse:
+    properties:
+      commit:
+        example: c1a2b3c
+        type: string
+      status:
+        example: ok
+        type: string
+      timestamp:
+        example: "2025-10-19T19:42:00Z"
+        type: string
+      version:
+        example: v1.3.2
+        type: string
+    type: object
   routes.PackSpritesResponse:
     properties:
       metadata:
@@ -70,6 +104,11 @@ definitions:
           type: string
         description: Format name -> file content
         type: object
+      resizedSprites:
+        description: Info about auto-resized sprites
+        items:
+          $ref: '#/definitions/routes.ResizeInfo'
+        type: array
       sheets:
         description: Base64-encoded PNG images
         items:
@@ -77,6 +116,19 @@ definitions:
         type: array
       totalSprites:
         type: integer
+    type: object
+  routes.ResizeInfo:
+    properties:
+      newHeight:
+        type: integer
+      newWidth:
+        type: integer
+      originalHeight:
+        type: integer
+      originalWidth:
+        type: integer
+      spriteName:
+        type: string
     type: object
   routes.SheetMetadata:
     properties:
@@ -110,6 +162,9 @@ definitions:
         type: integer
       originalColorSpace:
         description: Original image color space
+        type: string
+      originalFormat:
+        description: Original input format
         type: string
       originalSize:
         type: integer
@@ -303,6 +358,134 @@ paths:
       summary: Optimize multiple images in a single request
       tags:
       - optimization
+  /health:
+    get:
+      description: Check API health status with version information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/routes.HealthResponse'
+      summary: Health check
+      tags:
+      - health
+  /metrics/formats:
+    get:
+      consumes:
+      - application/json
+      description: Get detailed statistics about format conversions
+      parameters:
+      - default: 30
+        description: 'Number of days to look back (default: 30)'
+        in: query
+        maximum: 365
+        minimum: 1
+        name: days
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid parameters
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get format conversion statistics
+      tags:
+      - metrics
+  /metrics/summary:
+    get:
+      consumes:
+      - application/json
+      description: Get aggregated metrics for a specified time range
+      parameters:
+      - default: 30
+        description: 'Number of days to look back (default: 30)'
+        in: query
+        maximum: 365
+        minimum: 1
+        name: days
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.MetricsSummary'
+        "400":
+          description: Invalid parameters
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get metrics summary
+      tags:
+      - metrics
+  /metrics/timeline:
+    get:
+      consumes:
+      - application/json
+      description: Get time-series data for charting and trend analysis
+      parameters:
+      - default: 7
+        description: 'Number of days to look back (default: 7)'
+        in: query
+        maximum: 365
+        minimum: 1
+        name: days
+        type: integer
+      - default: hour
+        description: 'Time interval: ''hour'' or ''day'' (default: ''hour'')'
+        enum:
+        - hour
+        - day
+        in: query
+        name: interval
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid parameters
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get time-series metrics
+      tags:
+      - metrics
   /optimize:
     post:
       consumes:
@@ -408,25 +591,35 @@ paths:
       summary: Optimize an image
       tags:
       - optimization
-  /pack-sprites:
+  /optimize-spritesheet:
     post:
       consumes:
       - multipart/form-data
-      description: Accepts multiple image files and packs them into one or more optimized
-        spritesheets using the MaxRects bin packing algorithm
+      description: Accepts a spritesheet PNG and its XML, extracts frames, optionally
+        deduplicates, and repacks optimally
       parameters:
-      - description: Sprite images to pack (multiple files supported)
+      - description: Spritesheet PNG image
         in: formData
-        name: images
+        name: spritesheet
         required: true
         type: file
+      - description: Spritesheet XML (Sparrow format)
+        in: formData
+        name: xml
+        required: true
+        type: file
+      - default: false
+        description: Remove duplicate frames
+        in: query
+        name: deduplicate
+        type: boolean
       - default: 2
         description: Padding between sprites in pixels
         in: query
         name: padding
         type: integer
       - default: false
-        description: Force power-of-2 dimensions (256, 512, 1024, etc.)
+        description: Force power-of-2 dimensions
         in: query
         name: powerOfTwo
         type: boolean
@@ -445,8 +638,8 @@ paths:
         in: query
         name: maxHeight
         type: integer
-      - default: '"json"'
-        description: 'Comma-separated list of output formats: json,css,csv,xml,unity,godot'
+      - default: '"sparrow"'
+        description: Comma-separated list of output formats
         in: query
         name: outputFormats
         type: string
@@ -455,6 +648,80 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Optimize an existing spritesheet
+      tags:
+      - spritesheet
+  /pack-sprites:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 'Accepts multiple image files and packs them into one or more optimized
+        spritesheets using the MaxRects bin packing algorithm. Automatically splits
+        into multiple sheets if needed. IMPORTANT: Each individual sprite must be
+        ≤12288x12288 pixels (hard limit). Use autoResize=true to automatically resize
+        oversized sprites - the response will include details of all resize operations.'
+      parameters:
+      - description: Sprite images to pack (multiple files supported). Each sprite
+          must be ≤12288x12288 pixels unless autoResize=true.
+        in: formData
+        name: images
+        required: true
+        type: file
+      - default: 2
+        description: Padding between sprites in pixels (0-32)
+        in: query
+        name: padding
+        type: integer
+      - default: false
+        description: Force power-of-2 dimensions (256, 512, 1024, etc.)
+        in: query
+        name: powerOfTwo
+        type: boolean
+      - default: false
+        description: Trim transparent pixels from sprites
+        in: query
+        name: trimTransparency
+        type: boolean
+      - default: 2048
+        description: Maximum sheet width in pixels (256-12288)
+        in: query
+        name: maxWidth
+        type: integer
+      - default: 2048
+        description: Maximum sheet height in pixels (256-12288)
+        in: query
+        name: maxHeight
+        type: integer
+      - default: false
+        description: Automatically resize sprites exceeding 12288x12288 to fit. Resize
+          details returned in response.
+        in: query
+        name: autoResize
+        type: boolean
+      - default: '"json"'
+        description: 'Comma-separated list of output formats: json,css,csv,xml,sparrow,texturepacker,cocos2d,unity,godot'
+        in: query
+        name: outputFormats
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response includes resizedSprites array if any sprites
+            were auto-resized
           schema:
             $ref: '#/definitions/routes.PackSpritesResponse'
         "400":

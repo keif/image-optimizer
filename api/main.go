@@ -88,6 +88,7 @@ func main() {
 	if allowedOrigins == "" {
 		allowedOrigins = "http://localhost:3000,http://localhost:8080"
 	}
+	log.Printf("CORS Origins: %s", allowedOrigins)
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     allowedOrigins,
 		AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
@@ -96,6 +97,7 @@ func main() {
 	}))
 	app.Use(middleware.NewRateLimiter())
 	app.Use(middleware.RequireAPIKey())
+	app.Use(middleware.NewMetricsCollector())
 
 	// Health check endpoint with version information
 	app.Get("/health", routes.HealthHandler(version, commit))
@@ -107,6 +109,7 @@ func main() {
 	routes.RegisterOptimizeRoutes(app)
 	routes.RegisterAPIKeyRoutes(app)
 	routes.SetupSpritesheetRoutes(app)
+	routes.SetupMetricsRoutes(app)
 
 	// Start server
 	port := os.Getenv("PORT")

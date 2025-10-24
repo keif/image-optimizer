@@ -18,7 +18,7 @@ const nextConfig = {
             value: [
               "default-src 'self'",
               // Allow scripts from self and analytics
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' gc.zgo.at goatcounter.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://gc.zgo.at https://goatcounter.com https://baker.goatcounter.com",
               // Allow styles from self and inline
               "style-src 'self' 'unsafe-inline'",
               // Allow images from self and common CDNs
@@ -26,7 +26,7 @@ const nextConfig = {
               // Allow fonts from self and data URLs
               "font-src 'self' data:",
               // Allow connections to API and analytics
-              "connect-src 'self' gc.zgo.at goatcounter.com https://api.sosquishy.io http://localhost:8080",
+              "connect-src 'self' https://gc.zgo.at https://goatcounter.com https://baker.goatcounter.com https://api.sosquishy.io http://localhost:8080",
               // Allow frames from self
               "frame-src 'self'",
               // Disallow objects

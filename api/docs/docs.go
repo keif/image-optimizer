@@ -273,6 +273,195 @@ const docTemplate = `{
                 }
             }
         },
+        "/health": {
+            "get": {
+                "description": "Check API health status with version information",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routes.HealthResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/metrics/formats": {
+            "get": {
+                "description": "Get detailed statistics about format conversions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "metrics"
+                ],
+                "summary": "Get format conversion statistics",
+                "parameters": [
+                    {
+                        "maximum": 365,
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 30,
+                        "description": "Number of days to look back (default: 30)",
+                        "name": "days",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/metrics/summary": {
+            "get": {
+                "description": "Get aggregated metrics for a specified time range",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "metrics"
+                ],
+                "summary": "Get metrics summary",
+                "parameters": [
+                    {
+                        "maximum": 365,
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 30,
+                        "description": "Number of days to look back (default: 30)",
+                        "name": "days",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.MetricsSummary"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/metrics/timeline": {
+            "get": {
+                "description": "Get time-series data for charting and trend analysis",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "metrics"
+                ],
+                "summary": "Get time-series metrics",
+                "parameters": [
+                    {
+                        "maximum": 365,
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 7,
+                        "description": "Number of days to look back (default: 7)",
+                        "name": "days",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "hour",
+                            "day"
+                        ],
+                        "type": "string",
+                        "default": "hour",
+                        "description": "Time interval: 'hour' or 'day' (default: 'hour')",
+                        "name": "interval",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/optimize": {
             "post": {
                 "description": "Optimize an image file or URL with custom quality, dimensions, and format",
@@ -418,9 +607,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/pack-sprites": {
+        "/optimize-spritesheet": {
             "post": {
-                "description": "Accepts multiple image files and packs them into one or more optimized spritesheets using the MaxRects bin packing algorithm",
+                "description": "Accepts a spritesheet PNG and its XML, extracts frames, optionally deduplicates, and repacks optimally",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -430,14 +619,28 @@ const docTemplate = `{
                 "tags": [
                     "spritesheet"
                 ],
-                "summary": "Pack multiple sprites into optimized spritesheets",
+                "summary": "Optimize an existing spritesheet",
                 "parameters": [
                     {
                         "type": "file",
-                        "description": "Sprite images to pack (multiple files supported)",
-                        "name": "images",
+                        "description": "Spritesheet PNG image",
+                        "name": "spritesheet",
                         "in": "formData",
                         "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Spritesheet XML (Sparrow format)",
+                        "name": "xml",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Remove duplicate frames",
+                        "name": "deduplicate",
+                        "in": "query"
                     },
                     {
                         "type": "integer",
@@ -449,7 +652,7 @@ const docTemplate = `{
                     {
                         "type": "boolean",
                         "default": false,
-                        "description": "Force power-of-2 dimensions (256, 512, 1024, etc.)",
+                        "description": "Force power-of-2 dimensions",
                         "name": "powerOfTwo",
                         "in": "query"
                     },
@@ -476,8 +679,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "default": "\"json\"",
-                        "description": "Comma-separated list of output formats: json,css,csv,xml,unity,godot",
+                        "default": "\"sparrow\"",
+                        "description": "Comma-separated list of output formats",
                         "name": "outputFormats",
                         "in": "query"
                     }
@@ -485,6 +688,102 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/pack-sprites": {
+            "post": {
+                "description": "Accepts multiple image files and packs them into one or more optimized spritesheets using the MaxRects bin packing algorithm. Automatically splits into multiple sheets if needed. IMPORTANT: Each individual sprite must be ≤12288x12288 pixels (hard limit). Use autoResize=true to automatically resize oversized sprites - the response will include details of all resize operations.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "spritesheet"
+                ],
+                "summary": "Pack multiple sprites into optimized spritesheets",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Sprite images to pack (multiple files supported). Each sprite must be ≤12288x12288 pixels unless autoResize=true.",
+                        "name": "images",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 2,
+                        "description": "Padding between sprites in pixels (0-32)",
+                        "name": "padding",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Force power-of-2 dimensions (256, 512, 1024, etc.)",
+                        "name": "powerOfTwo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Trim transparent pixels from sprites",
+                        "name": "trimTransparency",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 2048,
+                        "description": "Maximum sheet width in pixels (256-12288)",
+                        "name": "maxWidth",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 2048,
+                        "description": "Maximum sheet height in pixels (256-12288)",
+                        "name": "maxHeight",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Automatically resize sprites exceeding 12288x12288 to fit. Resize details returned in response.",
+                        "name": "autoResize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "\"json\"",
+                        "description": "Comma-separated list of output formats: json,css,csv,xml,sparrow,texturepacker,cocos2d,unity,godot",
+                        "name": "outputFormats",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response includes resizedSprites array if any sprites were auto-resized",
                         "schema": {
                             "$ref": "#/definitions/routes.PackSpritesResponse"
                         }
@@ -546,6 +845,35 @@ const docTemplate = `{
                 },
                 "revoked_at": {
                     "type": "string"
+                }
+            }
+        },
+        "db.MetricsSummary": {
+            "type": "object",
+            "properties": {
+                "average_savings_percent": {
+                    "type": "number"
+                },
+                "avg_processing_time_ms": {
+                    "type": "number"
+                },
+                "failed_requests": {
+                    "type": "integer"
+                },
+                "successful_requests": {
+                    "type": "integer"
+                },
+                "total_bytes_optimized": {
+                    "type": "integer"
+                },
+                "total_bytes_original": {
+                    "type": "integer"
+                },
+                "total_bytes_saved": {
+                    "type": "integer"
+                },
+                "total_requests": {
+                    "type": "integer"
                 }
             }
         },
@@ -618,6 +946,27 @@ const docTemplate = `{
                 }
             }
         },
+        "routes.HealthResponse": {
+            "type": "object",
+            "properties": {
+                "commit": {
+                    "type": "string",
+                    "example": "c1a2b3c"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "ok"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "2025-10-19T19:42:00Z"
+                },
+                "version": {
+                    "type": "string",
+                    "example": "v1.3.2"
+                }
+            }
+        },
         "routes.PackSpritesResponse": {
             "type": "object",
             "properties": {
@@ -635,6 +984,13 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "resizedSprites": {
+                    "description": "Info about auto-resized sprites",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/routes.ResizeInfo"
+                    }
+                },
                 "sheets": {
                     "description": "Base64-encoded PNG images",
                     "type": "array",
@@ -644,6 +1000,26 @@ const docTemplate = `{
                 },
                 "totalSprites": {
                     "type": "integer"
+                }
+            }
+        },
+        "routes.ResizeInfo": {
+            "type": "object",
+            "properties": {
+                "newHeight": {
+                    "type": "integer"
+                },
+                "newWidth": {
+                    "type": "integer"
+                },
+                "originalHeight": {
+                    "type": "integer"
+                },
+                "originalWidth": {
+                    "type": "integer"
+                },
+                "spriteName": {
+                    "type": "string"
                 }
             }
         },
@@ -693,6 +1069,10 @@ const docTemplate = `{
                 },
                 "originalColorSpace": {
                     "description": "Original image color space",
+                    "type": "string"
+                },
+                "originalFormat": {
+                    "description": "Original input format",
                     "type": "string"
                 },
                 "originalSize": {

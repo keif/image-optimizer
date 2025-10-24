@@ -14,6 +14,7 @@ type OptimizeResult struct {
 	OriginalSize     int64  `json:"originalSize"`
 	OptimizedSize    int64  `json:"optimizedSize"`
 	Format           string `json:"format"`
+	OriginalFormat   string `json:"originalFormat"` // Original input format
 	Width            int    `json:"width"`
 	Height            int    `json:"height"`
 	Savings          string `json:"savings"`
@@ -263,6 +264,7 @@ func OptimizeImage(buffer []byte, options OptimizeOptions) (*OptimizeResult, err
 		OriginalSize:       originalSize,
 		OptimizedSize:      resultSize,
 		Format:             formatName,
+		OriginalFormat:     originalMetadata.Type,
 		Width:              resultMetadata.Size.Width,
 		Height:             resultMetadata.Size.Height,
 		Savings:            fmt.Sprintf("%.2f%%", savingsPercent),

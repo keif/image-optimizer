@@ -17,6 +17,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/h2non/bimg"
+	"github.com/keif/image-optimizer/middleware"
 	"github.com/keif/image-optimizer/services"
 )
 
@@ -504,6 +505,9 @@ func handleOptimize(c *fiber.Ctx) error {
 	if err != nil {
 		return errorResponse(c, fiber.StatusInternalServerError, "Failed to process image", err)
 	}
+
+	// Record metrics for this optimization
+	middleware.RecordOptimizationMetric(c, result.OriginalFormat, result.Format, result.OriginalSize, result.OptimizedSize)
 
 	// Return either the image file or JSON metadata
 	if returnImage {
