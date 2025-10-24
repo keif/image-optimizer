@@ -36,8 +36,6 @@ export default function SpriteSheetOptimization() {
           </div>
         </header>
 
-        </div>
-
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Why Sprite Sheet Optimization Matters</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
