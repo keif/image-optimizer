@@ -25,7 +25,7 @@ import (
 const (
 	maxImageSize      = 10 << 20        // 10 MB
 	fetchTimeout      = 10 * time.Second // 10 seconds
-	maxDecodedPixels  = 100_000_000     // 100 megapixels (10000x10000) - protection against decompression bombs
+	maxDecodedPixels  = 121_000_000     // 121 megapixels (11000x11000) - protection against decompression bombs
 )
 
 // isProduction checks if we're running in production mode
