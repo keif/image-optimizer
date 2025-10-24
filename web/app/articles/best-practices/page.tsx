@@ -35,8 +35,6 @@ export default function BestPracticesGuide() {
           </div>
         </header>
 
-        </div>
-
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Introduction</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
@@ -96,8 +94,6 @@ export default function BestPracticesGuide() {
             <strong>Sharpen images lightly</strong>—over-sharpening introduces artifacts and hurts compression.
           </li>
         </ul>
-
-        </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Phase 2: Format Selection</h2>
@@ -204,8 +200,6 @@ export default function BestPracticesGuide() {
             <strong>Create presets for each image type</strong> (hero, product, thumbnail) with the right settings.
           </li>
         </ul>
-
-        </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Phase 4: Responsive Images</h2>
@@ -430,8 +424,6 @@ export default function BestPracticesGuide() {
   <img src="logo-light.png" alt="Company logo">
 </picture>`}</code>
         </pre>
-
-        </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Phase 8: Monitoring and Maintenance</h2>
