@@ -989,6 +989,30 @@ ALLOWED_DOMAINS=cloudinary.com,imgur.com,example.com
 
 ## Development
 
+### Pre-Commit Hooks (Recommended)
+
+Set up automatic linting before every commit to catch issues early:
+
+```bash
+./setup-hooks.sh
+```
+
+This installs pre-commit hooks that automatically:
+- ✅ Lint Go code with golangci-lint
+- ✅ Check TypeScript types
+- ✅ Format code with gofmt and ESLint
+- ✅ Validate Markdown
+- ✅ Detect secrets and large files
+- ✅ Fix trailing whitespace and line endings
+
+**Manual usage:**
+```bash
+pre-commit run --all-files    # Check all files
+git commit --no-verify         # Skip hooks (not recommended)
+```
+
+See [PRE_COMMIT_GUIDE.md](./PRE_COMMIT_GUIDE.md) for detailed documentation.
+
 ### Building the Binary
 
 ```bash

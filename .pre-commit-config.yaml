@@ -1,0 +1,78 @@
+# Pre-commit hooks configuration
+# Install: pip install pre-commit
+# Setup: pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '^(\.github/|_notes/)'
+      - id: end-of-file-fixer
+        exclude: '^(\.github/|_notes/)'
+      - id: check-yaml
+        args: ['--unsafe']  # Allow custom YAML tags
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # Go linting
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v1.55.2
+    hooks:
+      - id: golangci-lint
+        name: golangci-lint (API)
+        entry: bash -c 'cd api && golangci-lint run --fix --timeout=5m'
+        files: ^api/.*\.go$
+        pass_filenames: false
+
+  # Go formatting
+  - repo: https://github.com/dnephin/pre-commit-golang
+    rev: v0.5.1
+    hooks:
+      - id: go-fmt
+        name: go-fmt (API)
+        args: ['-w']
+        files: ^api/.*\.go$
+      - id: go-imports
+        name: go-imports (API)
+        args: ['-w']
+        files: ^api/.*\.go$
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.38.0
+    hooks:
+      - id: markdownlint
+        args: ['--fix', '--config', '.markdownlint.json']
+        exclude: '^(_notes/|node_modules/)'
+
+  # Frontend linting (ESLint)
+  - repo: local
+    hooks:
+      - id: eslint
+        name: ESLint (Frontend)
+        entry: bash -c 'cd web && pnpm run lint:fix'
+        language: system
+        files: ^web/.*\.(ts|tsx|js|jsx)$
+        pass_filenames: false
+
+      - id: typescript-check
+        name: TypeScript Check (Frontend)
+        entry: bash -c 'cd web && pnpm run type-check'
+        language: system
+        files: ^web/.*\.(ts|tsx)$
+        pass_filenames: false
+
+  # Prevent committing secrets
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: '^(\.secrets\.baseline|package-lock\.json|pnpm-lock\.yaml|go\.sum)$'
