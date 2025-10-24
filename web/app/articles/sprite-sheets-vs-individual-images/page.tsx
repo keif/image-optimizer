@@ -106,7 +106,6 @@ export default function SpriteSheetVsIndividualImages() {
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           <strong>Key Insight:</strong> HTTP/2 reduces but doesn't eliminate the sprite sheet advantage. For 30+ images or game assets, sprite sheets still load 2-3x faster.
         </p>
-        </div>
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Mobile Networks: Sprite Sheets Still Crucial</h3>
         <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-6">
           <strong>Pro Tip:</strong> Sprite sheets still matter on mobile—latency is the real bottleneck.
@@ -165,7 +164,6 @@ export default function SpriteSheetVsIndividualImages() {
           A sprite sheet has one set of headers. For small icons where the header overhead might
           be 30% of the payload, this matters significantly.
         </p>
-        </div>
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Runtime Memory: Where the Savings Really Show</h2>
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Browser Memory: Individual Images Cost More</h3>
@@ -232,7 +230,6 @@ export default function SpriteSheetVsIndividualImages() {
           <li>Use content hashing in filenames (spritesheet-a3f8b2.png)</li>
           <li>Implement versioning for sprite sheet updates</li>
         </ul>
-        </div>
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Rendering and GPU Performance: The Visual Frontier</h2>
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">DOM Elements: Fewer is Better</h3>
@@ -311,7 +308,6 @@ export default function SpriteSheetVsIndividualImages() {
           <li>Debugging is harder (must map coordinates to sprites)</li>
           <li>Learning curve for sprite sheet tools</li>
         </ul>
-        </div>
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Real-World Case Studies</h2>
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Case Study 1: E-Commerce Product Icons (Web)</h3>
@@ -423,7 +419,6 @@ export default function SpriteSheetVsIndividualImages() {
               </tr>
             </tbody>
           </table>
-        </div>
         </div>
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Final Verdict: It Depends—And That’s Okay</h2>
