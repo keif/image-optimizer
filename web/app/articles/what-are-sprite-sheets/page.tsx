@@ -34,8 +34,6 @@ export default function WhatAreSpriteSheets() {
           </div>
         </header>
 
-        </div>
-
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Sprite Sheets 101: The Core Idea</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
@@ -81,8 +79,6 @@ export default function WhatAreSpriteSheets() {
         <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-6">
           <strong>Pro Tip:</strong> Even in the HTTP/2 and HTTP/3 era, sprite sheets still outperform multiple requests when you're dealing with large icon sets.
         </blockquote>
-
-        </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">How Sprite Sheets Actually Work</h2>
@@ -143,8 +139,6 @@ export default function WhatAreSpriteSheets() {
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           This metadata tells your code exactly where to find each sprite. Game engines and tools read it so you can grab the right chunk of pixels, instantly.
         </p>
-
-        </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Sprite Sheets on the Web</h2>
@@ -280,8 +274,6 @@ function animate() {
           <li><strong>Babylon.js:</strong> Sprite sheet support for particle systems and UI</li>
         </ul>
 
-        </div>
-
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Tile Maps and Sprite Sheets</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           Many games use sprite sheets for tile-based levels. A tile set sprite sheet holds grass, dirt, water, walls, and more. The game engine reads a level map (a 2D array of tile IDs) and renders each tile by pulling the right chunk from the sheet.
@@ -340,8 +332,6 @@ function animate() {
         <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-6">
           <strong>Pro Tip:</strong> Sprite sheets are unbeatable for large sets of static assets. For just a few big images or anything user-uploaded, skip them.
         </blockquote>
-
-        </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Modern Alternatives and What’s Next</h2>
@@ -409,8 +399,6 @@ function animate() {
               </li>
             </ol>
           </div>
-        </div>
-
         </div>
 
         <div className="not-prose mt-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white text-center">
