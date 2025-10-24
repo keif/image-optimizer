@@ -323,8 +323,6 @@ export default function BestPracticesGuide() {
           </li>
         </ul>
 
-        </div>
-
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Phase 6: Delivery and Caching</h2>
 
@@ -636,8 +634,6 @@ export default function BestPracticesGuide() {
               </li>
             </ol>
           </div>
-        </div>
-
         </div>
 
         <div className="not-prose mt-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white text-center">
