@@ -8,7 +8,7 @@ docker_compose('./docker-compose.yml')
 docker_build(
     'squish-api',
     './api',
-    dockerfile='./api/Dockerfile',
+    dockerfile='./api/Dockerfile.dev',  # Use dev Dockerfile for faster builds
     live_update=[
         # Sync Go source files to container
         sync('./api', '/app'),
