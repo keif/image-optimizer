@@ -35,9 +35,6 @@ export default function ImageFormatsGuide() {
           </div>
         </header>
 
-        {/* Top Banner Ad */}
-        </div>
-
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Introduction</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           Picking the right image format is essential for fast, beautiful websites. Each format has its own way of compressing images, its own strengths, and its own quirks. Choose poorly, and you might end up with slow load times, blurry pictures, or missing features like transparency.
@@ -97,8 +94,6 @@ export default function ImageFormatsGuide() {
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           JPEG is perfect for photos, images with lots of colors or gradients, and anything where a bit of quality loss is worth the smaller size. Reach for JPEG with hero images, product shots, user uploads, or backgrounds.
         </p>
-
-        </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         {/* Next up: PNG, for when you need sharpness or transparency. */}
@@ -206,8 +201,6 @@ export default function ImageFormatsGuide() {
           Use WebP as your go-to format for most modern sites. It works for photos, graphics, illustrations, and images with transparency. Just make sure to serve JPEG or PNG as a backup for browsers that don’t support it.
         </p>
 
-        </div>
-
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         {/* Ready to push compression even further? Meet AVIF. */}
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">AVIF: The Future of Image Compression</h2>
@@ -308,8 +301,6 @@ export default function ImageFormatsGuide() {
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           Only use GIF for simple, low-color animations when video or animated WebP aren’t an option. For most cases, MP4, WebP, or APNG will give you better quality and smaller files. If you need a quick, looping animation with few colors, GIF can still do the job.
         </p>
-
-        </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         {/* Let’s pull it all together with a side-by-side comparison. */}
@@ -513,9 +504,6 @@ export default function ImageFormatsGuide() {
               </li>
             </ol>
           </div>
-        </div>
-
-        {/* Bottom Banner Ad */}
         </div>
 
         {/* CTA */}
