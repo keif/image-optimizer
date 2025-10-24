@@ -55,8 +55,20 @@ www.sosquishy.io {
 
 # API subdomain
 api.sosquishy.io {
+    # Increase request body size limit for large images (20MB)
+    request_body {
+        max_size 20MB
+    }
+
     # Reverse proxy to Go API Docker container
     reverse_proxy localhost:8080 {
+        # Extended timeouts for large image processing
+        transport http {
+            read_timeout 6m      # 6 minutes for reading response
+            write_timeout 6m     # 6 minutes for sending request
+            dial_timeout 30s     # 30 seconds for connection
+        }
+
         # Health check
         health_uri /health
         health_interval 30s
