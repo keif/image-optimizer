@@ -110,9 +110,9 @@ class ApiClient {
     const url = `${this.baseUrl}/optimize${params.toString() ? '?' + params.toString() : ''}`;
     console.log('[ApiClient] optimizeImage - Calling URL:', url);
 
-    // 5 minute timeout for long-running optimizations
+    // 7 minute timeout for long-running optimizations (large spritesheets can take 1+ min)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
+    const timeoutId = setTimeout(() => controller.abort(), 7 * 60 * 1000);
 
     try {
       const response = await fetch(url, {
@@ -133,7 +133,7 @@ class ApiClient {
     } catch (error: any) {
       clearTimeout(timeoutId);
       if (error.name === 'AbortError') {
-        throw new Error('Request timed out after 5 minutes. Try reducing image size or quality settings.');
+        throw new Error('Request timed out after 7 minutes. Try reducing image size or quality settings.');
       }
       throw error;
     }
@@ -179,9 +179,9 @@ class ApiClient {
 
     const url = `${this.baseUrl}/optimize?${params.toString()}`;
 
-    // 5 minute timeout for long-running optimizations
+    // 7 minute timeout for long-running optimizations (large spritesheets can take 1+ min)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
+    const timeoutId = setTimeout(() => controller.abort(), 7 * 60 * 1000);
 
     try {
       const response = await fetch(url, {
@@ -207,7 +207,7 @@ class ApiClient {
     } catch (error: any) {
       clearTimeout(timeoutId);
       if (error.name === 'AbortError') {
-        throw new Error('Request timed out after 5 minutes. Try reducing image size or quality settings.');
+        throw new Error('Request timed out after 7 minutes. Try reducing image size or quality settings.');
       }
       throw error;
     }
@@ -287,7 +287,7 @@ class ApiClient {
     const url = `${this.baseUrl}/pack-sprites?${params.toString()}`;
     console.log('[ApiClient] packSprites - Calling URL:', url);
 
-    // 5 minute timeout for packing large sprite collections
+    // 7 minute timeout for packing large sprite collections
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
 
@@ -310,7 +310,7 @@ class ApiClient {
     } catch (error: any) {
       clearTimeout(timeoutId);
       if (error.name === 'AbortError') {
-        throw new Error('Request timed out after 5 minutes. Try with fewer sprites or smaller images.');
+        throw new Error('Request timed out after 7 minutes. Try with fewer sprites or smaller images.');
       }
       throw error;
     }
@@ -339,7 +339,7 @@ class ApiClient {
     const url = `${this.baseUrl}/optimize-spritesheet?${params.toString()}`;
     console.log('[ApiClient] optimizeSpritesheet - Calling URL:', url);
 
-    // 5 minute timeout for spritesheet optimization
+    // 7 minute timeout for spritesheet optimization
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5 * 60 * 1000);
 
@@ -362,7 +362,7 @@ class ApiClient {
     } catch (error: any) {
       clearTimeout(timeoutId);
       if (error.name === 'AbortError') {
-        throw new Error('Request timed out after 5 minutes. Try with a smaller spritesheet.');
+        throw new Error('Request timed out after 7 minutes. Try with a smaller spritesheet.');
       }
       throw error;
     }
