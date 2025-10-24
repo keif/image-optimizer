@@ -26,6 +26,8 @@ services:
       - PUBLIC_OPTIMIZATION_ENABLED=true
       # Trusted Origins - production domains
       - TRUSTED_ORIGINS=https://sosquishy.io,https://www.sosquishy.io
+      # CORS Origins - required for CORS headers
+      - CORS_ORIGINS=https://sosquishy.io,https://www.sosquishy.io
       - ALLOWED_DOMAINS=cloudinary.com,imgur.com,unsplash.com,pexels.com,localhost
     volumes:
       # Persist database

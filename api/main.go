@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/keif/image-optimizer/db"
 	"github.com/keif/image-optimizer/middleware"
@@ -89,12 +89,26 @@ func main() {
 		allowedOrigins = "http://localhost:3000,http://localhost:8080"
 	}
 	log.Printf("CORS Origins: %s", allowedOrigins)
-	app.Use(cors.New(cors.Config{
-		AllowOrigins:     allowedOrigins,
-		AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
-		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
-		AllowCredentials: true,
-	}))
+
+	// Custom CORS middleware that ALWAYS adds headers (even on errors)
+	app.Use(func(c *fiber.Ctx) error {
+		origin := c.Get("Origin")
+
+		// Check if origin is allowed
+		if origin != "" && strings.Contains(allowedOrigins, origin) {
+			c.Set("Access-Control-Allow-Origin", origin)
+			c.Set("Access-Control-Allow-Credentials", "true")
+			c.Set("Access-Control-Allow-Headers", "Origin,Content-Type,Accept,Authorization")
+			c.Set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
+		}
+
+		// Handle preflight
+		if c.Method() == "OPTIONS" {
+			return c.SendStatus(fiber.StatusNoContent)
+		}
+
+		return c.Next()
+	})
 	app.Use(middleware.NewRateLimiter())
 	app.Use(middleware.RequireAPIKey())
 	app.Use(middleware.NewMetricsCollector())
