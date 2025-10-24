@@ -35,8 +35,6 @@ export default function CompressionGuide() {
           </div>
         </header>
 
-        </div>
-
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">What Is Image Compression?</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
@@ -105,8 +103,6 @@ export default function CompressionGuide() {
             <strong>Text and diagrams:</strong> 5:1 to 10:1 (extremely efficient—lots of repeated patterns)
           </li>
         </ul>
-
-        </div>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">When to Use Lossless Compression</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
@@ -201,8 +197,6 @@ export default function CompressionGuide() {
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           For most web photos, a quality setting between 75 and 85 strikes a great balance—delivering 10–15x smaller files with little visible difference.
         </p>
-
-        </div>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Common Lossy Compression Artifacts</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
@@ -321,8 +315,6 @@ export default function CompressionGuide() {
           <li>Quality 85 cuts file size by 40–50% with almost no visible loss</li>
           <li>Going below 75 can introduce obvious artifacts, especially on big screens</li>
         </ul>
-
-        </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Hybrid Approach: Using Both Methods</h2>
@@ -500,8 +492,6 @@ export default function CompressionGuide() {
               </li>
             </ol>
           </div>
-        </div>
-
         </div>
 
         <div className="not-prose mt-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white text-center">
