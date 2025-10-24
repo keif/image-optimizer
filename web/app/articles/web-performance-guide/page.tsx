@@ -41,8 +41,6 @@ export default function WebPerformanceGuide() {
           This is your complete guide to mastering image optimization — with real metrics, actionable techniques, and proof that small changes can lead to massive performance gains.
         </p>
 
-        </div>
-
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">The Image Performance Problem</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
@@ -92,8 +90,6 @@ export default function WebPerformanceGuide() {
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           This one’s simple: smaller images mean less to download, so your site loads faster. A typical product page might have 2-3 MB of images—enough to stall a moderate 3G connection for 3-5 seconds. Trim that to 500-800 KB, and you’re looking at sub-second load times. That’s the difference between a user who stays and one who bounces.
         </p>
-
-        </div>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">The Real Business Impact of Faster Images</h2>
@@ -173,8 +169,6 @@ export default function WebPerformanceGuide() {
           <strong>Performance impact:</strong> Mobile users (often on slower connections) see
           the biggest benefits, with load time improvements of 2-4 seconds on product pages.
         </p>
-
-        </div>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">4. Lazy Loading (Immediate perceived performance improvement)</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
@@ -336,8 +330,6 @@ export default function WebPerformanceGuide() {
           </li>
         </ul>
 
-        </div>
-
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Avoid These Optimization Pitfalls</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
@@ -485,8 +477,6 @@ export default function WebPerformanceGuide() {
               </li>
             </ol>
           </div>
-        </div>
-
         </div>
 
         <div className="not-prose mt-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white text-center">
