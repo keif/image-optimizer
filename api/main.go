@@ -55,9 +55,9 @@ func main() {
 
 	app := fiber.New(fiber.Config{
 		AppName:      "Image Optimizer API v1.0",
-		BodyLimit:    15 * 1024 * 1024,  // 15MB limit for large spritesheet uploads
-		ReadTimeout:  5 * time.Minute,   // 5 minute read timeout for large file uploads
-		WriteTimeout: 5 * time.Minute,   // 5 minute write timeout for processing large sprites
+		BodyLimit:    20 * 1024 * 1024,  // 20MB limit for large spritesheet uploads (matches Caddy)
+		ReadTimeout:  7 * time.Minute,   // 7 minute read timeout for large file uploads
+		WriteTimeout: 7 * time.Minute,   // 7 minute write timeout for processing large sprites (100MP+)
 		IdleTimeout:  10 * time.Minute,  // 10 minute idle timeout
 	})
 
