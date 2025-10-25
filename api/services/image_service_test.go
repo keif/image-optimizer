@@ -43,6 +43,26 @@ func checkAVIFEncodingSupport(t *testing.T) bool {
 	return err == nil
 }
 
+// checkAVIFDecodingSupport checks if libvips can decode AVIF
+// Returns true if AVIF decoding is supported, false otherwise
+func checkAVIFDecodingSupport(t *testing.T) bool {
+	t.Helper()
+
+	// Try to load and read metadata from an AVIF test fixture
+	imageData := loadTestFixture(t, "test-200x150.avif")
+	_, err := bimg.NewImage(imageData).Metadata()
+	if err != nil {
+		// Check if error is specifically about AVIF decoding support
+		if strings.Contains(err.Error(), "Unsupported image format") ||
+		   strings.Contains(err.Error(), "heifload") ||
+		   strings.Contains(err.Error(), "avif") {
+			return false
+		}
+	}
+
+	return err == nil
+}
+
 func TestOptimizeImage_BasicOptimization(t *testing.T) {
 	// Load test image
 	imageData := loadTestFixture(t, "test-100x100.jpg")
@@ -316,6 +336,11 @@ func TestOptimizeImage_SavingsCalculation(t *testing.T) {
 }
 
 func TestOptimizeImage_AVIFDecoding(t *testing.T) {
+	// Skip if AVIF decoding not supported
+	if !checkAVIFDecodingSupport(t) {
+		t.Skip("AVIF decoding not supported by libvips (decoding support requires libheif with AVIF decoder)")
+	}
+
 	// Test decoding AVIF files and converting to other formats
 	tests := []struct {
 		name           string
