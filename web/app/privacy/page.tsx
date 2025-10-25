@@ -61,10 +61,10 @@ export default function PrivacyPage() {
             <Shield className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
             <div>
               <h3 className="font-medium text-green-900 dark:text-green-200">
-                No Tracking
+                Privacy-First Analytics
               </h3>
               <p className="text-sm text-green-700 dark:text-green-300 mt-1">
-                No personal data collection or third-party tracking
+                Aggregated metrics only - no personal data or IP tracking
               </p>
             </div>
           </div>
@@ -129,29 +129,44 @@ export default function PrivacyPage() {
           </h2>
           <div className="space-y-4 text-gray-700 dark:text-gray-300">
             <p>
-              We collect minimal data necessary for service operation:
+              We collect minimal aggregated data necessary for service operation and improvement:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>
-                <strong>Anonymous Analytics:</strong> Basic page view statistics via GoatCounter
-                (privacy-focused analytics) to understand usage patterns. No personal information
-                or IP addresses are stored.
+                <strong>Page View Analytics:</strong> Basic page view statistics via GoatCounter
+                (privacy-focused analytics) to understand which pages are visited. No personal information,
+                cookies, or IP addresses are stored.
+              </li>
+              <li>
+                <strong>Usage Metrics (Aggregated):</strong> Hourly aggregated statistics about service usage:
+                <ul className="list-circle list-inside ml-6 mt-2 space-y-1">
+                  <li>Number of optimization requests per hour</li>
+                  <li>Average file sizes (before/after optimization)</li>
+                  <li>Format conversion statistics (e.g., PNG→WebP)</li>
+                  <li>Processing times and success/error rates</li>
+                </ul>
+                <p className="mt-2 text-sm">
+                  These metrics are <strong>aggregated by hour</strong> with no individual request tracking,
+                  IP addresses, or personally identifiable information. They help us monitor service
+                  health and optimize performance.
+                </p>
               </li>
               <li>
                 <strong>Technical Logs:</strong> Temporary server logs for debugging and
                 performance monitoring. These contain no personally identifiable information and
-                are automatically rotated.
+                are automatically rotated every 30 days.
               </li>
             </ul>
-            <p className="font-medium">
+            <p className="font-medium mt-4">
               We do NOT collect:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>Your images or any visual content you upload</li>
+              <li>Individual request details or image metadata</li>
               <li>Cookies or browser fingerprints</li>
               <li>Personal information (name, email, etc.)</li>
-              <li>IP addresses or location data</li>
-              <li>User accounts or authentication data</li>
+              <li>IP addresses or precise location data</li>
+              <li>User accounts or authentication data (service is completely anonymous)</li>
             </ul>
           </div>
         </div>
@@ -179,8 +194,8 @@ export default function PrivacyPage() {
                 .
               </li>
               <li>
-                <strong>Render.com:</strong> Our hosting provider. Images are processed in memory
-                on Render&apos;s infrastructure and are never persisted.
+                <strong>Hetzner Cloud:</strong> Our hosting provider (Germany-based). Images are processed in memory
+                on our infrastructure and are never written to disk or persisted.
               </li>
             </ul>
           </div>
