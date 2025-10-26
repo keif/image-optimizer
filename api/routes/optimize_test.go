@@ -45,7 +45,7 @@ func createMultipartRequest(t *testing.T, imageData []byte, filename string) (*h
 		t.Fatalf("Failed to write image data: %v", err)
 	}
 
-	writer.Close()
+	_ = writer.Close()
 
 	req := httptest.NewRequest("POST", "/optimize", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -177,8 +177,8 @@ func TestOptimizeEndpoint_ReturnImage(t *testing.T) {
 	h["Content-Disposition"] = []string{`form-data; name="image"; filename="test.jpg"`}
 	h["Content-Type"] = []string{"image/jpeg"}
 	part, _ := writer.CreatePart(h)
-	part.Write(imageData)
-	writer.Close()
+	_, _ = part.Write(imageData)
+	_ = writer.Close()
 
 	req := httptest.NewRequest("POST", "/optimize?returnImage=true&format=webp", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -243,8 +243,8 @@ func TestOptimizeEndpoint_InvalidQuality(t *testing.T) {
 	h["Content-Disposition"] = []string{`form-data; name="image"; filename="test.jpg"`}
 	h["Content-Type"] = []string{"image/jpeg"}
 	part, _ := writer.CreatePart(h)
-	part.Write(imageData)
-	writer.Close()
+	_, _ = part.Write(imageData)
+	_ = writer.Close()
 
 	req := httptest.NewRequest("POST", "/optimize?quality=150", body) // Invalid quality > 100
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -271,8 +271,8 @@ func TestOptimizeEndpoint_InvalidFormat(t *testing.T) {
 	h["Content-Disposition"] = []string{`form-data; name="image"; filename="test.jpg"`}
 	h["Content-Type"] = []string{"image/jpeg"}
 	part, _ := writer.CreatePart(h)
-	part.Write(imageData)
-	writer.Close()
+	_, _ = part.Write(imageData)
+	_ = writer.Close()
 
 	req := httptest.NewRequest("POST", "/optimize?format=invalid", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -291,19 +291,19 @@ func TestOptimizeEndpoint_URLFetching(t *testing.T) {
 	// Set ALLOWED_DOMAINS to empty to disable domain whitelist for this test
 	// This allows the test to fetch from localhost test server
 	originalDomains := os.Getenv("ALLOWED_DOMAINS")
-	os.Setenv("ALLOWED_DOMAINS", "")
+	_ = os.Setenv("ALLOWED_DOMAINS", "")
 	// Also set environment variable to allow private IPs in test mode
-	os.Setenv("ALLOW_PRIVATE_IPS", "true")
+	_ = os.Setenv("ALLOW_PRIVATE_IPS", "true")
 	defer func() {
-		os.Setenv("ALLOWED_DOMAINS", originalDomains)
-		os.Unsetenv("ALLOW_PRIVATE_IPS")
+		_ = os.Setenv("ALLOWED_DOMAINS", originalDomains)
+		_ = os.Unsetenv("ALLOW_PRIVATE_IPS")
 	}()
 
 	// Create a test HTTP server that serves an image
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		imageData := loadTestFixture(t, "test-100x100.jpg")
 		w.Header().Set("Content-Type", "image/jpeg")
-		w.Write(imageData)
+		_, _ = w.Write(imageData)
 	}))
 	defer testServer.Close()
 
@@ -313,8 +313,8 @@ func TestOptimizeEndpoint_URLFetching(t *testing.T) {
 	// Create request with URL parameter
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	writer.WriteField("url", testServer.URL+"/test.jpg")
-	writer.Close()
+	_ = writer.WriteField("url", testServer.URL+"/test.jpg")
+	_ = writer.Close()
 
 	req := httptest.NewRequest("POST", "/optimize?format=webp", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -333,8 +333,8 @@ func TestOptimizeEndpoint_URLFetching(t *testing.T) {
 func TestOptimizeEndpoint_InvalidURL(t *testing.T) {
 	// Set ALLOWED_DOMAINS to a specific whitelist to ensure this domain is blocked
 	originalDomains := os.Getenv("ALLOWED_DOMAINS")
-	os.Setenv("ALLOWED_DOMAINS", "cloudinary.com,imgur.com")
-	defer os.Setenv("ALLOWED_DOMAINS", originalDomains)
+	_ = os.Setenv("ALLOWED_DOMAINS", "cloudinary.com,imgur.com")
+	defer func() { _ = os.Setenv("ALLOWED_DOMAINS", originalDomains) }()
 
 	app := fiber.New()
 	RegisterOptimizeRoutes(app)
@@ -342,8 +342,8 @@ func TestOptimizeEndpoint_InvalidURL(t *testing.T) {
 	// Create request with URL that's not in the whitelist
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	writer.WriteField("url", "https://blocked-domain.com/image.jpg")
-	writer.Close()
+	_ = writer.WriteField("url", "https://blocked-domain.com/image.jpg")
+	_ = writer.Close()
 
 	req := httptest.NewRequest("POST", "/optimize", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -371,8 +371,8 @@ func TestOptimizeEndpoint_CombinedParameters(t *testing.T) {
 	h["Content-Disposition"] = []string{`form-data; name="image"; filename="test.png"`}
 	h["Content-Type"] = []string{"image/png"}
 	part, _ := writer.CreatePart(h)
-	part.Write(imageData)
-	writer.Close()
+	_, _ = part.Write(imageData)
+	_ = writer.Close()
 
 	req := httptest.NewRequest("POST", "/optimize?quality=85&width=100&height=75&format=webp&returnImage=true", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -396,7 +396,11 @@ func TestOptimizeEndpoint_CombinedParameters(t *testing.T) {
 }
 
 // createBatchMultipartRequest creates a multipart form request with multiple image files
-func createBatchMultipartRequest(t *testing.T, images []struct{ data []byte; filename string; contentType string }) (*http.Request, string) {
+func createBatchMultipartRequest(t *testing.T, images []struct {
+	data        []byte
+	filename    string
+	contentType string
+}) (*http.Request, string) {
 	t.Helper()
 
 	body := &bytes.Buffer{}
@@ -418,7 +422,7 @@ func createBatchMultipartRequest(t *testing.T, images []struct{ data []byte; fil
 		}
 	}
 
-	writer.Close()
+	_ = writer.Close()
 
 	req := httptest.NewRequest("POST", "/batch-optimize", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -430,7 +434,11 @@ func TestBatchOptimizeEndpoint_BasicOptimization(t *testing.T) {
 	app := fiber.New()
 	RegisterOptimizeRoutes(app)
 
-	images := []struct{ data []byte; filename string; contentType string }{
+	images := []struct {
+		data        []byte
+		filename    string
+		contentType string
+	}{
 		{loadTestFixture(t, "test-100x100.jpg"), "test1.jpg", "image/jpeg"},
 		{loadTestFixture(t, "test-200x150.png"), "test2.png", "image/png"},
 		{loadTestFixture(t, "test-50x50.webp"), "test3.webp", "image/webp"},
@@ -459,7 +467,11 @@ func TestBatchOptimizeEndpoint_WithFormatConversion(t *testing.T) {
 	app := fiber.New()
 	RegisterOptimizeRoutes(app)
 
-	images := []struct{ data []byte; filename string; contentType string }{
+	images := []struct {
+		data        []byte
+		filename    string
+		contentType string
+	}{
 		{loadTestFixture(t, "test-100x100.jpg"), "test1.jpg", "image/jpeg"},
 		{loadTestFixture(t, "test-200x150.png"), "test2.png", "image/png"},
 	}
@@ -484,7 +496,7 @@ func TestBatchOptimizeEndpoint_NoImages(t *testing.T) {
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	writer.Close()
+	_ = writer.Close()
 
 	req := httptest.NewRequest("POST", "/batch-optimize", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -503,7 +515,11 @@ func TestBatchOptimizeEndpoint_InvalidQuality(t *testing.T) {
 	app := fiber.New()
 	RegisterOptimizeRoutes(app)
 
-	images := []struct{ data []byte; filename string; contentType string }{
+	images := []struct {
+		data        []byte
+		filename    string
+		contentType string
+	}{
 		{loadTestFixture(t, "test-100x100.jpg"), "test1.jpg", "image/jpeg"},
 	}
 
@@ -516,9 +532,9 @@ func TestBatchOptimizeEndpoint_InvalidQuality(t *testing.T) {
 		h["Content-Type"] = []string{img.contentType}
 
 		part, _ := writer.CreatePart(h)
-		part.Write(img.data)
+		_, _ = part.Write(img.data)
 	}
-	writer.Close()
+	_ = writer.Close()
 
 	req := httptest.NewRequest("POST", "/batch-optimize?quality=150", body) // Invalid quality > 100
 	req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -538,7 +554,11 @@ func TestBatchOptimizeEndpoint_MixedResults(t *testing.T) {
 	RegisterOptimizeRoutes(app)
 
 	// Mix of valid and invalid files
-	images := []struct{ data []byte; filename string; contentType string }{
+	images := []struct {
+		data        []byte
+		filename    string
+		contentType string
+	}{
 		{loadTestFixture(t, "test-100x100.jpg"), "test1.jpg", "image/jpeg"},
 		{[]byte("invalid image data"), "test2.jpg", "image/jpeg"}, // Invalid image
 		{loadTestFixture(t, "test-200x150.png"), "test3.png", "image/png"},

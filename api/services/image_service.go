@@ -1,3 +1,4 @@
+// Package services provides image processing and spritesheet packing functionality.
 package services
 
 import (
@@ -24,29 +25,29 @@ var largeImageSemaphore = make(chan struct{}, 2) // Max 2 concurrent large image
 
 // OptimizeResult represents the result of an image optimization
 type OptimizeResult struct {
-	OriginalSize     int64  `json:"originalSize"`
-	OptimizedSize    int64  `json:"optimizedSize"`
-	Format           string `json:"format"`
-	OriginalFormat   string `json:"originalFormat"` // Original input format
-	Width            int    `json:"width"`
-	Height            int    `json:"height"`
-	Savings          string `json:"savings"`
-	ProcessingTime   string `json:"processingTime"`
-	OptimizedImage   []byte `json:"-"` // Not included in JSON response
-	AlreadyOptimized bool   `json:"alreadyOptimized"` // True if original was returned due to better compression
-	Message          string `json:"message,omitempty"` // Optional message about optimization
-	ColorSpace       string `json:"colorSpace"` // Color space of the result (srgb, p3, etc)
+	OriginalSize       int64  `json:"originalSize"`
+	OptimizedSize      int64  `json:"optimizedSize"`
+	Format             string `json:"format"`
+	OriginalFormat     string `json:"originalFormat"` // Original input format
+	Width              int    `json:"width"`
+	Height             int    `json:"height"`
+	Savings            string `json:"savings"`
+	ProcessingTime     string `json:"processingTime"`
+	OptimizedImage     []byte `json:"-"`                  // Not included in JSON response
+	AlreadyOptimized   bool   `json:"alreadyOptimized"`   // True if original was returned due to better compression
+	Message            string `json:"message,omitempty"`  // Optional message about optimization
+	ColorSpace         string `json:"colorSpace"`         // Color space of the result (srgb, p3, etc)
 	OriginalColorSpace string `json:"originalColorSpace"` // Original image color space
-	WideGamut        bool   `json:"wideGamut"` // True if image uses colors beyond sRGB
+	WideGamut          bool   `json:"wideGamut"`          // True if image uses colors beyond sRGB
 }
 
 // OptimizeOptions contains parameters for image optimization
 type OptimizeOptions struct {
-	Quality    int            // 1-100, higher is better quality
-	Width      int            // Target width (0 = maintain aspect ratio)
-	Height     int            // Target height (0 = maintain aspect ratio)
-	Format     bimg.ImageType // Target format (JPEG, PNG, WEBP, etc.)
-	ForceSRGB  bool           // Force conversion to sRGB color space
+	Quality   int            // 1-100, higher is better quality
+	Width     int            // Target width (0 = maintain aspect ratio)
+	Height    int            // Target height (0 = maintain aspect ratio)
+	Format    bimg.ImageType // Target format (JPEG, PNG, WEBP, etc.)
+	ForceSRGB bool           // Force conversion to sRGB color space
 
 	// Lossless mode - enables perfect quality preservation
 	LosslessMode bool   // Enable lossless mode (forces lossless encoding for all formats)
@@ -421,7 +422,7 @@ func getImageTypeFromString(format string) bimg.ImageType {
 }
 
 // detectColorSpace attempts to detect the color space from image metadata
-func detectColorSpace(metadata bimg.ImageMetadata) string {
+func detectColorSpace(_ bimg.ImageMetadata) string {
 	// Note: bimg/libvips doesn't expose interpretation directly via metadata
 	// This is a simplified detection based on available metadata
 	// Most web images use sRGB by default
@@ -433,19 +434,6 @@ func detectColorSpace(metadata bimg.ImageMetadata) string {
 }
 
 // isWideGamutColorSpace checks if a color space is wider than sRGB
-func isWideGamutColorSpace(colorSpace string) bool {
-	wideGamutSpaces := map[string]bool{
-		"Display P3":  true,
-		"Adobe RGB":   true,
-		"ProPhoto RGB": true,
-		"Rec. 2020":   true,
-		"scRGB":       true,
-		"RGB16":       true,
-		"LAB":         true,
-		"CMYK":        true,
-	}
-	return wideGamutSpaces[colorSpace]
-}
 
 // optimizePNGWithOxipng performs lossless PNG optimization using oxipng
 // Returns the optimized buffer or the original if oxipng fails or doesn't improve compression
@@ -453,12 +441,12 @@ func isWideGamutColorSpace(colorSpace string) bool {
 // SECURITY: Command Execution Safety
 // This function executes an external binary (oxipng) for additional PNG compression.
 // The command is safe because:
-//   1. All parameters are validated integers from controlled sources (level: 0-6)
-//   2. No user-supplied strings are passed as command arguments
-//   3. Input is passed via stdin (not file path), preventing path traversal
-//   4. Output is read from stdout (not file system), preventing file overwrites
-//   5. Graceful fallback: if oxipng fails, original buffer is returned
-//   6. Binary must be installed at system level (not user-controllable path)
+//  1. All parameters are validated integers from controlled sources (level: 0-6)
+//  2. No user-supplied strings are passed as command arguments
+//  3. Input is passed via stdin (not file path), preventing path traversal
+//  4. Output is read from stdout (not file system), preventing file overwrites
+//  5. Graceful fallback: if oxipng fails, original buffer is returned
+//  6. Binary must be installed at system level (not user-controllable path)
 //
 // Additional hardening recommendations:
 //   - Keep oxipng binary updated via package manager
@@ -532,12 +520,12 @@ func optimizePNGWithOxipng(inputBuffer []byte, level int) ([]byte, error) {
 // SECURITY: Command Execution Safety
 // This function executes an external binary (cjpeg from mozjpeg) for JPEG optimization.
 // The command is safe because:
-//   1. All parameters are validated integers from controlled sources (quality: 1-100)
-//   2. No user-supplied strings are passed as command arguments
-//   3. Input is passed via stdin (not file path), preventing path traversal
-//   4. Output is read from stdout (not file system), preventing file overwrites
-//   5. Graceful fallback: if cjpeg fails, original buffer is returned
-//   6. Binary must be installed at system level (not user-controllable path)
+//  1. All parameters are validated integers from controlled sources (quality: 1-100)
+//  2. No user-supplied strings are passed as command arguments
+//  3. Input is passed via stdin (not file path), preventing path traversal
+//  4. Output is read from stdout (not file system), preventing file overwrites
+//  5. Graceful fallback: if cjpeg fails, original buffer is returned
+//  6. Binary must be installed at system level (not user-controllable path)
 //
 // Additional hardening recommendations:
 //   - Keep mozjpeg binary updated via package manager

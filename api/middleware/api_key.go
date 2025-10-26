@@ -1,3 +1,4 @@
+// Package middleware provides HTTP middleware for the API.
 package middleware
 
 import (
@@ -18,9 +19,9 @@ type BypassRule struct {
 
 // APIKeyConfig holds API key authentication configuration
 type APIKeyConfig struct {
-	Enabled         bool          // Whether API key authentication is enabled
-	BypassRules     []BypassRule  // Rules that bypass API key authentication
-	TrustedOrigins  []string      // Origins/domains that can access without API keys
+	Enabled        bool         // Whether API key authentication is enabled
+	BypassRules    []BypassRule // Rules that bypass API key authentication
+	TrustedOrigins []string     // Origins/domains that can access without API keys
 }
 
 // GetAPIKeyConfig loads API key config from environment variables
@@ -50,9 +51,9 @@ func GetAPIKeyConfig() APIKeyConfig {
 	// Add optimization endpoints to bypass rules if public access is enabled
 	if publicOptEnabled {
 		config.BypassRules = append(config.BypassRules,
-			BypassRule{Path: "/optimize", Method: ""},            // Public image optimization
-			BypassRule{Path: "/batch-optimize", Method: ""},      // Public batch optimization
-			BypassRule{Path: "/pack-sprites", Method: ""},        // Public spritesheet packing
+			BypassRule{Path: "/optimize", Method: ""},             // Public image optimization
+			BypassRule{Path: "/batch-optimize", Method: ""},       // Public batch optimization
+			BypassRule{Path: "/pack-sprites", Method: ""},         // Public spritesheet packing
 			BypassRule{Path: "/optimize-spritesheet", Method: ""}, // Public spritesheet optimization
 		)
 	}
@@ -94,10 +95,6 @@ func matchesOrigin(origin, trusted string) bool {
 
 	// Handle subdomain wildcards (e.g., trusted="https://*.sosquishy.io")
 	if strings.Contains(trusted, "*") {
-		// Convert wildcard pattern to regex-like matching
-		// "https://*.sosquishy.io" should match "https://www.sosquishy.io", "https://api.sosquishy.io", etc.
-		pattern := strings.ReplaceAll(trusted, ".", "\\.")
-		pattern = strings.ReplaceAll(pattern, "*", ".*")
 		// Simple contains check for basic wildcard support
 		baseDomain := strings.TrimPrefix(trusted, "https://*.")
 		baseDomain = strings.TrimPrefix(baseDomain, "http://*.")

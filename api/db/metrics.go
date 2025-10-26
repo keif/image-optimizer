@@ -3,20 +3,21 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 )
 
 // MetricEvent represents a single optimization event to be recorded
 type MetricEvent struct {
-	Endpoint        string
-	Success         bool
-	InputFormat     string
-	OutputFormat    string
-	BytesOriginal   int64
-	BytesOptimized  int64
+	Endpoint         string
+	Success          bool
+	InputFormat      string
+	OutputFormat     string
+	BytesOriginal    int64
+	BytesOptimized   int64
 	ProcessingTimeMs int64
-	APIKeyID        *int
-	Timestamp       time.Time
+	APIKeyID         *int
+	Timestamp        time.Time
 }
 
 // MetricsSummary represents aggregated metrics
@@ -64,7 +65,11 @@ func RecordMetric(event MetricEvent) error {
 	if err != nil {
 		return fmt.Errorf("failed to start transaction: %w", err)
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
+			log.Printf("warning: failed to rollback transaction: %v", err)
+		}
+	}()
 
 	// Update metrics_hourly
 	if err := recordHourlyMetric(tx, hourBucket, event); err != nil {
@@ -251,7 +256,11 @@ func GetFormatConversions(startTime, endTime time.Time) ([]FormatConversion, err
 	if err != nil {
 		return nil, fmt.Errorf("failed to query format conversions: %w", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			log.Printf("warning: failed to close rows: %v", err)
+		}
+	}()
 
 	var conversions []FormatConversion
 	for rows.Next() {
@@ -325,7 +334,11 @@ func GetTimeSeriesData(startTime, endTime time.Time, interval string) ([]TimeSer
 	if err != nil {
 		return nil, fmt.Errorf("failed to query time series data: %w", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			log.Printf("warning: failed to close rows: %v", err)
+		}
+	}()
 
 	var dataPoints []TimeSeriesDataPoint
 	for rows.Next() {
@@ -366,7 +379,11 @@ func CleanupOldMetrics(retentionDays int) error {
 	if err != nil {
 		return fmt.Errorf("failed to start transaction: %w", err)
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
+			log.Printf("warning: failed to rollback transaction: %v", err)
+		}
+	}()
 
 	// Delete old hourly metrics
 	if _, err := tx.Exec("DELETE FROM metrics_hourly WHERE timestamp < ?", cutoffTime); err != nil {

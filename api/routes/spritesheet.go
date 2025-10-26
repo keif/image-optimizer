@@ -34,20 +34,20 @@ type ResizeInfo struct {
 
 // PackSpritesResponse represents the response for sprite packing
 type PackSpritesResponse struct {
-	Sheets       []string          `json:"sheets"`       // Base64-encoded PNG images
-	Metadata     []SheetMetadata   `json:"metadata"`     // Metadata for each sheet
-	OutputFiles  map[string]string `json:"outputFiles"`  // Format name -> file content
-	TotalSprites int               `json:"totalSprites"`
-	ResizedSprites []ResizeInfo    `json:"resizedSprites,omitempty"` // Info about auto-resized sprites
+	Sheets         []string          `json:"sheets"`      // Base64-encoded PNG images
+	Metadata       []SheetMetadata   `json:"metadata"`    // Metadata for each sheet
+	OutputFiles    map[string]string `json:"outputFiles"` // Format name -> file content
+	TotalSprites   int               `json:"totalSprites"`
+	ResizedSprites []ResizeInfo      `json:"resizedSprites,omitempty"` // Info about auto-resized sprites
 }
 
 // SheetMetadata contains information about a packed sheet
 type SheetMetadata struct {
-	Index      int     `json:"index"`
-	Width      int     `json:"width"`
-	Height     int     `json:"height"`
-	SpriteCount int    `json:"spriteCount"`
-	Efficiency float64 `json:"efficiency"`
+	Index       int     `json:"index"`
+	Width       int     `json:"width"`
+	Height      int     `json:"height"`
+	SpriteCount int     `json:"spriteCount"`
+	Efficiency  float64 `json:"efficiency"`
 }
 
 // SetupSpritesheetRoutes registers spritesheet-related routes
@@ -135,7 +135,7 @@ func PackSprites(c *fiber.Ctx) error {
 				"error": fmt.Sprintf("Failed to open file %s: %v", fileHeader.Filename, err),
 			})
 		}
-		defer file.Close()
+		defer func() { _ = file.Close() }()
 
 		// Read file data
 		data, err := io.ReadAll(file)
@@ -443,7 +443,7 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 			"error": "Failed to open spritesheet file",
 		})
 	}
-	defer sheetFile.Close()
+	defer func() { _ = sheetFile.Close() }()
 
 	sheetData, err := io.ReadAll(sheetFile)
 	if err != nil {
@@ -476,7 +476,7 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 			"error": "Failed to open XML file",
 		})
 	}
-	defer xmlFile.Close()
+	defer func() { _ = xmlFile.Close() }()
 
 	xmlData, err := io.ReadAll(xmlFile)
 	if err != nil {
@@ -554,11 +554,11 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 	}
 
 	response := fiber.Map{
-		"sheets":         base64Sheets,
-		"metadata":       metadata,
-		"outputFiles":    outputFiles,
-		"totalSprites":   result.TotalSprites,
-		"originalCount":  originalCount,
+		"sheets":            base64Sheets,
+		"metadata":          metadata,
+		"outputFiles":       outputFiles,
+		"totalSprites":      result.TotalSprites,
+		"originalCount":     originalCount,
 		"duplicatesRemoved": originalCount - len(sprites),
 	}
 

@@ -52,19 +52,19 @@ type PackingOptions struct {
 
 // Spritesheet represents the packed result
 type Spritesheet struct {
-	Width      int            // Final sheet width
-	Height     int            // Final sheet height
-	Sprites    []PackedSprite // Packed sprites with positions
-	Image      image.Image    // The composite image
-	ImageBuffer []byte        // PNG-encoded image buffer
-	Efficiency float64        // Packing efficiency (0-1)
+	Width       int            // Final sheet width
+	Height      int            // Final sheet height
+	Sprites     []PackedSprite // Packed sprites with positions
+	Image       image.Image    // The composite image
+	ImageBuffer []byte         // PNG-encoded image buffer
+	Efficiency  float64        // Packing efficiency (0-1)
 }
 
 // PackingResult contains the spritesheet and all requested output formats
 type PackingResult struct {
-	Sheets     []Spritesheet     // One or more sheets (if split)
-	Formats    map[string][]byte // Output format data (json, css, csv, xml)
-	TotalSprites int             // Total number of sprites packed
+	Sheets       []Spritesheet     // One or more sheets (if split)
+	Formats      map[string][]byte // Output format data (json, css, csv, xml)
+	TotalSprites int               // Total number of sprites packed
 }
 
 // Rectangle represents a rectangular area for packing
@@ -77,11 +77,11 @@ type Rectangle struct {
 
 // MaxRectsPacker implements the MaxRects bin packing algorithm
 type MaxRectsPacker struct {
-	Width       int
-	Height      int
-	FreeRects   []Rectangle
-	UsedRects   []Rectangle
-	Padding     int
+	Width     int
+	Height    int
+	FreeRects []Rectangle
+	UsedRects []Rectangle
+	Padding   int
 }
 
 // NewMaxRectsPacker creates a new MaxRects packer
@@ -112,8 +112,8 @@ func (p *MaxRectsPacker) Insert(width, height int) (Rectangle, bool) {
 		if rect.Width >= paddedWidth && rect.Height >= paddedHeight {
 			leftoverHoriz := rect.Width - paddedWidth
 			leftoverVert := rect.Height - paddedHeight
-			shortSideFit := min(leftoverHoriz, leftoverVert)
-			longSideFit := max(leftoverHoriz, leftoverVert)
+			shortSideFit := minInt(leftoverHoriz, leftoverVert)
+			longSideFit := maxInt(leftoverHoriz, leftoverVert)
 
 			if shortSideFit < bestShortSideFit || (shortSideFit == bestShortSideFit && longSideFit < bestLongSideFit) {
 				bestRect = Rectangle{
@@ -234,8 +234,8 @@ func (p *MaxRectsPacker) pruneFreeRectangles() {
 
 // rectanglesIntersect checks if two rectangles intersect
 func (p *MaxRectsPacker) rectanglesIntersect(a, b Rectangle) bool {
-	return !(a.X >= b.X+b.Width || a.X+a.Width <= b.X ||
-		a.Y >= b.Y+b.Height || a.Y+a.Height <= b.Y)
+	return a.X < b.X+b.Width && a.X+a.Width > b.X &&
+		a.Y < b.Y+b.Height && a.Y+a.Height > b.Y
 }
 
 // rectangleContains checks if rectangle a contains rectangle b
@@ -245,14 +245,14 @@ func (p *MaxRectsPacker) rectangleContains(a, b Rectangle) bool {
 }
 
 // Helper functions
-func min(a, b int) int {
+func minInt(a, b int) int {
 	if a < b {
 		return a
 	}
 	return b
 }
 
-func max(a, b int) int {
+func maxInt(a, b int) int {
 	if a > b {
 		return a
 	}
@@ -618,7 +618,7 @@ func generateOutputFormat(sheets []Spritesheet, format string, nameMapping map[s
 }
 
 // JSON output format
-func generateJSON(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
+func generateJSON(sheets []Spritesheet, _ map[string]string) ([]byte, error) {
 	type JSONSprite struct {
 		Name   string `json:"name"`
 		X      int    `json:"x"`
@@ -630,7 +630,7 @@ func generateJSON(sheets []Spritesheet, nameMapping map[string]string) ([]byte, 
 
 	type JSONOutput struct {
 		Sheets  []map[string]interface{} `json:"sheets"`
-		Sprites []JSONSprite              `json:"sprites"`
+		Sprites []JSONSprite             `json:"sprites"`
 	}
 
 	output := JSONOutput{
@@ -662,7 +662,7 @@ func generateJSON(sheets []Spritesheet, nameMapping map[string]string) ([]byte, 
 }
 
 // CSS output format
-func generateCSS(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
+func generateCSS(sheets []Spritesheet, _ map[string]string) ([]byte, error) {
 	var buf bytes.Buffer
 
 	for sheetIdx, sheet := range sheets {
@@ -688,16 +688,16 @@ func generateCSS(sheets []Spritesheet, nameMapping map[string]string) ([]byte, e
 }
 
 // CSV output format
-func generateCSV(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
+func generateCSV(sheets []Spritesheet, _ map[string]string) ([]byte, error) {
 	var buf bytes.Buffer
 	writer := csv.NewWriter(&buf)
 
 	// Header
-	writer.Write([]string{"name", "sheet", "x", "y", "width", "height"})
+	_ = writer.Write([]string{"name", "sheet", "x", "y", "width", "height"})
 
 	for sheetIdx, sheet := range sheets {
 		for _, sprite := range sheet.Sprites {
-			writer.Write([]string{
+			_ = writer.Write([]string{
 				sprite.Name,
 				fmt.Sprintf("%d", sheetIdx),
 				fmt.Sprintf("%d", sprite.X),
@@ -713,7 +713,7 @@ func generateCSV(sheets []Spritesheet, nameMapping map[string]string) ([]byte, e
 }
 
 // XML output format
-func generateXML(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
+func generateXML(sheets []Spritesheet, _ map[string]string) ([]byte, error) {
 	type XMLSprite struct {
 		Name   string `xml:"name,attr"`
 		X      int    `xml:"x,attr"`
@@ -723,11 +723,11 @@ func generateXML(sheets []Spritesheet, nameMapping map[string]string) ([]byte, e
 	}
 
 	type XMLSheet struct {
-		Index      int          `xml:"index,attr"`
-		Width      int          `xml:"width,attr"`
-		Height     int          `xml:"height,attr"`
-		Efficiency float64      `xml:"efficiency,attr"`
-		Sprites    []XMLSprite  `xml:"sprite"`
+		Index      int         `xml:"index,attr"`
+		Width      int         `xml:"width,attr"`
+		Height     int         `xml:"height,attr"`
+		Efficiency float64     `xml:"efficiency,attr"`
+		Sprites    []XMLSprite `xml:"sprite"`
 	}
 
 	type XMLOutput struct {
@@ -763,7 +763,7 @@ func generateXML(sheets []Spritesheet, nameMapping map[string]string) ([]byte, e
 }
 
 // Unity output format (TexturePackerJSONArray format)
-func generateUnity(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
+func generateUnity(sheets []Spritesheet, _ map[string]string) ([]byte, error) {
 	type UnityFrame struct {
 		Filename string `json:"filename"`
 		Frame    struct {
@@ -781,8 +781,8 @@ func generateUnity(sheets []Spritesheet, nameMapping map[string]string) ([]byte,
 	type UnityOutput struct {
 		Frames []UnityFrame `json:"frames"`
 		Meta   struct {
-			Image  string `json:"image"`
-			Size   struct {
+			Image string `json:"image"`
+			Size  struct {
 				W int `json:"w"`
 				H int `json:"h"`
 			} `json:"size"`
@@ -820,11 +820,11 @@ func generateUnity(sheets []Spritesheet, nameMapping map[string]string) ([]byte,
 }
 
 // Godot output format (.tres resource file)
-func generateGodot(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
+func generateGodot(sheets []Spritesheet, _ map[string]string) ([]byte, error) {
 	var buf bytes.Buffer
 
 	for sheetIdx, sheet := range sheets {
-		buf.WriteString(fmt.Sprintf("[gd_resource type=\"AtlasTexture\" format=2]\n\n"))
+		buf.WriteString("[gd_resource type=\"AtlasTexture\" format=2]\n\n")
 		buf.WriteString(fmt.Sprintf("[ext_resource path=\"res://spritesheet-%d.png\" type=\"Texture\" id=1]\n\n", sheetIdx))
 
 		for i, sprite := range sheet.Sprites {
@@ -841,15 +841,15 @@ func generateGodot(sheets []Spritesheet, nameMapping map[string]string) ([]byte,
 // Sparrow/Starling XML format (used by HaxeFlixel, Friday Night Funkin', etc.)
 func generateSparrow(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
 	type SparrowSprite struct {
-		Name        string  `xml:"name,attr"`
-		X           int     `xml:"x,attr"`
-		Y           int     `xml:"y,attr"`
-		Width       int     `xml:"width,attr"`
-		Height      int     `xml:"height,attr"`
-		FrameX      int     `xml:"frameX,attr,omitempty"`
-		FrameY      int     `xml:"frameY,attr,omitempty"`
-		FrameWidth  int     `xml:"frameWidth,attr,omitempty"`
-		FrameHeight int     `xml:"frameHeight,attr,omitempty"`
+		Name        string `xml:"name,attr"`
+		X           int    `xml:"x,attr"`
+		Y           int    `xml:"y,attr"`
+		Width       int    `xml:"width,attr"`
+		Height      int    `xml:"height,attr"`
+		FrameX      int    `xml:"frameX,attr,omitempty"`
+		FrameY      int    `xml:"frameY,attr,omitempty"`
+		FrameWidth  int    `xml:"frameWidth,attr,omitempty"`
+		FrameHeight int    `xml:"frameHeight,attr,omitempty"`
 	}
 
 	type SparrowAtlas struct {
@@ -871,10 +871,8 @@ func generateSparrow(sheets []Spritesheet, nameMapping map[string]string) ([]byt
 
 	// Create reverse mapping: canonical name -> list of all names (including duplicates)
 	reverseMapping := make(map[string][]string)
-	if nameMapping != nil {
-		for originalName, canonicalName := range nameMapping {
-			reverseMapping[canonicalName] = append(reverseMapping[canonicalName], originalName)
-		}
+	for originalName, canonicalName := range nameMapping {
+		reverseMapping[canonicalName] = append(reverseMapping[canonicalName], originalName)
 	}
 
 	for _, sprite := range sheet.Sprites {
@@ -911,17 +909,17 @@ func generateSparrow(sheets []Spritesheet, nameMapping map[string]string) ([]byt
 }
 
 // TexturePacker Generic XML format
-func generateTexturePacker(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
+func generateTexturePacker(sheets []Spritesheet, _ map[string]string) ([]byte, error) {
 	type TPSprite struct {
-		Name     string `xml:"n,attr"`
-		X        int    `xml:"x,attr"`
-		Y        int    `xml:"y,attr"`
-		Width    int    `xml:"w,attr"`
-		Height   int    `xml:"h,attr"`
-		OffsetX  int    `xml:"oX,attr,omitempty"`
-		OffsetY  int    `xml:"oY,attr,omitempty"`
-		OriginalW int   `xml:"oW,attr,omitempty"`
-		OriginalH int   `xml:"oH,attr,omitempty"`
+		Name      string `xml:"n,attr"`
+		X         int    `xml:"x,attr"`
+		Y         int    `xml:"y,attr"`
+		Width     int    `xml:"w,attr"`
+		Height    int    `xml:"h,attr"`
+		OffsetX   int    `xml:"oX,attr,omitempty"`
+		OffsetY   int    `xml:"oY,attr,omitempty"`
+		OriginalW int    `xml:"oW,attr,omitempty"`
+		OriginalH int    `xml:"oH,attr,omitempty"`
 	}
 
 	type TPAtlas struct {
@@ -969,7 +967,7 @@ func generateTexturePacker(sheets []Spritesheet, nameMapping map[string]string) 
 }
 
 // Cocos2d plist format (Apple Property List XML)
-func generateCocos2d(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
+func generateCocos2d(sheets []Spritesheet, _ map[string]string) ([]byte, error) {
 	var buf bytes.Buffer
 
 	buf.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
@@ -1075,6 +1073,7 @@ func ParseSparrowXML(xmlData []byte) ([]FrameData, error) {
 
 	frames := make([]FrameData, len(atlas.SubTextures))
 	for i, st := range atlas.SubTextures {
+		//nolint:staticcheck // Cannot convert SubTexture to FrameData due to XML tags
 		frames[i] = FrameData{
 			Name:        st.Name,
 			X:           st.X,
@@ -1176,12 +1175,4 @@ func bytesEqual(a, b []byte) bool {
 		}
 	}
 	return true
-}
-
-// minInt returns the minimum of two integers
-func minInt(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }

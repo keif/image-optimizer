@@ -34,7 +34,7 @@ func TestDecompressionBombProtection(t *testing.T) {
 		_, err = part.Write(testImage)
 		assert.NoError(t, err)
 
-		writer.Close()
+		_ = writer.Close()
 
 		req := httptest.NewRequest("POST", "/optimize", body)
 		req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -45,7 +45,7 @@ func TestDecompressionBombProtection(t *testing.T) {
 		// For now, this will pass because our 100x100 test image doesn't trigger it
 		// In a real scenario with actual huge image data, we'd get 400
 		assert.True(t, resp.StatusCode == 200 || resp.StatusCode == 400)
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 	})
 
 	t.Run("Accept image within size limits", func(t *testing.T) {
@@ -65,7 +65,7 @@ func TestDecompressionBombProtection(t *testing.T) {
 		_, err = part.Write(testImage)
 		assert.NoError(t, err)
 
-		writer.Close()
+		_ = writer.Close()
 
 		req := httptest.NewRequest("POST", "/optimize", body)
 		req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -73,7 +73,7 @@ func TestDecompressionBombProtection(t *testing.T) {
 		resp, err := app.Test(req)
 		assert.NoError(t, err)
 		assert.Equal(t, 200, resp.StatusCode)
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 	})
 }
 
@@ -81,11 +81,11 @@ func TestDecompressionBombProtection(t *testing.T) {
 func TestSSRFProtection(t *testing.T) {
 	// Ensure clean environment - explicitly set to defaults
 	// This prevents pollution from other tests that modify ALLOWED_DOMAINS
-	os.Setenv("ALLOWED_DOMAINS", "cloudinary.com,imgur.com,unsplash.com,pexels.com")
-	os.Unsetenv("ALLOW_PRIVATE_IPS")
+	_ = os.Setenv("ALLOWED_DOMAINS", "cloudinary.com,imgur.com,unsplash.com,pexels.com")
+	_ = os.Unsetenv("ALLOW_PRIVATE_IPS")
 	defer func() {
-		os.Unsetenv("ALLOWED_DOMAINS")
-		os.Unsetenv("ALLOW_PRIVATE_IPS")
+		_ = os.Unsetenv("ALLOWED_DOMAINS")
+		_ = os.Unsetenv("ALLOW_PRIVATE_IPS")
 	}()
 
 	app := fiber.New()
@@ -155,7 +155,7 @@ func TestSSRFProtection(t *testing.T) {
 			err := writer.WriteField("url", tc.url)
 			assert.NoError(t, err)
 
-			writer.Close()
+			_ = writer.Close()
 
 			req := httptest.NewRequest("POST", "/optimize", body)
 			req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -164,7 +164,7 @@ func TestSSRFProtection(t *testing.T) {
 			assert.NoError(t, err)
 
 			assert.Equal(t, tc.expectedStatus, resp.StatusCode, tc.description)
-			defer resp.Body.Close()
+			defer func() { _ = resp.Body.Close() }()
 		})
 	}
 }
@@ -173,11 +173,11 @@ func TestSSRFProtection(t *testing.T) {
 func TestDomainWhitelistEdgeCases(t *testing.T) {
 	// Ensure clean environment - explicitly set to defaults
 	// This prevents pollution from other tests that modify ALLOWED_DOMAINS
-	os.Setenv("ALLOWED_DOMAINS", "cloudinary.com,imgur.com,unsplash.com,pexels.com")
-	os.Unsetenv("ALLOW_PRIVATE_IPS")
+	_ = os.Setenv("ALLOWED_DOMAINS", "cloudinary.com,imgur.com,unsplash.com,pexels.com")
+	_ = os.Unsetenv("ALLOW_PRIVATE_IPS")
 	defer func() {
-		os.Unsetenv("ALLOWED_DOMAINS")
-		os.Unsetenv("ALLOW_PRIVATE_IPS")
+		_ = os.Unsetenv("ALLOWED_DOMAINS")
+		_ = os.Unsetenv("ALLOW_PRIVATE_IPS")
 	}()
 
 	app := fiber.New()
@@ -217,7 +217,7 @@ func TestDomainWhitelistEdgeCases(t *testing.T) {
 			err := writer.WriteField("url", tc.url)
 			assert.NoError(t, err)
 
-			writer.Close()
+			_ = writer.Close()
 
 			req := httptest.NewRequest("POST", "/optimize", body)
 			req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -226,7 +226,7 @@ func TestDomainWhitelistEdgeCases(t *testing.T) {
 			assert.NoError(t, err)
 
 			assert.Equal(t, tc.expectedStatus, resp.StatusCode, tc.description)
-			defer resp.Body.Close()
+			defer func() { _ = resp.Body.Close() }()
 		})
 	}
 }
@@ -253,7 +253,7 @@ func TestFileSizeLimits(t *testing.T) {
 		_, err = part.Write(largeData)
 		assert.NoError(t, err)
 
-		writer.Close()
+		_ = writer.Close()
 
 		req := httptest.NewRequest("POST", "/optimize", body)
 		req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -264,7 +264,7 @@ func TestFileSizeLimits(t *testing.T) {
 		// Should return 413 (Request Entity Too Large) or 400 (Bad Request)
 		assert.True(t, resp.StatusCode == 413 || resp.StatusCode == 400,
 			"Expected status 413 or 400 for oversized file, got %d", resp.StatusCode)
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 	})
 
 	t.Run("Accept file within size limit", func(t *testing.T) {
@@ -284,7 +284,7 @@ func TestFileSizeLimits(t *testing.T) {
 		_, err = part.Write(testImage)
 		assert.NoError(t, err)
 
-		writer.Close()
+		_ = writer.Close()
 
 		req := httptest.NewRequest("POST", "/optimize", body)
 		req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -292,7 +292,7 @@ func TestFileSizeLimits(t *testing.T) {
 		resp, err := app.Test(req)
 		assert.NoError(t, err)
 		assert.Equal(t, 200, resp.StatusCode)
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 	})
 }
 
@@ -302,8 +302,8 @@ func TestInputValidation(t *testing.T) {
 	RegisterOptimizeRoutes(app)
 
 	testCases := []struct {
-		name          string
-		setupRequest  func() (*http.Request, func())
+		name           string
+		setupRequest   func() (*http.Request, func())
 		expectedStatus int
 	}{
 		{
@@ -311,7 +311,7 @@ func TestInputValidation(t *testing.T) {
 			setupRequest: func() (*http.Request, func()) {
 				body := &bytes.Buffer{}
 				writer := multipart.NewWriter(body)
-				writer.Close()
+				_ = writer.Close()
 
 				req := httptest.NewRequest("POST", "/optimize", body)
 				req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -328,8 +328,8 @@ func TestInputValidation(t *testing.T) {
 				writer := multipart.NewWriter(body)
 
 				part, _ := writer.CreateFormFile("image", "test.jpg")
-				part.Write(testImage)
-				writer.Close()
+				_, _ = part.Write(testImage)
+				_ = writer.Close()
 
 				req := httptest.NewRequest("POST", "/optimize?quality=0", body)
 				req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -346,8 +346,8 @@ func TestInputValidation(t *testing.T) {
 				writer := multipart.NewWriter(body)
 
 				part, _ := writer.CreateFormFile("image", "test.jpg")
-				part.Write(testImage)
-				writer.Close()
+				_, _ = part.Write(testImage)
+				_ = writer.Close()
 
 				req := httptest.NewRequest("POST", "/optimize?quality=101", body)
 				req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -364,8 +364,8 @@ func TestInputValidation(t *testing.T) {
 				writer := multipart.NewWriter(body)
 
 				part, _ := writer.CreateFormFile("image", "test.jpg")
-				part.Write(testImage)
-				writer.Close()
+				_, _ = part.Write(testImage)
+				_ = writer.Close()
 
 				req := httptest.NewRequest("POST", "/optimize?format=bmp", body)
 				req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -382,8 +382,8 @@ func TestInputValidation(t *testing.T) {
 				writer := multipart.NewWriter(body)
 
 				part, _ := writer.CreateFormFile("image", "test.jpg")
-				part.Write(testImage)
-				writer.Close()
+				_, _ = part.Write(testImage)
+				_ = writer.Close()
 
 				req := httptest.NewRequest("POST", "/optimize?width=-100", body)
 				req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -401,7 +401,7 @@ func TestInputValidation(t *testing.T) {
 			resp, err := app.Test(req)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedStatus, resp.StatusCode)
-			defer resp.Body.Close()
+			defer func() { _ = resp.Body.Close() }()
 		})
 	}
 }
@@ -410,10 +410,10 @@ func TestInputValidation(t *testing.T) {
 func createTestImage(t *testing.T, width, height int, format bimg.ImageType) []byte {
 	// Use bimg to create a properly sized image
 	options := bimg.Options{
-		Width:  width,
-		Height: height,
-		Type:   format,
-		Extend: bimg.ExtendBackground,
+		Width:      width,
+		Height:     height,
+		Type:       format,
+		Extend:     bimg.ExtendBackground,
 		Background: bimg.Color{R: 255, G: 255, B: 255},
 	}
 
@@ -441,11 +441,4 @@ func createTestImage(t *testing.T, width, height int, format bimg.ImageType) []b
 	}
 
 	return result
-}
-
-// mockHTTPServer creates a simple HTTP server for testing URL fetching
-func mockHTTPServer(t *testing.T, responseCode int, responseBody []byte) (string, func()) {
-	// This is a placeholder - in real tests, you'd use httptest.NewServer
-	// For now, return dummy values
-	return "http://test.example.com/image.jpg", func() {}
 }

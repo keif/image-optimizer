@@ -14,7 +14,9 @@ import (
 // setupTestApp creates a test Fiber app with API key middleware
 func setupTestApp(t *testing.T) (*fiber.App, string) {
 	// Initialize database for testing
-	os.Setenv("DB_PATH", ":memory:")
+	if err := os.Setenv("DB_PATH", ":memory:"); err != nil {
+		t.Fatalf("Failed to set DB_PATH: %v", err)
+	}
 	if err := db.Initialize(); err != nil {
 		t.Fatalf("Failed to initialize test database: %v", err)
 	}
@@ -26,7 +28,9 @@ func setupTestApp(t *testing.T) (*fiber.App, string) {
 	}
 
 	// Enable API key authentication for testing
-	os.Setenv("API_KEY_AUTH_ENABLED", "true")
+	if err := os.Setenv("API_KEY_AUTH_ENABLED", "true"); err != nil {
+		t.Fatalf("Failed to set API_KEY_AUTH_ENABLED: %v", err)
+	}
 
 	app := fiber.New()
 	app.Use(RequireAPIKey())
@@ -58,7 +62,7 @@ func setupTestApp(t *testing.T) (*fiber.App, string) {
 // TestAPIKeyMiddleware_BypassRules tests method-specific bypass rules
 func TestAPIKeyMiddleware_BypassRules(t *testing.T) {
 	app, validAPIKey := setupTestApp(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	tests := []struct {
 		name           string
@@ -142,7 +146,7 @@ func TestAPIKeyMiddleware_BypassRules(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Request failed: %v", err)
 			}
-			defer resp.Body.Close()
+			defer func() { _ = resp.Body.Close() }()
 
 			if resp.StatusCode != tt.expectedStatus {
 				body, _ := io.ReadAll(resp.Body)
@@ -156,7 +160,7 @@ func TestAPIKeyMiddleware_BypassRules(t *testing.T) {
 // TestAPIKeyMiddleware_InvalidKey tests that invalid keys are rejected
 func TestAPIKeyMiddleware_InvalidKey(t *testing.T) {
 	app, _ := setupTestApp(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	req := httptest.NewRequest("GET", "/api/keys", nil)
 	req.Header.Set("Authorization", "Bearer sk_invalid_key_12345")
@@ -165,7 +169,7 @@ func TestAPIKeyMiddleware_InvalidKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Request failed: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != 401 {
 		t.Errorf("Expected status 401 for invalid API key, got %d", resp.StatusCode)
@@ -180,7 +184,7 @@ func TestAPIKeyMiddleware_InvalidKey(t *testing.T) {
 // TestAPIKeyMiddleware_RevokedKey tests that revoked keys are rejected
 func TestAPIKeyMiddleware_RevokedKey(t *testing.T) {
 	app, validAPIKey := setupTestApp(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	// Revoke the key
 	if err := db.RevokeAPIKey(1); err != nil {
@@ -194,7 +198,7 @@ func TestAPIKeyMiddleware_RevokedKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Request failed: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != 401 {
 		t.Errorf("Expected status 401 for revoked API key, got %d", resp.StatusCode)
@@ -209,7 +213,7 @@ func TestAPIKeyMiddleware_RevokedKey(t *testing.T) {
 // TestAPIKeyMiddleware_BearerAndDirectFormat tests both auth header formats
 func TestAPIKeyMiddleware_BearerAndDirectFormat(t *testing.T) {
 	app, validAPIKey := setupTestApp(t)
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	tests := []struct {
 		name      string
@@ -228,7 +232,7 @@ func TestAPIKeyMiddleware_BearerAndDirectFormat(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Request failed: %v", err)
 			}
-			defer resp.Body.Close()
+			defer func() { _ = resp.Body.Close() }()
 
 			if resp.StatusCode != 200 {
 				body, _ := io.ReadAll(resp.Body)
@@ -242,14 +246,18 @@ func TestAPIKeyMiddleware_BearerAndDirectFormat(t *testing.T) {
 // TestAPIKeyMiddleware_Disabled tests that middleware can be disabled
 func TestAPIKeyMiddleware_Disabled(t *testing.T) {
 	// Disable API key authentication
-	os.Setenv("API_KEY_AUTH_ENABLED", "false")
-	defer os.Setenv("API_KEY_AUTH_ENABLED", "true")
+	if err := os.Setenv("API_KEY_AUTH_ENABLED", "false"); err != nil {
+		t.Fatalf("Failed to set API_KEY_AUTH_ENABLED: %v", err)
+	}
+	defer func() { _ = os.Setenv("API_KEY_AUTH_ENABLED", "true") }()
 
-	os.Setenv("DB_PATH", ":memory:")
+	if err := os.Setenv("DB_PATH", ":memory:"); err != nil {
+		t.Fatalf("Failed to set DB_PATH: %v", err)
+	}
 	if err := db.Initialize(); err != nil {
 		t.Fatalf("Failed to initialize test database: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	app := fiber.New()
 	app.Use(RequireAPIKey())
@@ -264,7 +272,7 @@ func TestAPIKeyMiddleware_Disabled(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Request failed: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != 200 {
 		t.Errorf("Expected status 200 when auth is disabled, got %d", resp.StatusCode)
@@ -274,16 +282,22 @@ func TestAPIKeyMiddleware_Disabled(t *testing.T) {
 // TestAPIKeyMiddleware_PublicOptimizationEnabled tests PUBLIC_OPTIMIZATION_ENABLED
 func TestAPIKeyMiddleware_PublicOptimizationEnabled(t *testing.T) {
 	// Enable public optimization mode
-	os.Setenv("PUBLIC_OPTIMIZATION_ENABLED", "true")
-	os.Setenv("API_KEY_AUTH_ENABLED", "true")
-	defer os.Unsetenv("PUBLIC_OPTIMIZATION_ENABLED")
-	defer os.Unsetenv("API_KEY_AUTH_ENABLED")
+	if err := os.Setenv("PUBLIC_OPTIMIZATION_ENABLED", "true"); err != nil {
+		t.Fatalf("Failed to set PUBLIC_OPTIMIZATION_ENABLED: %v", err)
+	}
+	if err := os.Setenv("API_KEY_AUTH_ENABLED", "true"); err != nil {
+		t.Fatalf("Failed to set API_KEY_AUTH_ENABLED: %v", err)
+	}
+	defer func() { _ = os.Unsetenv("PUBLIC_OPTIMIZATION_ENABLED") }()
+	defer func() { _ = os.Unsetenv("API_KEY_AUTH_ENABLED") }()
 
-	os.Setenv("DB_PATH", ":memory:")
+	if err := os.Setenv("DB_PATH", ":memory:"); err != nil {
+		t.Fatalf("Failed to set DB_PATH: %v", err)
+	}
 	if err := db.Initialize(); err != nil {
 		t.Fatalf("Failed to initialize test database: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	app := fiber.New()
 	app.Use(RequireAPIKey())
@@ -320,7 +334,7 @@ func TestAPIKeyMiddleware_PublicOptimizationEnabled(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Request failed: %v", err)
 			}
-			defer resp.Body.Close()
+			defer func() { _ = resp.Body.Close() }()
 
 			if resp.StatusCode != tt.expectedStatus {
 				body, _ := io.ReadAll(resp.Body)
@@ -334,16 +348,22 @@ func TestAPIKeyMiddleware_PublicOptimizationEnabled(t *testing.T) {
 // TestAPIKeyMiddleware_TrustedOrigins tests origin-based bypass
 func TestAPIKeyMiddleware_TrustedOrigins(t *testing.T) {
 	// Set trusted origins
-	os.Setenv("TRUSTED_ORIGINS", "https://sosquishy.io,https://www.sosquishy.io,http://localhost:3000")
-	os.Setenv("API_KEY_AUTH_ENABLED", "true")
-	defer os.Unsetenv("TRUSTED_ORIGINS")
-	defer os.Unsetenv("API_KEY_AUTH_ENABLED")
+	if err := os.Setenv("TRUSTED_ORIGINS", "https://sosquishy.io,https://www.sosquishy.io,http://localhost:3000"); err != nil {
+		t.Fatalf("Failed to set TRUSTED_ORIGINS: %v", err)
+	}
+	if err := os.Setenv("API_KEY_AUTH_ENABLED", "true"); err != nil {
+		t.Fatalf("Failed to set API_KEY_AUTH_ENABLED: %v", err)
+	}
+	defer func() { _ = os.Unsetenv("TRUSTED_ORIGINS") }()
+	defer func() { _ = os.Unsetenv("API_KEY_AUTH_ENABLED") }()
 
-	os.Setenv("DB_PATH", ":memory:")
+	if err := os.Setenv("DB_PATH", ":memory:"); err != nil {
+		t.Fatalf("Failed to set DB_PATH: %v", err)
+	}
 	if err := db.Initialize(); err != nil {
 		t.Fatalf("Failed to initialize test database: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	app := fiber.New()
 	app.Use(RequireAPIKey())
@@ -438,7 +458,7 @@ func TestAPIKeyMiddleware_TrustedOrigins(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Request failed: %v", err)
 			}
-			defer resp.Body.Close()
+			defer func() { _ = resp.Body.Close() }()
 
 			if resp.StatusCode != tt.expectedStatus {
 				body, _ := io.ReadAll(resp.Body)
@@ -452,16 +472,22 @@ func TestAPIKeyMiddleware_TrustedOrigins(t *testing.T) {
 // TestAPIKeyMiddleware_WildcardOrigins tests wildcard subdomain support
 func TestAPIKeyMiddleware_WildcardOrigins(t *testing.T) {
 	// Set trusted origins with wildcard
-	os.Setenv("TRUSTED_ORIGINS", "https://*.sosquishy.io")
-	os.Setenv("API_KEY_AUTH_ENABLED", "true")
-	defer os.Unsetenv("TRUSTED_ORIGINS")
-	defer os.Unsetenv("API_KEY_AUTH_ENABLED")
+	if err := os.Setenv("TRUSTED_ORIGINS", "https://*.sosquishy.io"); err != nil {
+		t.Fatalf("Failed to set TRUSTED_ORIGINS: %v", err)
+	}
+	if err := os.Setenv("API_KEY_AUTH_ENABLED", "true"); err != nil {
+		t.Fatalf("Failed to set API_KEY_AUTH_ENABLED: %v", err)
+	}
+	defer func() { _ = os.Unsetenv("TRUSTED_ORIGINS") }()
+	defer func() { _ = os.Unsetenv("API_KEY_AUTH_ENABLED") }()
 
-	os.Setenv("DB_PATH", ":memory:")
+	if err := os.Setenv("DB_PATH", ":memory:"); err != nil {
+		t.Fatalf("Failed to set DB_PATH: %v", err)
+	}
 	if err := db.Initialize(); err != nil {
 		t.Fatalf("Failed to initialize test database: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	app := fiber.New()
 	app.Use(RequireAPIKey())
@@ -523,7 +549,7 @@ func TestAPIKeyMiddleware_WildcardOrigins(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Request failed: %v", err)
 			}
-			defer resp.Body.Close()
+			defer func() { _ = resp.Body.Close() }()
 
 			if resp.StatusCode != tt.expectedStatus {
 				body, _ := io.ReadAll(resp.Body)

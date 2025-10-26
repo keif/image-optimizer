@@ -20,15 +20,15 @@ type RateLimitConfig struct {
 // GetRateLimitConfig loads rate limit configuration from environment variables
 func GetRateLimitConfig() RateLimitConfig {
 	config := RateLimitConfig{
-		Max:        100,              // Default: 100 requests
-		Expiration: 1 * time.Minute,  // Default: per minute
-		Enabled:    true,             // Default: enabled
+		Max:        100,             // Default: 100 requests
+		Expiration: 1 * time.Minute, // Default: per minute
+		Enabled:    true,            // Default: enabled
 	}
 
 	// Load from environment
 	if maxStr := os.Getenv("RATE_LIMIT_MAX"); maxStr != "" {
-		if max, err := strconv.Atoi(maxStr); err == nil && max > 0 {
-			config.Max = max
+		if maxReqs, err := strconv.Atoi(maxStr); err == nil && maxReqs > 0 {
+			config.Max = maxReqs
 		}
 	}
 

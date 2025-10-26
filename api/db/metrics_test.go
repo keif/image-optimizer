@@ -16,7 +16,9 @@ func setupTestDB(t *testing.T) func() {
 	dbPath := filepath.Join(tmpDir, "test_metrics.db")
 
 	// Set the DB_PATH environment variable
-	os.Setenv("DB_PATH", dbPath)
+	if err := os.Setenv("DB_PATH", dbPath); err != nil {
+		t.Fatalf("Failed to set DB_PATH: %v", err)
+	}
 
 	// Initialize the database
 	if err := Initialize(); err != nil {
@@ -25,8 +27,8 @@ func setupTestDB(t *testing.T) func() {
 
 	// Return cleanup function
 	return func() {
-		Close()
-		os.Remove(dbPath)
+		_ = Close()
+		_ = os.Remove(dbPath)
 	}
 }
 

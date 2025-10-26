@@ -23,9 +23,9 @@ import (
 
 // Security configuration
 const (
-	maxImageSize      = 10 << 20        // 10 MB
-	fetchTimeout      = 10 * time.Second // 10 seconds
-	maxDecodedPixels  = 121_000_000     // 121 megapixels (11000x11000) - protection against decompression bombs
+	maxImageSize     = 10 << 20         // 10 MB
+	fetchTimeout     = 10 * time.Second // 10 seconds
+	maxDecodedPixels = 121_000_000      // 121 megapixels (11000x11000) - protection against decompression bombs
 )
 
 // isProduction checks if we're running in production mode
@@ -83,10 +83,10 @@ func validateDecodedImageSize(imgData []byte, filename string) error {
 // Default includes common image hosting/CDN services
 // Note: localhost/private IPs are blocked by SSRF protection regardless of whitelist
 var allowedDomains = []string{
-	"cloudinary.com",   // Cloudinary CDN
-	"imgur.com",        // Imgur image hosting
-	"unsplash.com",     // Unsplash stock photos
-	"pexels.com",       // Pexels stock photos
+	"cloudinary.com", // Cloudinary CDN
+	"imgur.com",      // Imgur image hosting
+	"unsplash.com",   // Unsplash stock photos
+	"pexels.com",     // Pexels stock photos
 }
 
 // InitializeConfig loads configuration from environment variables
@@ -400,7 +400,11 @@ func handleOptimize(c *fiber.Ctx) error {
 				"error": "Failed to open uploaded file.",
 			})
 		}
-		defer f.Close()
+		defer func() {
+			if err := f.Close(); err != nil {
+				log.Printf("warning: failed to close file: %v", err)
+			}
+		}()
 
 		imgData, err = io.ReadAll(io.LimitReader(f, maxImageSize))
 		if err != nil {
@@ -459,7 +463,7 @@ func handleOptimize(c *fiber.Ctx) error {
 				"error": "Failed to fetch image from URL. Check that the URL is accessible.",
 			})
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusOK {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -564,13 +568,13 @@ type BatchImageResult struct {
 type BatchOptimizeResponse struct {
 	Results []BatchImageResult `json:"results"`
 	Summary struct {
-		Total             int    `json:"total"`
-		Successful        int    `json:"successful"`
-		Failed            int    `json:"failed"`
-		TotalOriginalSize int64  `json:"totalOriginalSize"`
+		Total              int    `json:"total"`
+		Successful         int    `json:"successful"`
+		Failed             int    `json:"failed"`
+		TotalOriginalSize  int64  `json:"totalOriginalSize"`
 		TotalOptimizedSize int64  `json:"totalOptimizedSize"`
-		TotalSavings      string `json:"totalSavings"`
-		ProcessingTime    string `json:"processingTime"`
+		TotalSavings       string `json:"totalSavings"`
+		ProcessingTime     string `json:"processingTime"`
 	} `json:"summary"`
 }
 
@@ -607,7 +611,9 @@ func processSingleImage(file *multipart.FileHeader, options services.OptimizeOpt
 	}
 
 	imgData, err := io.ReadAll(io.LimitReader(f, maxImageSize))
-	f.Close()
+	if closeErr := f.Close(); closeErr != nil {
+		log.Printf("warning: failed to close file: %v", closeErr)
+	}
 
 	if err != nil {
 		result.Success = false

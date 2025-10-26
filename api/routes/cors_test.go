@@ -80,7 +80,7 @@ func TestCORS_SuccessResponse(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to make request: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Verify CORS headers are present
 	if resp.Header.Get("Access-Control-Allow-Origin") != "https://sosquishy.io" {
@@ -106,7 +106,7 @@ func TestCORS_ErrorResponse400(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to make request: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Verify status code is 400
 	if resp.StatusCode != fiber.StatusBadRequest {
@@ -135,7 +135,7 @@ func TestCORS_ErrorResponse500(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to make request: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Verify status code is 500
 	if resp.StatusCode != fiber.StatusInternalServerError {
@@ -161,7 +161,7 @@ func TestCORS_PreflightRequest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to make request: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Verify preflight response
 	if resp.StatusCode != fiber.StatusNoContent {
@@ -191,7 +191,7 @@ func TestCORS_DisallowedOrigin(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to make request: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Verify CORS headers are NOT present for disallowed origin
 	if resp.Header.Get("Access-Control-Allow-Origin") != "" {
@@ -218,7 +218,7 @@ func TestCORS_MultipleAllowedOrigins(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Failed to make request: %v", err)
 			}
-			defer resp.Body.Close()
+			defer func() { _ = resp.Body.Close() }()
 
 			if resp.Header.Get("Access-Control-Allow-Origin") != origin {
 				t.Errorf("Expected CORS header for origin %s, got '%s'",
@@ -238,7 +238,7 @@ func TestCORS_NoOriginHeader(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to make request: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Should succeed but no CORS headers
 	if resp.StatusCode != fiber.StatusOK {
@@ -255,21 +255,21 @@ func TestCORS_WithMiddlewareStack(t *testing.T) {
 	app := fiber.New()
 
 	// Set up environment for testing
-	os.Setenv("API_KEY_AUTH_ENABLED", "true")
-	os.Setenv("PUBLIC_OPTIMIZATION_ENABLED", "false")
-	os.Setenv("TRUSTED_ORIGINS", "https://sosquishy.io")
+	_ = os.Setenv("API_KEY_AUTH_ENABLED", "true")
+	_ = os.Setenv("PUBLIC_OPTIMIZATION_ENABLED", "false")
+	_ = os.Setenv("TRUSTED_ORIGINS", "https://sosquishy.io")
 	defer func() {
-		os.Unsetenv("API_KEY_AUTH_ENABLED")
-		os.Unsetenv("PUBLIC_OPTIMIZATION_ENABLED")
-		os.Unsetenv("TRUSTED_ORIGINS")
+		_ = os.Unsetenv("API_KEY_AUTH_ENABLED")
+		_ = os.Unsetenv("PUBLIC_OPTIMIZATION_ENABLED")
+		_ = os.Unsetenv("TRUSTED_ORIGINS")
 	}()
 
 	// Initialize database for API key tests
-	os.Setenv("DB_PATH", ":memory:")
+	_ = os.Setenv("DB_PATH", ":memory:")
 	if err := db.Initialize(); err != nil {
 		t.Fatalf("Failed to initialize database: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	allowedOrigins := "https://sosquishy.io"
 
@@ -305,7 +305,7 @@ func TestCORS_WithMiddlewareStack(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to make request: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Should have CORS headers even if request succeeds/fails
 	corsHeader := resp.Header.Get("Access-Control-Allow-Origin")
@@ -327,7 +327,7 @@ func TestCORS_RealWorldScenario(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to make request: %v", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	body, _ := io.ReadAll(resp.Body)
 

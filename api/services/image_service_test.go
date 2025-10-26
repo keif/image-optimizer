@@ -35,8 +35,8 @@ func checkAVIFEncodingSupport(t *testing.T) bool {
 	if err != nil {
 		// Check if error is specifically about AVIF encoding support
 		if strings.Contains(err.Error(), "heifsave") ||
-		   strings.Contains(err.Error(), "Unsupported compression") ||
-		   strings.Contains(err.Error(), "avif") {
+			strings.Contains(err.Error(), "Unsupported compression") ||
+			strings.Contains(err.Error(), "avif") {
 			return false
 		}
 	}
@@ -55,8 +55,8 @@ func checkAVIFDecodingSupport(t *testing.T) bool {
 	if err != nil {
 		// Check if error is specifically about AVIF decoding support
 		if strings.Contains(err.Error(), "Unsupported image format") ||
-		   strings.Contains(err.Error(), "heifload") ||
-		   strings.Contains(err.Error(), "avif") {
+			strings.Contains(err.Error(), "heifload") ||
+			strings.Contains(err.Error(), "avif") {
 			return false
 		}
 	}

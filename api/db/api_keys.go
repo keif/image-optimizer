@@ -1,3 +1,4 @@
+// Package db provides database operations for API keys and metrics.
 package db
 
 import (
@@ -5,15 +6,16 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"log"
 	"time"
 )
 
 // APIKey represents an API key in the database
 type APIKey struct {
-	ID        int       `json:"id"`
-	Key       string    `json:"key"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        int        `json:"id"`
+	Key       string     `json:"key"`
+	Name      string     `json:"name"`
+	CreatedAt time.Time  `json:"created_at"`
 	RevokedAt *time.Time `json:"revoked_at,omitempty"`
 }
 
@@ -101,7 +103,11 @@ func ListAPIKeys() ([]APIKey, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to query API keys: %w", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			log.Printf("warning: failed to close rows: %v", err)
+		}
+	}()
 
 	var keys []APIKey
 	for rows.Next() {

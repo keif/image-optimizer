@@ -1,3 +1,4 @@
+// Package main is the entry point for the Image Optimizer API server.
 package main
 
 import (
@@ -51,14 +52,18 @@ func main() {
 	if err := db.Initialize(); err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Printf("warning: failed to close database: %v", err)
+		}
+	}()
 
 	app := fiber.New(fiber.Config{
 		AppName:      "Image Optimizer API v1.0",
-		BodyLimit:    20 * 1024 * 1024,  // 20MB limit for large spritesheet uploads (matches Caddy)
-		ReadTimeout:  7 * time.Minute,   // 7 minute read timeout for large file uploads
-		WriteTimeout: 7 * time.Minute,   // 7 minute write timeout for processing large sprites (100MP+)
-		IdleTimeout:  10 * time.Minute,  // 10 minute idle timeout
+		BodyLimit:    20 * 1024 * 1024, // 20MB limit for large spritesheet uploads (matches Caddy)
+		ReadTimeout:  7 * time.Minute,  // 7 minute read timeout for large file uploads
+		WriteTimeout: 7 * time.Minute,  // 7 minute write timeout for processing large sprites (100MP+)
+		IdleTimeout:  10 * time.Minute, // 10 minute idle timeout
 	})
 
 	// Middleware

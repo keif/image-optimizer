@@ -6,9 +6,10 @@ import (
 	"os"
 	"path/filepath"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/mattn/go-sqlite3" // SQLite driver for database/sql
 )
 
+// DB is the global database connection
 var DB *sql.DB
 
 // Initialize creates and initializes the SQLite database

@@ -32,10 +32,10 @@ func GetMetricsConfig() MetricsConfig {
 
 // Context keys for storing metrics data
 const (
-	MetricsStartTimeKey  = "metrics_start_time"
-	MetricsEndpointKey   = "metrics_endpoint"
-	MetricsSuccessKey    = "metrics_success"
-	MetricsAPIKeyIDKey   = "metrics_api_key_id" // #nosec G101 - This is a context key name, not credentials
+	MetricsStartTimeKey = "metrics_start_time"
+	MetricsEndpointKey  = "metrics_endpoint"
+	MetricsSuccessKey   = "metrics_success"
+	MetricsAPIKeyIDKey  = "metrics_api_key_id" // #nosec G101 - This is a context key name, not credentials
 )
 
 // NewMetricsCollector creates middleware that collects metrics for each request
@@ -56,13 +56,16 @@ func NewMetricsCollector() fiber.Handler {
 
 		// Determine endpoint type
 		path := c.Path()
-		endpoint := "other"
-		if path == "/optimize" {
+		var endpoint string
+		switch path {
+		case "/optimize":
 			endpoint = "optimize"
-		} else if path == "/batch-optimize" {
+		case "/batch-optimize":
 			endpoint = "batch-optimize"
-		} else if path == "/pack-sprites" {
+		case "/pack-sprites":
 			endpoint = "pack-sprites"
+		default:
+			endpoint = "other"
 		}
 		c.Locals(MetricsEndpointKey, endpoint)
 
