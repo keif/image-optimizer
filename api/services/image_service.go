@@ -481,7 +481,6 @@ func optimizePNGWithOxipng(inputBuffer []byte, level int) ([]byte, error) {
 	// --strip all: remove all metadata - hardcoded string
 	// --stdout: write to stdout instead of file - prevents file system writes
 	// "-": read from stdin - prevents path traversal attacks
-	// #nosec G204 - Command arguments are validated/hardcoded, no user input in command path
 
 	// Add timeout to prevent OxiPNG from hanging on problematic PNGs
 	// Large PNGs can take 30+ seconds at high optimization levels
@@ -495,6 +494,7 @@ func optimizePNGWithOxipng(inputBuffer []byte, level int) ([]byte, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
+	// #nosec G204 - Command arguments are validated/hardcoded, no user input in command path
 	cmd := exec.CommandContext(ctx, "oxipng", "-o", fmt.Sprintf("%d", level), "--strip", "all", "--stdout", "-")
 
 	// Set up stdin/stdout pipes
