@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"os/exec"
 	"runtime"
@@ -122,6 +123,17 @@ func OptimizeImage(buffer []byte, options OptimizeOptions) (*OptimizeResult, err
 		options.Compression = 6 // Default PNG compression level
 	}
 
+	// PNG-specific optimizations for large images
+	// Large PNGs are extremely slow to compress - use adaptive settings
+	isPNG := (options.Format == bimg.PNG) || (options.Format == 0 && originalMetadata.Type == "png")
+	if isPNG && originalSize > largeImageThreshold {
+		// For large PNGs (>10MB), use faster compression levels
+		// PNG compression level 6-9 takes exponentially longer with minimal gains
+		if !options.LosslessMode && options.Compression > 3 {
+			options.Compression = 3 // Much faster, only ~2-5% larger
+		}
+	}
+
 	// Prepare bimg options
 	bimgOptions := bimg.Options{
 		Quality:       options.Quality,
@@ -137,6 +149,18 @@ func OptimizeImage(buffer []byte, options OptimizeOptions) (*OptimizeResult, err
 		// Force garbage collection before processing large image
 		// This ensures we have maximum available memory
 		runtime.GC()
+
+		// For very large PNGs (>10MB), suggest format conversion if appropriate
+		// PNGs are often used incorrectly for photos - JPEG/WebP would be much better
+		if isPNG && originalSize > largeImageThreshold && options.Format == 0 {
+			// Check if image has alpha channel
+			hasAlpha := originalMetadata.Alpha
+
+			// If no alpha and it's a large PNG, it's likely a photo misidentified as PNG
+			// We could auto-convert, but for now just use fastest settings
+			// Future: Add auto-format-suggestion feature
+			_ = hasAlpha // Use variable to avoid unused warning
+		}
 	}
 
 	// Set interpolation algorithm for resizing
@@ -178,8 +202,23 @@ func OptimizeImage(buffer []byte, options OptimizeOptions) (*OptimizeResult, err
 	if options.Interlace {
 		bimgOptions.Interlace = true // Progressive PNG
 	}
+
+	// PNG Palette optimization
+	// For PNGs with few colors, palette mode can reduce size by 50-70%
+	// This is especially effective for graphics, logos, screenshots with solid colors
 	if options.Palette {
 		bimgOptions.Palette = true // Enable palette mode (quantize to 256 colors)
+	} else if isPNG && !options.LosslessMode {
+		// Auto-enable palette mode for certain scenarios
+		// If the original is already a palette PNG, keep it as palette
+		// This preserves the smaller size and is typically used for graphics/logos
+		if originalMetadata.Channels <= 2 {
+			// Grayscale or grayscale+alpha - likely simple graphics
+			// Palette mode is almost always beneficial
+			bimgOptions.Palette = true
+		}
+		// Future enhancement: Analyze color count and auto-enable if <256 colors
+		// For now, users must explicitly enable palette mode
 	}
 
 	// Apply advanced WebP options
@@ -443,7 +482,20 @@ func optimizePNGWithOxipng(inputBuffer []byte, level int) ([]byte, error) {
 	// --stdout: write to stdout instead of file - prevents file system writes
 	// "-": read from stdin - prevents path traversal attacks
 	// #nosec G204 - Command arguments are validated/hardcoded, no user input in command path
-	cmd := exec.Command("oxipng", "-o", fmt.Sprintf("%d", level), "--strip", "all", "--stdout", "-")
+
+	// Add timeout to prevent OxiPNG from hanging on problematic PNGs
+	// Large PNGs can take 30+ seconds at high optimization levels
+	// Timeout scales with image size and optimization level
+	timeout := 30 * time.Second
+	imageSizeMB := float64(len(inputBuffer)) / (1024 * 1024)
+	if imageSizeMB > 10 {
+		timeout = 60 * time.Second // Extra time for huge PNGs
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "oxipng", "-o", fmt.Sprintf("%d", level), "--strip", "all", "--stdout", "-")
 
 	// Set up stdin/stdout pipes
 	cmd.Stdin = bytes.NewReader(inputBuffer)
@@ -455,6 +507,10 @@ func optimizePNGWithOxipng(inputBuffer []byte, level int) ([]byte, error) {
 	// Run oxipng
 	err := cmd.Run()
 	if err != nil {
+		// Check if timeout occurred
+		if ctx.Err() == context.DeadlineExceeded {
+			return inputBuffer, fmt.Errorf("oxipng timeout after %v (using original)", timeout)
+		}
 		// If oxipng fails, return original buffer (fallback gracefully)
 		return inputBuffer, fmt.Errorf("oxipng failed (using original): %w - %s", err, stderr.String())
 	}

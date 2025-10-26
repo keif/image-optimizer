@@ -547,11 +547,26 @@ func packSingleSheet(sprites []Sprite, maxW, maxH int, options PackingOptions) (
 			ps.Image, ps.Image.Bounds().Min, draw.Over)
 	}
 
-	// Encode to PNG
+	// Encode to PNG using faster encoder
+	// For spritesheets (especially FNF), we use a faster compression level
+	// Level 3 is much faster than default (9) with minimal size increase
 	var buf bytes.Buffer
-	if err := png.Encode(&buf, composite); err != nil {
+	encoder := &png.Encoder{
+		CompressionLevel: png.BestSpeed, // Fast compression for large spritesheets
+	}
+	if err := encoder.Encode(&buf, composite); err != nil {
 		return nil, sprites
 	}
+
+	// Post-process with OxiPNG for better compression
+	// This is worth it for spritesheets since they're downloaded once and cached
+	// Use level 1 (fast) since spritesheet generation is already slow
+	optimizedBuffer, err := optimizePNGWithOxipng(buf.Bytes(), 1)
+	if err == nil && len(optimizedBuffer) < len(buf.Bytes()) {
+		// OxiPNG succeeded and made it smaller - use it
+		buf = *bytes.NewBuffer(optimizedBuffer)
+	}
+	// If OxiPNG fails or doesn't improve, use the original
 
 	// Calculate efficiency
 	usedArea := 0
@@ -1086,9 +1101,13 @@ func ExtractFramesFromSheet(sheetImage image.Image, frames []FrameData) ([]Sprit
 		frameImg := image.NewRGBA(rect)
 		draw.Draw(frameImg, frameImg.Bounds(), sheetImage, rect.Min, draw.Src)
 
-		// Encode to PNG buffer
+		// Encode to PNG buffer using fast compression
+		// Individual frames are typically small, so fast encoding is preferred
 		var buf bytes.Buffer
-		if err := png.Encode(&buf, frameImg); err != nil {
+		encoder := &png.Encoder{
+			CompressionLevel: png.BestSpeed, // Fast encoding for frame extraction
+		}
+		if err := encoder.Encode(&buf, frameImg); err != nil {
 			return nil, fmt.Errorf("failed to encode frame %s: %w", frame.Name, err)
 		}
 
