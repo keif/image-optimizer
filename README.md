@@ -945,16 +945,23 @@ Returns time-series data for charting and trend analysis.
 **Data Retention:**
 Metrics data is automatically deleted after 30 days to match our privacy policy. You can configure a different retention period using the cleanup script.
 
+**Setup (First Time):**
+Create an API key for the cleanup script:
+```bash
+curl -X POST "http://localhost:8080/api/keys" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Metrics Cleanup"}'
+
+# Save the returned API key (sk_...) - it won't be shown again!
+```
+
 **Manual Cleanup:**
 ```bash
 # Clean up metrics older than 30 days (default)
-./cleanup-metrics.sh
+API_KEY="sk_your_api_key" ./cleanup-metrics.sh
 
 # Custom retention period (e.g., 90 days)
-./cleanup-metrics.sh 90
-
-# With API key authentication
-API_KEY="your-api-key" ./cleanup-metrics.sh
+API_KEY="sk_your_api_key" ./cleanup-metrics.sh 90
 ```
 
 **API Endpoint:**
