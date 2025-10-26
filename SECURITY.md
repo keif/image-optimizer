@@ -28,6 +28,7 @@ This document tracks security features, vulnerabilities, mitigations, and ongoin
 ### ✅ Implemented & Secure
 
 #### Authentication (api/middleware/api_key.go)
+
 - [x] Cryptographically secure API key generation (32 bytes)
 - [x] Database-backed key storage with revocation support
 - [x] Origin-based authentication bypass for trusted domains
@@ -36,6 +37,7 @@ This document tracks security features, vulnerabilities, mitigations, and ongoin
 - [x] Bearer token support in Authorization header
 
 #### Rate Limiting (api/middleware/rate_limit.go)
+
 - [x] Per-IP rate limiting with sliding window algorithm
 - [x] Configurable limits (default: 100 req/min)
 - [x] Proper HTTP 429 responses
@@ -43,6 +45,7 @@ This document tracks security features, vulnerabilities, mitigations, and ongoin
 - [x] Enabled by default in production
 
 #### SSRF Protection (api/routes/optimize.go)
+
 - [x] Private IP range blocking (RFC 1918, loopback)
 - [x] Cloud metadata endpoint blocking (169.254.169.254)
 - [x] DNS resolution validation
@@ -50,6 +53,7 @@ This document tracks security features, vulnerabilities, mitigations, and ongoin
 - [x] Configurable via ALLOWED_DOMAINS
 
 #### Input Validation
+
 - [x] Quality: 1-100 range validation
 - [x] Dimensions: Non-negative integer checks
 - [x] Format: Whitelist validation (jpeg, png, webp, gif, avif)
@@ -58,6 +62,7 @@ This document tracks security features, vulnerabilities, mitigations, and ongoin
 - [x] Interpolator: Whitelist validation
 
 #### File Upload Security (api/routes/optimize.go)
+
 - [x] 10MB hard limit per file
 - [x] 15MB total request body limit
 - [x] Content-Type validation
@@ -65,6 +70,7 @@ This document tracks security features, vulnerabilities, mitigations, and ongoin
 - [x] Proper file handle cleanup (defer Close)
 
 #### Resource Exhaustion Protection (api/main.go)
+
 - [x] Body limit: 15MB
 - [x] Read timeout: 5 minutes
 - [x] Write timeout: 5 minutes
@@ -72,6 +78,7 @@ This document tracks security features, vulnerabilities, mitigations, and ongoin
 - [x] Batch processing: 4 worker pool limit
 
 #### Security Headers (api/main.go)
+
 - [x] X-Content-Type-Options: nosniff
 - [x] X-Frame-Options: DENY
 - [x] X-XSS-Protection: 1; mode=block
@@ -79,12 +86,14 @@ This document tracks security features, vulnerabilities, mitigations, and ongoin
 - [x] Strict-Transport-Security (HTTPS only)
 
 #### Error Handling (api/routes/optimize.go)
+
 - [x] Production mode hides internal errors
 - [x] Development mode shows detailed errors
 - [x] No stack trace leakage
 - [x] Graceful fallback for external tools (oxipng, cjpeg)
 
 #### SQL Injection Protection (api/db/*.go)
+
 - [x] All queries use parameterized statements
 - [x] No string concatenation in SQL
 - [x] Proper error handling
@@ -96,12 +105,14 @@ This document tracks security features, vulnerabilities, mitigations, and ongoin
 ### 🔒 Implemented Fixes
 
 #### ✅ Decompression Bomb Protection
+
 **Status**: IMPLEMENTED (2025-10-22)
 **Location**: api/routes/optimize.go
 
 **Issue**: Small compressed files could expand to massive images causing memory exhaustion.
 
 **Mitigation**:
+
 - Max decoded pixels: 100 million (10,000 x 10,000)
 - Validation after image decode
 - Clear error message for oversized images
@@ -114,14 +125,17 @@ This document tracks security features, vulnerabilities, mitigations, and ongoin
 ### ⚠️ Active Concerns
 
 #### Command Execution Safety
+
 **Risk Level**: Medium (mitigated by input validation)
 **Location**: api/services/image_service.go:367, 412
 
 **Issue**: External commands executed for PNG/JPEG optimization:
+
 - `oxipng` - PNG lossless compression
 - `cjpeg` (MozJPEG) - JPEG optimization
 
 **Current Mitigations**:
+
 - ✅ All parameters are validated integers from controlled sources
 - ✅ Quality: 1-100 range validation
 - ✅ OxiPNG level: 0-6 range validation
@@ -131,23 +145,27 @@ This document tracks security features, vulnerabilities, mitigations, and ongoin
 **Documentation**: Inline comments added explaining safety (2025-10-22)
 
 **Recommendations**:
+
 - [ ] Consider sandboxing (seccomp, containers) for additional isolation
 - [ ] Monitor and log when external tools fail
 - [ ] Regular security updates for oxipng and mozjpeg binaries
 
 #### Image Processing CPU Usage
+
 **Risk Level**: Low (mitigated by timeouts)
 **Location**: api/services/image_service.go
 
 **Issue**: Complex images could cause high CPU usage during processing.
 
 **Current Mitigations**:
+
 - ✅ 5 minute read/write timeouts
 - ✅ Worker pool limits concurrent processing
 - ✅ Decompression bomb protection (max 100M pixels)
 - ✅ Rate limiting prevents DoS attempts
 
 **Recommendations**:
+
 - [ ] Add per-operation CPU time limits
 - [ ] Monitor resource usage metrics
 - [ ] Consider memory limits per request
@@ -218,6 +236,7 @@ ALLOWED_DOMAINS=  # Allow all domains in dev
 ### Test Coverage
 
 #### Unit Tests
+
 - [x] API key authentication middleware (api/middleware/api_key_test.go)
 - [x] Origin-based bypass validation
 - [x] Domain whitelist validation
@@ -227,6 +246,7 @@ ALLOWED_DOMAINS=  # Allow all domains in dev
 - [ ] SSRF protection edge cases
 
 #### Integration Tests
+
 - [x] Image optimization workflows (api/routes/optimize_test.go)
 - [x] Spritesheet packing
 - [ ] Batch processing under load
@@ -301,12 +321,14 @@ Monitor logs for these patterns:
 ### Response Procedures
 
 #### Suspected Abuse
+
 1. Check logs for IP address patterns
 2. Verify rate limiting is functioning
 3. Consider temporary IP ban if needed
 4. Review API key usage if authenticated
 
 #### Potential Vulnerability Discovery
+
 1. Document the vulnerability details
 2. Assess impact and exploitability
 3. Develop fix and test thoroughly
@@ -318,17 +340,20 @@ Monitor logs for these patterns:
 ## Future Enhancements
 
 ### High Priority
+
 - [ ] Add security event logging (structured logging for auth failures, rate limits, SSRF)
 - [ ] Implement API key expiration feature
 - [ ] Add monitoring and alerting for suspicious patterns
 
 ### Medium Priority
+
 - [ ] IP whitelisting for admin endpoints (/api/keys management)
 - [ ] Database encryption (consider sqlcipher)
 - [ ] Add per-operation memory limits
 - [ ] Implement request ID tracking for audit trail
 
 ### Low Priority
+
 - [ ] Add Content Security Policy headers
 - [ ] Implement key rotation mechanism
 - [ ] Add OWASP dependency checking to CI/CD
@@ -349,6 +374,7 @@ If you discover a security vulnerability, please:
    - Suggested fix (if any)
 
 Response timeline:
+
 - Initial response: 24 hours
 - Vulnerability assessment: 72 hours
 - Fix deployment: Based on severity (Critical: 24-48h, High: 1 week, Medium: 2 weeks)
@@ -376,6 +402,7 @@ Response timeline:
 ## Document Maintenance
 
 This document should be reviewed and updated:
+
 - After each security review
 - When new security features are implemented
 - When vulnerabilities are discovered and fixed

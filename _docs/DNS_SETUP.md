@@ -40,7 +40,7 @@ Example IP: `123.45.67.89`
 3. Go to **DNS** → **Records**
 4. Update/Add records:
 
-```
+```text
 Type: A
 Name: @
 Content: 123.45.67.89
@@ -61,6 +61,7 @@ TTL: Auto
 ```
 
 **Important Cloudflare Notes:**
+
 - For `api.sosquishy.io`: **Disable proxy (gray cloud)** to allow Let's Encrypt certificate verification
 - For `sosquishy.io` and `www`: Can use proxy (orange cloud) for CDN benefits, OR disable proxy for direct connection
 - If using Cloudflare proxy, you may need to adjust SSL/TLS settings
@@ -72,7 +73,7 @@ TTL: Auto
 3. Go to **Advanced DNS** tab
 4. Add/Update records:
 
-```
+```text
 Type: A Record
 Host: @
 Value: 123.45.67.89
@@ -96,7 +97,7 @@ TTL: Automatic
 3. Go to **DNS** tab
 4. Under **Custom resource records**, add:
 
-```
+```text
 Name: @
 Type: A
 TTL: 1H
@@ -120,7 +121,7 @@ Data: 123.45.67.89
 3. Click **Create record**
 4. Add records:
 
-```
+```text
 Record name: (leave empty for root)
 Record type: A
 Value: 123.45.67.89
@@ -162,9 +163,10 @@ curl https://dnschecker.org/all-dns-records-of-domain.php?query=sosquishy.io
 ```
 
 **Online tools:**
-- https://dnschecker.org
-- https://www.whatsmydns.net
-- https://mxtoolbox.com/SuperTool.aspx
+
+- <https://dnschecker.org>
+- <https://www.whatsmydns.net>
+- <https://mxtoolbox.com/SuperTool.aspx>
 
 ## Before Deploying
 
@@ -214,7 +216,9 @@ openssl s_client -connect api.sosquishy.io:443 -servername api.sosquishy.io < /d
 **Problem:** DNS still shows old IP after 1 hour
 
 **Solution:**
+
 1. Clear local DNS cache:
+
    ```bash
    # macOS
    sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
@@ -234,11 +238,13 @@ openssl s_client -connect api.sosquishy.io:443 -servername api.sosquishy.io < /d
 **Problem:** Caddy can't obtain Let's Encrypt certificate
 
 **Common causes:**
+
 1. Port 80/443 blocked by firewall
 2. DNS not propagated yet
 3. Cloudflare proxy enabled (for API subdomain)
 
 **Solution:**
+
 ```bash
 # SSH to server
 ssh sosquishy-server
@@ -262,6 +268,7 @@ curl http://sosquishy.io/.well-known/acme-challenge/test
 **Problem:** dig shows wrong IP address
 
 **Solution:**
+
 1. Double-check DNS records in provider dashboard
 2. Ensure you're updating the right domain
 3. Check if there's a CNAME record conflicting with A record (remove CNAME)
@@ -313,8 +320,8 @@ After DNS is configured and propagated:
 
 1. Deploy with `./deploy-docker-hetzner.sh` or GitHub Actions
 2. Verify services:
-   - https://sosquishy.io (frontend)
-   - https://api.sosquishy.io/health (API)
-   - https://sosquishy.io/ads.txt (should 301 redirect)
+   - <https://sosquishy.io> (frontend)
+   - <https://api.sosquishy.io/health> (API)
+   - <https://sosquishy.io/ads.txt> (should 301 redirect)
 3. Monitor Caddy logs for SSL certificate issuance
 4. Test all functionality

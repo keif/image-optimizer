@@ -3,21 +3,25 @@
 ## Copy-Paste Ready Commands
 
 ### 1. Install Fly CLI (macOS)
+
 ```bash
 brew install flyctl
 ```
 
 ### 2. Authenticate
+
 ```bash
 flyctl auth login
 ```
 
 ### 3. Navigate to API Directory
+
 ```bash
 cd /Users/keif/projects/git/image-optimizer/api
 ```
 
 ### 4. Initialize App (Don't Deploy Yet)
+
 ```bash
 flyctl launch --no-deploy
 # Choose app name: image-optimizer
@@ -27,11 +31,13 @@ flyctl launch --no-deploy
 ```
 
 ### 5. Create Persistent Volume
+
 ```bash
 flyctl volumes create image_optimizer_data --region iad --size 1
 ```
 
 ### 6. Set Environment Variables (Secrets)
+
 ```bash
 flyctl secrets set CORS_ORIGINS="https://sosquishy.io,https://www.sosquishy.io,https://keif.github.io"
 flyctl secrets set PUBLIC_OPTIMIZATION_ENABLED=true
@@ -43,11 +49,13 @@ flyctl secrets set DB_PATH=/app/data/api_keys.db
 ```
 
 ### 7. Deploy Application
+
 ```bash
 flyctl deploy
 ```
 
 ### 8. Verify Deployment
+
 ```bash
 flyctl status
 flyctl logs
@@ -55,21 +63,25 @@ curl https://image-optimizer.fly.dev/health
 ```
 
 ### 9. Scale Memory to 2GB
+
 ```bash
 flyctl scale memory 2048
 ```
 
 ### 10. Add Custom Domain
+
 ```bash
 flyctl certs add api.sosquishy.io
 ```
 
 ### 11. Get DNS Configuration
+
 ```bash
 flyctl certs show api.sosquishy.io
 ```
 
 **Add this to your DNS:**
+
 ```
 Type: CNAME
 Name: api
@@ -79,6 +91,7 @@ Proxy: OFF
 ```
 
 ### 12. Verify Certificate
+
 ```bash
 flyctl certs show api.sosquishy.io
 # Wait for status: "issued"
@@ -91,32 +104,38 @@ curl https://api.sosquishy.io/health
 ## Common Management Commands
 
 ### View Logs
+
 ```bash
 flyctl logs
 flyctl logs --follow  # Real-time
 ```
 
 ### Check Status
+
 ```bash
 flyctl status
 ```
 
 ### List Secrets
+
 ```bash
 flyctl secrets list
 ```
 
 ### SSH into Container
+
 ```bash
 flyctl ssh console
 ```
 
 ### View Metrics
+
 ```bash
 flyctl metrics
 ```
 
 ### Scale Resources
+
 ```bash
 # Memory
 flyctl scale memory 4096
@@ -129,12 +148,14 @@ flyctl platform vm-sizes
 ```
 
 ### Rollback Deployment
+
 ```bash
 flyctl releases
 flyctl rollback v<VERSION>
 ```
 
 ### Destroy App (WARNING: Permanent)
+
 ```bash
 flyctl apps destroy image-optimizer
 ```
@@ -144,11 +165,13 @@ flyctl apps destroy image-optimizer
 ## Testing Commands
 
 ### Test Health Endpoint
+
 ```bash
 curl https://api.sosquishy.io/health
 ```
 
 ### Test Image Optimization
+
 ```bash
 curl -X POST https://api.sosquishy.io/optimize \
   -F "image=@test.jpg" \
@@ -158,6 +181,7 @@ curl -X POST https://api.sosquishy.io/optimize \
 ```
 
 ### Test Swagger Docs
+
 ```bash
 open https://api.sosquishy.io/swagger/index.html
 ```
@@ -167,22 +191,26 @@ open https://api.sosquishy.io/swagger/index.html
 ## Emergency Commands
 
 ### View All Apps
+
 ```bash
 flyctl apps list
 ```
 
 ### Restart App
+
 ```bash
 flyctl apps restart image-optimizer
 ```
 
 ### Delete Volume (CAREFUL: Data Loss)
+
 ```bash
 flyctl volumes list
 flyctl volumes destroy <VOLUME_ID>
 ```
 
 ### Remove Certificate
+
 ```bash
 flyctl certs remove api.sosquishy.io
 ```
@@ -192,6 +220,7 @@ flyctl certs remove api.sosquishy.io
 ## One-Line Full Deployment
 
 **After initial setup, redeploy with:**
+
 ```bash
 flyctl deploy && flyctl logs
 ```
@@ -253,6 +282,7 @@ Proxy Status: DNS Only (disable proxy/CDN)
 ```
 
 **Alternative: A/AAAA Records**
+
 ```bash
 # Get IPs first
 flyctl ips list
@@ -297,11 +327,13 @@ flyctl certs show api.sosquishy.io
 ## Troubleshooting
 
 **Build fails:**
+
 ```bash
 flyctl deploy --local-only
 ```
 
 **Certificate not issuing:**
+
 ```bash
 dig api.sosquishy.io  # Verify DNS
 flyctl certs remove api.sosquishy.io
@@ -309,12 +341,14 @@ flyctl certs add api.sosquishy.io
 ```
 
 **Volume issues:**
+
 ```bash
 flyctl volumes list
 flyctl ssh console -C "df -h"
 ```
 
 **Memory issues:**
+
 ```bash
 flyctl scale memory 4096
 ```
@@ -324,11 +358,13 @@ flyctl scale memory 4096
 ## Cost Estimate
 
 Run this to see pricing:
+
 ```bash
 flyctl platform vm-sizes
 ```
 
 **Expected cost for 2GB RAM:**
+
 - ~$0.007/hour
 - ~$5-10/month
 - Includes 1GB volume
@@ -339,6 +375,6 @@ flyctl platform vm-sizes
 
 ## Support
 
-- Docs: https://fly.io/docs/
-- Community: https://community.fly.io/
-- Status: https://status.fly.io/
+- Docs: <https://fly.io/docs/>
+- Community: <https://community.fly.io/>
+- Status: <https://status.fly.io/>

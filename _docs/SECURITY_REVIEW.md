@@ -1,4 +1,5 @@
 # Security Review Report
+
 **Date:** October 16, 2025
 **Reviewer:** Security Analysis
 **Version:** v1.0.0
@@ -13,9 +14,11 @@ This security review examines the Image Optimizer API for common vulnerabilities
 **Overall Security Posture:** ✅ **EXCELLENT** (after fixes and enhancements)
 
 ### Critical Findings Fixed
+
 - ✅ **FIXED:** API key authentication bypass vulnerability (GET/DELETE `/api/keys`)
 
 ### Current Security Status
+
 - ✅ 35 tests passing (including 7 security tests)
 - ✅ Method-specific authentication bypass rules
 - ✅ Comprehensive input validation
@@ -35,14 +38,16 @@ This security review examines the Image Optimizer API for common vulnerabilities
 
 **Status:** SECURE (after fix)
 
-#### Strengths:
+#### Strengths
+
 - **Cryptographically secure API keys**: 32-byte random keys generated with `crypto/rand`
 - **Key format**: `sk_` prefix + 64 hex characters (256-bit entropy)
 - **Method-specific bypass rules**: Only POST `/api/keys` allows unauthenticated access for bootstrapping
 - **Revocation support**: Keys can be revoked with audit trail (`revoked_at` timestamp)
 - **No key disclosure**: `ListAPIKeys()` excludes actual key values (api_keys.go:99)
 
-#### Implementation Review:
+#### Implementation Review
+
 ```go
 // API Key Generation (db/api_keys.go:21-26)
 - Uses crypto/rand for secure randomness
@@ -55,7 +60,8 @@ This security review examines the Image Optimizer API for common vulnerabilities
 - Parameterized query (SQL injection safe)
 ```
 
-#### Authentication Bypass Rules:
+#### Authentication Bypass Rules
+
 | Endpoint | Method | Auth Required | Purpose |
 |----------|--------|---------------|---------|
 | `/health` | ALL | ❌ No | Health checks |
@@ -74,9 +80,10 @@ This security review examines the Image Optimizer API for common vulnerabilities
 
 **Status:** SECURE
 
-#### Comprehensive Validation:
+#### Comprehensive Validation
 
 **Query Parameters:**
+
 - ✅ `quality`: Range check (1-100) with error handling
 - ✅ `width/height`: Positive integer validation
 - ✅ `format`: Whitelist validation (jpeg, png, webp, avif, gif)
@@ -88,17 +95,20 @@ This security review examines the Image Optimizer API for common vulnerabilities
 - ✅ `oxipngLevel`: Range check (0-6)
 
 **File Uploads:**
+
 - ✅ Content-Type validation (whitelist of image MIME types)
 - ✅ File size limit enforcement (10MB via `io.LimitReader`)
 - ✅ Size check after read to ensure limit not exceeded
 
 **URL Fetching:**
+
 - ✅ URL parsing and validation
 - ✅ Domain whitelist enforcement
 - ✅ Subdomain matching support
 - ✅ Timeout enforcement (10 seconds)
 
 **Code Examples:**
+
 ```go
 // Quality validation (routes/optimize.go:108-115)
 quality, err := strconv.Atoi(qualityStr)
@@ -127,7 +137,8 @@ if !validTypes[contentType] {
 
 **Status:** SECURE
 
-#### Analysis:
+#### Analysis
+
 All database queries use **parameterized statements** with placeholder arguments:
 
 ```go
@@ -146,7 +157,8 @@ DB.Exec("UPDATE api_keys SET revoked_at = CURRENT_TIMESTAMP WHERE id = ? AND rev
 DB.Exec("DELETE FROM api_keys WHERE id = ?", id)
 ```
 
-#### Findings:
+#### Findings
+
 - ✅ No string concatenation in SQL queries
 - ✅ All user input passed as parameters
 - ✅ SQLite driver (`mattn/go-sqlite3`) handles escaping
@@ -160,9 +172,10 @@ DB.Exec("DELETE FROM api_keys WHERE id = ?", id)
 
 **Status:** SECURE
 
-#### Security Controls:
+#### Security Controls
 
 **Size Limits:**
+
 ```go
 const maxImageSize = 10 << 20  // 10 MB (routes/optimize.go:21)
 
@@ -176,17 +189,20 @@ if len(imgData) >= int(maxImageSize) {
 ```
 
 **Content-Type Validation:**
+
 - Whitelist approach (not blacklist)
 - Validates MIME type from `Content-Type` header
 - Only allows: `image/jpeg`, `image/png`, `image/webp`, `image/avif`, `image/gif`
 
 **File Processing:**
+
 - ✅ Images processed in-memory (no disk writes)
 - ✅ Automatic garbage collection after processing
 - ✅ No temporary files created
 - ✅ No path traversal vulnerabilities (no file writes)
 
 **Potential Enhancement:**
+
 - Consider adding magic byte validation (verify file header matches Content-Type)
 - Consider virus scanning for enterprise deployments
 
@@ -196,14 +212,16 @@ if len(imgData) >= int(maxImageSize) {
 
 **Status:** SECURE
 
-#### Implementation (middleware/rate_limit.go):
+#### Implementation (middleware/rate_limit.go)
 
 **Default Configuration:**
+
 - Max: 100 requests per minute per IP
 - Window: 1 minute sliding window
 - Key: Client IP address
 
 **Configurable via Environment:**
+
 ```bash
 RATE_LIMIT_ENABLED=true
 RATE_LIMIT_MAX=100
@@ -211,6 +229,7 @@ RATE_LIMIT_WINDOW=1m
 ```
 
 **Implementation:**
+
 ```go
 // Uses Fiber's built-in limiter with sliding window
 LimiterMiddleware: limiter.SlidingWindow{}
@@ -227,12 +246,14 @@ LimitReached: func(c *fiber.Ctx) error {
 ```
 
 **Strengths:**
+
 - ✅ Sliding window algorithm (better than fixed window)
 - ✅ Per-IP rate limiting
 - ✅ Configurable and can be disabled
 - ✅ Proper HTTP 429 status code
 
 **Considerations:**
+
 - IP-based limiting can be bypassed with proxies/VPNs
 - For production, consider adding:
   - API key-based rate limiting (higher limits for authenticated users)
@@ -245,18 +266,21 @@ LimitReached: func(c *fiber.Ctx) error {
 
 **Status:** SECURE (production error handling implemented)
 
-#### API Key Protection:
+#### API Key Protection
+
 - ✅ **Excellent:** `ListAPIKeys()` excludes key values (only returns ID, name, timestamps)
 - ✅ Key only returned once during creation
 - ✅ No key storage in logs or responses
 
-#### Error Messages:
+#### Error Messages
+
 - ✅ **Environment-aware error handling** (implemented)
 - ✅ Generic error messages (no stack traces in production)
 - ✅ No sensitive path disclosure
 - ✅ Appropriate HTTP status codes
 
 **Implementation:**
+
 ```go
 // Production error handling (routes/optimize.go, routes/api_keys.go)
 func errorResponse(c *fiber.Ctx, status int, message string, err error) error {
@@ -278,6 +302,7 @@ func isProduction() bool {
 ```
 
 **Configuration:**
+
 - Set `GO_ENV=production` to enable production mode (hides error details)
 - Development mode includes detailed errors for debugging
 - Production mode returns only generic error messages
@@ -288,7 +313,8 @@ func isProduction() bool {
 
 **Status:** SECURE
 
-#### Environment Variables Used:
+#### Environment Variables Used
+
 ```
 PORT                    - Server port
 DB_PATH                 - Database file path
@@ -302,13 +328,15 @@ CORS_ORIGINS            - Allowed CORS origins
 ALLOW_PRIVATE_IPS       - Allow private IPs (test mode only)
 ```
 
-#### Security Practices:
+#### Security Practices
+
 - ✅ No hardcoded secrets in code
 - ✅ API keys stored in database (not env vars)
 - ✅ Proper default values for all configs
 - ✅ No secrets in version control
 
 **Recommendation:**
+
 - Add `.env.example` file for documentation (✅ Already exists in README)
 - Consider using a secrets management service for production (AWS Secrets Manager, HashiCorp Vault)
 
@@ -319,6 +347,7 @@ ALLOW_PRIVATE_IPS       - Allow private IPs (test mode only)
 **Status:** SECURE with recommendations
 
 **Current Configuration (main.go:48-58):**
+
 ```go
 allowedOrigins := os.Getenv("CORS_ORIGINS")
 if allowedOrigins == "" {
@@ -334,12 +363,14 @@ app.Use(cors.New(cors.Config{
 ```
 
 **Strengths:**
+
 - ✅ Configurable origins via environment variable
 - ✅ Explicit origin whitelist (not wildcard)
 - ✅ Appropriate headers allowed
 - ✅ `AllowCredentials: true` properly configured
 
 **Production Recommendation:**
+
 - Ensure `CORS_ORIGINS` is set to production domains only
 - Never use `*` wildcard with `AllowCredentials: true`
 - Current implementation is correct ✅
@@ -351,6 +382,7 @@ app.Use(cors.New(cors.Config{
 **Status:** GOOD (dependencies relatively up-to-date)
 
 **Key Dependencies:**
+
 ```go
 github.com/gofiber/fiber/v2 v2.52.9    // Latest: v2.52.9 ✅
 github.com/h2non/bimg v1.1.9           // Image processing (libvips wrapper)
@@ -358,18 +390,22 @@ github.com/mattn/go-sqlite3 v1.14.32   // SQLite driver
 ```
 
 **Analysis:**
+
 - ✅ Fiber v2.52.9 (latest stable - no known CVEs)
 - ✅ SQLite driver v1.14.32 (recent version)
 - ✅ bimg v1.1.9 (stable, depends on libvips)
 
 **Dependency Tree:**
+
 - No known vulnerable transitive dependencies
 - All dependencies are well-maintained
 
 **Recommendations:**
+
 1. ✅ Keep dependencies up to date
 2. Run `go list -m -u all` regularly to check for updates
 3. Use tools like `govulncheck` for vulnerability scanning:
+
    ```bash
    go install golang.org/x/vuln/cmd/govulncheck@latest
    govulncheck ./...
@@ -382,9 +418,11 @@ github.com/mattn/go-sqlite3 v1.14.32   // SQLite driver
 **Status:** ✅ IMPLEMENTED
 
 **Current State:**
+
 - ✅ Security headers middleware configured in main.go
 
 **Implemented Headers:**
+
 ```go
 // Security headers middleware (main.go)
 app.Use(func(c *fiber.Ctx) error {
@@ -401,6 +439,7 @@ app.Use(func(c *fiber.Ctx) error {
 ```
 
 **Headers Explained:**
+
 - **X-Content-Type-Options: nosniff** - Prevents MIME type sniffing
 - **X-Frame-Options: DENY** - Prevents clickjacking attacks
 - **X-XSS-Protection: 1; mode=block** - Enables browser XSS protection
@@ -414,6 +453,7 @@ app.Use(func(c *fiber.Ctx) error {
 ### 11. Domain Whitelist Implementation ✅ SECURE
 
 **Current Implementation (routes/optimize.go:53-67):**
+
 ```go
 func isAllowedDomain(u *url.URL) bool {
     if len(allowedDomains) == 0 {
@@ -431,11 +471,13 @@ func isAllowedDomain(u *url.URL) bool {
 ```
 
 **Analysis:**
+
 - ✅ Subdomain matching works correctly
 - ✅ Empty list = allow all (documented as dev mode)
 - ✅ Default whitelist includes safe domains
 
 **⚠️ Warning:** Empty `ALLOWED_DOMAINS` allows ALL domains
+
 - Document this clearly in production checklist
 - Consider requiring explicit whitelist in production
 
@@ -446,6 +488,7 @@ func isAllowedDomain(u *url.URL) bool {
 **Status:** ✅ FULLY PROTECTED (implemented)
 
 **Protections in Place:**
+
 - ✅ Domain whitelist with subdomain matching
 - ✅ **Private IP blocking** (implemented)
 - ✅ **Loopback address blocking** (implemented)
@@ -455,6 +498,7 @@ func isAllowedDomain(u *url.URL) bool {
 - ✅ 10MB size limit
 
 **Implementation:**
+
 ```go
 // Private IP blocking (routes/optimize.go)
 func isPrivateIP(host string) bool {
@@ -508,6 +552,7 @@ func isAllowedDomain(u *url.URL) bool {
 ```
 
 **Protection Coverage:**
+
 - ✅ Blocks all loopback addresses (127.0.0.0/8, ::1)
 - ✅ Blocks private IP ranges:
   - 10.0.0.0/8
@@ -521,6 +566,7 @@ func isAllowedDomain(u *url.URL) bool {
 - ✅ Uses DNS resolution to detect hostname-based attacks
 
 **Test Support:**
+
 - `ALLOW_PRIVATE_IPS=true` environment variable for testing with localhost
 - Maintains security in production while allowing test flexibility
 
@@ -531,6 +577,7 @@ func isAllowedDomain(u *url.URL) bool {
 **Current Test Suite:** 35 tests total
 
 **Security-Specific Tests:**
+
 1. ✅ `TestAPIKeyMiddleware_BypassRules` - Method-specific bypass
 2. ✅ `TestAPIKeyMiddleware_InvalidKey` - Invalid key rejection
 3. ✅ `TestAPIKeyMiddleware_RevokedKey` - Revoked key rejection
@@ -540,11 +587,13 @@ func isAllowedDomain(u *url.URL) bool {
 7. ✅ File size limit tests
 
 **Coverage:**
+
 - Services: 84.4%
 - Routes: 69.8%
 - Middleware: Comprehensive security coverage
 
 **Recommendations:**
+
 - Add SSRF attack tests
 - Add rate limit bypass attempt tests
 - Add SQL injection attempt tests (verify parameterization holds)
@@ -557,7 +606,7 @@ func isAllowedDomain(u *url.URL) bool {
 
 ### High Risks: ✅ NONE
 
-### Medium Risks:
+### Medium Risks
 
 1. **SSRF via URL Fetching** (Medium)
    - Mitigation: Domain whitelist exists
@@ -567,7 +616,7 @@ func isAllowedDomain(u *url.URL) bool {
    - Mitigation: Generic errors used
    - Recommendation: Remove `err.Error()` from production responses
 
-### Low Risks:
+### Low Risks
 
 1. **Missing Security Headers** (Low)
    - Impact: Minimal for API-only service
@@ -581,7 +630,7 @@ func isAllowedDomain(u *url.URL) bool {
 
 ## Compliance & Best Practices
 
-### OWASP Top 10 (2021) Assessment:
+### OWASP Top 10 (2021) Assessment
 
 | Risk | Status | Notes |
 |------|--------|-------|
@@ -601,9 +650,11 @@ func isAllowedDomain(u *url.URL) bool {
 ## Recommendations Summary
 
 ### Immediate Actions (Priority: HIGH)
+
 None - critical issues have been addressed ✅
 
 ### Short-term Improvements (Priority: MEDIUM)
+
 1. ✅ **COMPLETED: Add Security Headers**
    - ✅ Implemented: Middleware added in `main.go`
    - Commit: `d38ce6b`
@@ -617,6 +668,7 @@ None - critical issues have been addressed ✅
    - Commit: `d38ce6b`
 
 ### Long-term Enhancements (Priority: LOW)
+
 1. **API Key-Based Rate Limiting**
    - Higher limits for authenticated users
    - Effort: 2-3 hours
@@ -639,6 +691,7 @@ None - critical issues have been addressed ✅
 ## Production Deployment Checklist
 
 ### Required (Before Production)
+
 - ✅ Enable API key authentication (`API_KEY_AUTH_ENABLED=true`)
 - ✅ Configure rate limiting (`RATE_LIMIT_MAX`, `RATE_LIMIT_WINDOW`)
 - ✅ Set domain whitelist (`ALLOWED_DOMAINS` - explicit list, not empty)
@@ -648,16 +701,19 @@ None - critical issues have been addressed ✅
 - ✅ Deploy behind reverse proxy (nginx, Caddy, Cloudflare)
 
 ### Implemented Security Features
+
 - ✅ **Security headers middleware** (X-Content-Type-Options, X-Frame-Options, etc.)
 - ✅ **SSRF protection with private IP blocking**
 - ✅ **Production error handling** (hides internal details)
 
 ### Recommended
+
 - ⚠️ Set up database backups
 - ⚠️ Configure security event logging
 - ⚠️ Run `govulncheck` regularly
 
 ### Monitoring
+
 - Track failed authentication attempts
 - Monitor rate limit violations
 - Alert on unusual patterns
@@ -671,7 +727,8 @@ The Image Optimizer API demonstrates **excellent security posture** with proper 
 
 **Security Score: A (92/100)**
 
-### Strengths:
+### Strengths
+
 - ✅ Cryptographically secure API key generation (256-bit entropy)
 - ✅ SQL injection protection (parameterized queries throughout)
 - ✅ Comprehensive input validation with range checks
@@ -684,7 +741,8 @@ The Image Optimizer API demonstrates **excellent security posture** with proper 
 - ✅ 35 passing tests including security tests
 - ✅ Method-specific authentication bypass rules
 
-### Remaining Improvements (Optional):
+### Remaining Improvements (Optional)
+
 - Add security event logging (low priority)
 - Implement API key-based rate limiting (low priority)
 - Content-based file validation with magic bytes (low priority)

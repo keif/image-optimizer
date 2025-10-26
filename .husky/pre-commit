@@ -1,0 +1,26 @@
+# Run markdown linter with auto-fix on staged files (don't fail on unfixable errors)
+STAGED_MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.md$' || true)
+if [ -n "$STAGED_MD_FILES" ]; then
+  echo "🔍 Linting markdown files..."
+  pnpm exec markdownlint --fix $STAGED_MD_FILES || true
+  git add $STAGED_MD_FILES
+fi
+
+# Run Go linter on staged Go files
+STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '^api/.*\.go$' || true)
+if [ -n "$STAGED_GO_FILES" ]; then
+  echo "🔍 Linting Go files..."
+  cd api && golangci-lint run $STAGED_GO_FILES 2>&1 || true
+  cd ..
+fi
+
+# Run frontend linter on staged TS/TSX files
+STAGED_WEB_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '^web/.*\.\(ts\|tsx\)$' || true)
+if [ -n "$STAGED_WEB_FILES" ]; then
+  echo "🔍 Linting frontend files..."
+  cd web && pnpm lint:fix || true
+  cd ..
+  git add $STAGED_WEB_FILES
+fi
+
+echo "✅ Pre-commit checks complete"

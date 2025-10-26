@@ -102,6 +102,7 @@ api.sosquishy.io {
 ```
 
 **Steps:**
+
 1. Build static site: `cd web && pnpm build`
 2. Copy to server: `rsync -avz web/out/ sosquishy-server:/var/www/sosquishy.io/`
 3. Update DNS: Point `sosquishy.io` A record to Hetzner IP
@@ -128,7 +129,8 @@ git commit -m "feat: add ads.txt redirect"
 git push origin main
 ```
 
-**Note:** This uses HTML meta refresh instead of HTTP 301 redirect. For a true 301 redirect, you need server-side control (Caddy on Hetzner).
+**Note:** This uses HTML meta refresh instead of HTTP 301 redirect.
+For a true 301 redirect, you need server-side control (Caddy on Hetzner).
 
 #### Option 3: Next.js Redirect (Better for GitHub Pages)
 
@@ -219,27 +221,32 @@ www.api.sosquishy.io {
 ## Applying the Changes
 
 1. **Backup current config**:
+
    ```bash
    ssh sosquishy-server
    sudo cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.backup
    ```
 
 2. **Edit Caddyfile**:
+
    ```bash
    sudo nano /etc/caddy/Caddyfile
    ```
 
 3. **Validate config**:
+
    ```bash
    sudo caddy validate --config /etc/caddy/Caddyfile
    ```
 
 4. **Apply changes**:
+
    ```bash
    sudo systemctl reload caddy
    ```
 
 5. **Verify**:
+
    ```bash
    # Check Caddy status
    sudo systemctl status caddy
@@ -253,7 +260,8 @@ www.api.sosquishy.io {
 
 ## Notes
 
-- **Docker networking**: The container binds to `127.0.0.1:8080` (localhost only), so Caddy is the only way to access it from outside
+- **Docker networking**: The container binds to `127.0.0.1:8080` (localhost only),
+so Caddy is the only way to access it from outside
 - **No restart needed**: Caddy automatically obtains/renews Let's Encrypt certificates
 - **Logging**: All access logs go to `/var/log/caddy/api.sosquishy.io.log` in JSON format
 - **Health checks**: Caddy monitors the backend and stops sending traffic if unhealthy

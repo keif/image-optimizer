@@ -1,0 +1,25 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Run markdown linter with auto-fix on staged files
+STAGED_MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.md$' || true)
+if [ -n "$STAGED_MD_FILES" ]; then
+  echo "Linting markdown files..."
+  pnpm lint:md:fix
+  git add $STAGED_MD_FILES
+fi
+
+# Run Go linter on staged Go files
+STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '^api/.*\.go$' || true)
+if [ -n "$STAGED_GO_FILES" ]; then
+  echo "Linting Go files..."
+  cd api && golangci-lint run ./...
+fi
+
+# Run frontend linter on staged TS/TSX files
+STAGED_WEB_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '^web/.*\.\(ts\|tsx\)$' || true)
+if [ -n "$STAGED_WEB_FILES" ]; then
+  echo "Linting frontend files..."
+  cd web && pnpm lint:fix
+  git add $STAGED_WEB_FILES
+fi

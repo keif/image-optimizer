@@ -65,6 +65,7 @@ var (
 ```
 
 **How it works:**
+
 - Variables are declared with default values ("dev", "none", "unknown")
 - At build time, Docker passes build args via `-ldflags`
 - The Go linker replaces the default values with actual git information
@@ -87,6 +88,7 @@ func HealthHandler(version, commit string) fiber.Handler {
 ```
 
 **Key features:**
+
 - Returns closure that captures version and commit
 - Generates fresh timestamp on each request
 - Always returns HTTP 200 (unless server is down)
@@ -110,6 +112,7 @@ func main() {
 ```
 
 **Startup logs example:**
+
 ```
 Image Optimizer API
 Version: v1.3.2
@@ -140,6 +143,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build \
 ```
 
 **What this does:**
+
 1. Declares `ARG` variables with defaults
 2. Uses `${APP_VERSION}`, `${GIT_COMMIT}`, and `${BUILD_TIME}` in ldflags
 3. The `-X` flag sets the value of string variables at link time
@@ -219,11 +223,13 @@ echo "✅ Deployment verified!"
 ```
 
 Make it executable:
+
 ```bash
 chmod +x api/deploy.sh
 ```
 
 Deploy:
+
 ```bash
 ./api/deploy.sh
 ```
@@ -369,6 +375,7 @@ curl https://api.sosquishy.io/health
 ```
 
 **Expected response:**
+
 ```json
 {
   "status": "ok",
@@ -437,6 +444,7 @@ curl -w "\nResponse Time: %{time_total}s\n" -s https://api.sosquishy.io/health
 ### Browser Verification
 
 Simply open in your browser:
+
 ```
 https://api.sosquishy.io/health
 ```
@@ -462,13 +470,14 @@ Fly.io automatically uses the `/health` endpoint for health checks (configured i
 ```
 
 **What this means:**
+
 - Fly checks `/health` every 30 seconds
 - If it fails, the instance is restarted
 - During deployment, waits 10 seconds before checking
 
 ### UptimeRobot Configuration
 
-1. Go to https://uptimerobot.com/
+1. Go to <https://uptimerobot.com/>
 2. Add New Monitor
 3. Settings:
    - Monitor Type: HTTP(s)
@@ -479,7 +488,7 @@ Fly.io automatically uses the `/health` endpoint for health checks (configured i
 
 ### Pingdom Configuration
 
-1. Go to https://www.pingdom.com/
+1. Go to <https://www.pingdom.com/>
 2. Add New Check
 3. Settings:
    - Name: `Image Optimizer API`
@@ -496,6 +505,7 @@ Fly.io automatically uses the `/health` endpoint for health checks (configured i
 **Cause:** Build args not passed during deployment
 
 **Solution:**
+
 ```bash
 # Always use build args when deploying
 flyctl deploy \
@@ -509,6 +519,7 @@ flyctl deploy \
 **Cause:** Git repository not initialized or build args missing
 
 **Solution:**
+
 ```bash
 # Verify git repo exists
 git status
@@ -525,6 +536,7 @@ flyctl deploy --build-arg GIT_COMMIT=$(git rev-parse --short HEAD)
 **Cause:** No git tags exist
 
 **Solution:**
+
 ```bash
 # Create a tag
 git tag v1.0.0
@@ -540,6 +552,7 @@ git describe --tags --always
 **Cause:** Route not registered or middleware blocking
 
 **Solution:**
+
 ```bash
 # Check app logs
 flyctl logs
@@ -590,6 +603,7 @@ curl -s https://api.sosquishy.io/health | jq '{version, commit, status}'
 ### 5. Include in Smoke Tests
 
 After deployment, always check:
+
 ```bash
 # 1. Health endpoint
 curl https://api.sosquishy.io/health
@@ -608,12 +622,14 @@ curl -X POST https://api.sosquishy.io/optimize -F "image=@test.jpg"
 ### What This Endpoint Exposes
 
 ✅ **Safe to expose:**
+
 - Application version (public information)
 - Git commit hash (public if GitHub repo is public)
 - Current timestamp (public information)
 - Health status ("ok")
 
 ❌ **Does NOT expose:**
+
 - Environment variables
 - Database credentials
 - API keys
@@ -626,6 +642,7 @@ curl -X POST https://api.sosquishy.io/optimize -F "image=@test.jpg"
 The health endpoint is **exempt from API key requirements** but still subject to rate limiting (configured in `middleware/`).
 
 **Why?**
+
 - Monitoring services need unauthenticated access
 - Rate limiting prevents abuse
 - No sensitive data exposed

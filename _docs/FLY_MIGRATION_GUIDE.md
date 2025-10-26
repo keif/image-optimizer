@@ -1,4 +1,5 @@
 # Render → Fly.io Migration Guide
+
 ## Image Optimizer API Migration
 
 ---
@@ -6,6 +7,7 @@
 ## Overview
 
 **Current Setup:**
+
 - Platform: Render.com
 - URL: `https://image-optimizer-1t9i.onrender.com`
 - Custom Domain: `api.sosquishy.io`
@@ -14,6 +16,7 @@
 - Database: SQLite (persistent volume needed)
 
 **Target Setup:**
+
 - Platform: Fly.io
 - Memory: 2 GB
 - Region: Auto-selected (can specify)
@@ -24,28 +27,33 @@
 ## Migration Plan
 
 ### Phase 1: Preparation (5 minutes)
+
 1. Install Fly CLI
 2. Create Fly.io account
 3. Review current environment variables on Render
 
 ### Phase 2: Initial Setup (10 minutes)
+
 1. Initialize Fly app
 2. Configure fly.toml
 3. Create volume for SQLite database
 4. Set environment variables
 
 ### Phase 3: Deployment (5 minutes)
+
 1. Deploy application
 2. Verify health endpoint
 3. Test API endpoints
 
 ### Phase 4: Domain Migration (10 minutes)
+
 1. Add custom domain to Fly
 2. Configure DNS records
 3. Enable HTTPS certificates
 4. Update CORS origins
 
 ### Phase 5: Cutover (5 minutes)
+
 1. Final testing on new domain
 2. Monitor logs and metrics
 3. Scale if needed
@@ -60,21 +68,25 @@
 ### Step 1: Install Fly CLI
 
 **macOS:**
+
 ```bash
 brew install flyctl
 ```
 
 **Linux:**
+
 ```bash
 curl -L https://fly.io/install.sh | sh
 ```
 
 **Windows (PowerShell):**
+
 ```powershell
 iwr https://fly.io/install.ps1 -useb | iex
 ```
 
 **Verify installation:**
+
 ```bash
 flyctl version
 ```
@@ -169,6 +181,7 @@ flyctl secrets set DB_PATH=/app/data/api_keys.db
 ```
 
 **View all secrets:**
+
 ```bash
 flyctl secrets list
 ```
@@ -190,6 +203,7 @@ flyctl deploy
 ```
 
 **Monitor deployment:**
+
 ```bash
 flyctl logs
 ```
@@ -224,6 +238,7 @@ flyctl certs add api.sosquishy.io
 ```
 
 **Example output:**
+
 ```
 Your certificate for api.sosquishy.io is being issued.
 Add the following DNS records to your domain:
@@ -240,6 +255,7 @@ CNAME record:
 Go to your DNS provider (e.g., Cloudflare, Namecheap, Route53) and add:
 
 **Option A: CNAME Record (Recommended)**
+
 ```
 Type: CNAME
 Name: api (or api.sosquishy.io)
@@ -249,6 +265,7 @@ Proxy: Disabled (important!)
 ```
 
 **Option B: A and AAAA Records**
+
 ```bash
 # Get Fly's IP addresses
 flyctl ips list
@@ -275,6 +292,7 @@ flyctl certs show api.sosquishy.io
 ```
 
 **Test HTTPS:**
+
 ```bash
 curl https://api.sosquishy.io/health
 ```
@@ -302,6 +320,7 @@ flyctl status
 ```
 
 **Available memory sizes:**
+
 - 256 MB (shared CPU)
 - 512 MB (shared CPU)
 - 1024 MB (1 GB)
@@ -392,6 +411,7 @@ flyctl deploy --image registry.fly.io/image-optimizer:<version>
 ```
 
 **Emergency fallback:**
+
 - Keep Render service running during initial testing
 - Switch DNS back to Render if issues occur
 - Debug on Fly.io without affecting users
@@ -401,10 +421,12 @@ flyctl deploy --image registry.fly.io/image-optimizer:<version>
 ## Cost Comparison
 
 **Render.com (Current):**
+
 - 512 MB: ~$7-25/month (depending on plan)
 - Limited free tier hours
 
 **Fly.io (New):**
+
 - 2 GB RAM: ~$5-10/month
 - Includes 3GB persistent volume
 - Pay-as-you-go pricing
@@ -433,13 +455,17 @@ flyctl deploy --image registry.fly.io/image-optimizer:<version>
 ## Troubleshooting
 
 ### Issue: "no such image" during build
+
 **Solution:**
+
 ```bash
 flyctl deploy --local-only
 ```
 
 ### Issue: Volume not mounting
+
 **Solution:**
+
 ```bash
 # Check volume exists
 flyctl volumes list
@@ -450,7 +476,9 @@ flyctl volumes create image_optimizer_data --region iad --size 1
 ```
 
 ### Issue: CORS errors from frontend
+
 **Solution:**
+
 ```bash
 # Verify CORS origins include your frontend
 flyctl secrets list
@@ -458,7 +486,9 @@ flyctl secrets set CORS_ORIGINS="https://sosquishy.io,https://www.sosquishy.io"
 ```
 
 ### Issue: Out of memory errors
+
 **Solution:**
+
 ```bash
 # Scale up memory
 flyctl scale memory 4096
@@ -468,7 +498,9 @@ flyctl scale memory 4096
 ```
 
 ### Issue: Certificate not issuing
+
 **Solution:**
+
 ```bash
 # Verify DNS is correct
 dig api.sosquishy.io
@@ -479,7 +511,9 @@ flyctl certs add api.sosquishy.io
 ```
 
 ### Issue: Database not persisting
+
 **Solution:**
+
 ```bash
 # Check volume is mounted
 flyctl ssh console
@@ -544,10 +578,10 @@ flyctl regions set iad lax
 
 ## Support Resources
 
-- Fly.io Docs: https://fly.io/docs/
-- Fly.io Community: https://community.fly.io/
-- Fly.io Status: https://status.fly.io/
-- Your project issues: https://github.com/keif/image-optimizer/issues
+- Fly.io Docs: <https://fly.io/docs/>
+- Fly.io Community: <https://community.fly.io/>
+- Fly.io Status: <https://status.fly.io/>
+- Your project issues: <https://github.com/keif/image-optimizer/issues>
 
 ---
 

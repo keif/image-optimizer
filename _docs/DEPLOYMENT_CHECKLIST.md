@@ -5,6 +5,7 @@ Complete checklist for deploying sosquishy.io full stack to Hetzner with Docker.
 ## Pre-Deployment Checklist
 
 ### 1. Server Setup ✅ (Already Done)
+
 - [x] Hetzner Cloud server provisioned
 - [x] SSH access configured
 - [x] Caddy installed
@@ -105,12 +106,12 @@ git commit -m "feat: enable full stack Docker deployment on Hetzner"
 git push origin main
 ```
 
-3. Monitor deployment:
+1. Monitor deployment:
    - Go to GitHub → Actions tab
    - Watch "Deploy Full Stack to Hetzner (Docker)" workflow
    - Check for ✅ success or ❌ failure
 
-4. Verify deployment (after workflow completes):
+2. Verify deployment (after workflow completes):
 
 ```bash
 # Check frontend
@@ -196,11 +197,11 @@ openssl s_client -connect api.sosquishy.io:443 -servername api.sosquishy.io < /d
 
 ### 4. Functional Testing
 
-- [ ] Visit https://sosquishy.io - homepage loads
+- [ ] Visit <https://sosquishy.io> - homepage loads
 - [ ] Upload an image - optimization works
 - [ ] Check before/after comparison - displays correctly
 - [ ] Test sprite sheet packer - works correctly
-- [ ] Check https://api.sosquishy.io/swagger - API docs load
+- [ ] Check <https://api.sosquishy.io/swagger> - API docs load
 - [ ] Test API directly with curl
 - [ ] Verify social media icons in footer
 - [ ] Check /learn page content
@@ -409,16 +410,16 @@ ssh sosquishy-server 'sudo journalctl -u caddy -f'
 - **DNS_SETUP.md** - DNS configuration instructions
 - **GITHUB_SECRETS_SETUP.md** - GitHub Actions setup
 - **CADDY_CONFIG_UPDATE.md** - Caddy configuration details
-- **Hetzner Console** - https://console.hetzner.cloud
+- **Hetzner Console** - <https://console.hetzner.cloud>
 - **GitHub Actions** - Check workflow runs in Actions tab
 
 ## Success Criteria
 
 Deployment is successful when:
 
-- ✅ https://sosquishy.io loads frontend
-- ✅ https://api.sosquishy.io/health returns OK
-- ✅ https://sosquishy.io/ads.txt redirects (301)
+- ✅ <https://sosquishy.io> loads frontend
+- ✅ <https://api.sosquishy.io/health> returns OK
+- ✅ <https://sosquishy.io/ads.txt> redirects (301)
 - ✅ SSL certificates are valid (Let's Encrypt)
 - ✅ Docker containers are healthy
 - ✅ No errors in logs

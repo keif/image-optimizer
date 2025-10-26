@@ -11,11 +11,13 @@ This guide explains the Ezoic ad integration with ad blocker detection and donat
 ### Files Created/Modified
 
 **New Files:**
+
 - `web/hooks/useAdBlockDetection.ts` - Detects ad blockers
 - `web/components/AdBanner.tsx` - Main ad component with Ezoic integration
 - `web/components/AdBlockerFallback.tsx` - Donation message for ad blocker users
 
 **Modified Files:**
+
 - `web/app/layout.tsx` - Added Ezoic privacy and header scripts
 - `web/app/page.tsx` - Added ad placements (top banner + sidebar)
 
@@ -24,12 +26,14 @@ This guide explains the Ezoic ad integration with ad blocker detection and donat
 ## Ad Placements
 
 ### 1. Top Banner Ad (Placeholder ID: 101)
+
 - **Location:** Below header, above main content
 - **Type:** Horizontal banner (728x90 or responsive)
 - **Visibility:** All devices (mobile + desktop)
 - **Fallback:** Donation banner when ads blocked
 
 ### 2. Sidebar Ad (Placeholder ID: 102)
+
 - **Location:** Right sidebar, between "How it Works" and "Privacy First" boxes
 - **Type:** Vertical sidebar (300x250 or 300x600)
 - **Visibility:** Desktop only (hidden on mobile)
@@ -46,11 +50,13 @@ This guide explains the Ezoic ad integration with ad blocker detection and donat
 3. Create two new ad placeholders:
 
 **Placeholder 101 (Top Banner):**
+
 - Type: Display Ad
 - Size: Responsive (or 728x90 leaderboard)
 - Location: Below header
 
 **Placeholder 102 (Sidebar):**
+
 - Type: Display Ad
 - Size: Medium Rectangle (300x250) or Half Page (300x600)
 - Location: Sidebar
@@ -96,6 +102,7 @@ Ad blocker detection runs
 ### Ad Blocker Detection
 
 The `useAdBlockDetection` hook:
+
 1. Creates a "bait" element with ad-like class names
 2. Checks if ad blockers hide/remove it
 3. Returns `true` if blocked, `false` if allowed
@@ -104,6 +111,7 @@ The `useAdBlockDetection` hook:
 ### Fallback Behavior
 
 **When ads are blocked:**
+
 - Top banner → Shows purple/pink gradient banner with donation CTAs
 - Sidebar → Shows compact card with donation buttons
 - Both link to Buy Me a Coffee and GitHub Sponsors
@@ -122,6 +130,7 @@ The `useAdBlockDetection` hook:
 | 500,000 | $1,000-2,500 | High traffic, premium CPMs |
 
 **Factors affecting CPM:**
+
 - Geographic location (US/EU = higher)
 - Ad placement quality
 - User engagement
@@ -150,15 +159,17 @@ pnpm run dev
 **What to test:**
 
 1. **Development mode (localhost):**
-   - Load http://localhost:3000
+   - Load <http://localhost:3000>
    - Should see blue/purple dashed boxes with "Development Mode - Ad Placeholder"
    - This is normal! Ads only work in production.
 
 2. **Ad blocker detection (test in production build):**
+
    ```bash
    pnpm run build
    pnpm run start  # Production mode locally
    ```
+
    - Enable uBlock Origin or AdBlock Plus
    - Should see donation banners instead of ads
    - Check both top banner and sidebar
@@ -195,6 +206,7 @@ After deploying to GitHub Pages:
 **Problem:** Placeholder divs visible but no ads appear
 
 **Solutions:**
+
 1. Check Ezoic dashboard → Ensure site is activated
 2. Verify placeholder IDs match (101, 102)
 3. Wait 24-48 hours after setup for ads to start serving
@@ -205,6 +217,7 @@ After deploying to GitHub Pages:
 **Problem:** Ads blocked but fallback doesn't show
 
 **Solutions:**
+
 1. Check browser console for errors
 2. Ensure `useAdBlockDetection` hook is running
 3. Test with different ad blockers (uBlock, AdBlock Plus)
@@ -215,6 +228,7 @@ After deploying to GitHub Pages:
 **Problem:** Console shows hydration mismatch errors
 
 **Solutions:**
+
 1. The `isMounted` check should prevent this
 2. If errors persist, check Next.js dev server logs
 3. Ensure `'use client'` is at top of components
@@ -224,6 +238,7 @@ After deploying to GitHub Pages:
 **Problem:** Consent popup not appearing in EU
 
 **Solutions:**
+
 1. Verify privacy scripts load first (check Network tab)
 2. Check `data-cfasync="false"` is set
 3. Test from actual EU location (not VPN)
@@ -288,9 +303,9 @@ if (process.env.NEXT_PUBLIC_ENABLE_ADS === 'false') {
 
 ## Support & Resources
 
-- **Ezoic Support:** https://support.ezoic.com/
-- **Ezoic Dashboard:** https://www.ezoic.com/dashboard/
-- **Chrome Extension:** https://www.ezoic.com/publishers/integrations/chrome-extension/
+- **Ezoic Support:** <https://support.ezoic.com/>
+- **Ezoic Dashboard:** <https://www.ezoic.com/dashboard/>
+- **Chrome Extension:** <https://www.ezoic.com/publishers/integrations/chrome-extension/>
 - **Privacy Scripts:** Already integrated (GatekeeperConsent)
 
 ---

@@ -3,6 +3,7 @@
 ## What Are Pre-Commit Hooks?
 
 Pre-commit hooks automatically check your code **before** you commit, catching issues like:
+
 - Linting errors
 - Formatting issues
 - Trailing whitespace
@@ -19,6 +20,7 @@ This prevents bad code from entering the repository and failing CI.
 ```
 
 That's it! The script will:
+
 1. Install pre-commit (if needed)
 2. Install Git hooks
 3. Generate secrets baseline
@@ -45,6 +47,7 @@ pre-commit run --all-files
 ## What Gets Checked
 
 ### On Every Commit
+
 - ✅ **Go API** - golangci-lint with auto-fix
 - ✅ **Frontend** - ESLint + TypeScript checks
 - ✅ **Markdown** - markdownlint for docs
@@ -52,7 +55,9 @@ pre-commit run --all-files
 - ✅ **Secrets** - detect hardcoded credentials
 
 ### Auto-Fixes
+
 Many issues are automatically fixed:
+
 - Trailing whitespace removed
 - Line endings normalized to LF
 - Go code formatted with `gofmt` and `goimports`
@@ -62,6 +67,7 @@ Many issues are automatically fixed:
 ## Usage
 
 ### Normal Workflow
+
 ```bash
 git add .
 git commit -m "feat: your changes"
@@ -69,12 +75,14 @@ git commit -m "feat: your changes"
 ```
 
 ### Run Manually (Without Committing)
+
 ```bash
 pre-commit run --all-files     # Check all files
 pre-commit run --files file.go # Check specific file
 ```
 
 ### Skip Hooks (Emergency Only)
+
 ```bash
 git commit --no-verify -m "emergency fix"
 ```
@@ -82,6 +90,7 @@ git commit --no-verify -m "emergency fix"
 **⚠️ Warning:** Only skip hooks if absolutely necessary. CI will catch the issues anyway.
 
 ### Update Hooks
+
 ```bash
 pre-commit autoupdate  # Update hook versions
 ```
@@ -106,6 +115,7 @@ pre-commit autoupdate  # Update hook versions
 ## Troubleshooting
 
 ### "command not found: pre-commit"
+
 ```bash
 pip install pre-commit
 # or
@@ -113,16 +123,19 @@ pip3 install pre-commit
 ```
 
 ### "golangci-lint: command not found"
+
 ```bash
 brew install golangci-lint
 ```
 
 ### "detect-secrets: command not found"
+
 ```bash
 pip install detect-secrets
 ```
 
 ### Hooks Not Running
+
 ```bash
 # Reinstall hooks
 pre-commit uninstall
@@ -130,6 +143,7 @@ pre-commit install
 ```
 
 ### Skip a Specific Hook
+
 ```bash
 SKIP=eslint git commit -m "skip eslint"
 ```
@@ -137,6 +151,7 @@ SKIP=eslint git commit -m "skip eslint"
 ## Configuration
 
 Edit `.pre-commit-config.yaml` to:
+
 - Add/remove hooks
 - Change hook versions
 - Modify hook arguments
@@ -148,6 +163,7 @@ Pre-commit hooks run **locally** before commit.
 GitHub Actions runs the same checks on **every push/PR**.
 
 This provides two layers of quality control:
+
 1. **Local** - Fast feedback before commit
 2. **CI** - Catches anything that slips through
 

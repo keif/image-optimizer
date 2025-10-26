@@ -5,6 +5,7 @@ Complete guide for deploying the entire Image Optimizer stack (Frontend + API) u
 ## Overview
 
 This deployment uses:
+
 - **Docker** for containerization
 - **docker-compose** for orchestration
 - **Next.js** (standalone mode) for frontend
@@ -42,6 +43,7 @@ Caddy (Port 443/80) → HTTPS + Reverse Proxy + ads.txt redirect
 ### Option 1: GitHub Actions (Recommended)
 
 1. **Set up GitHub Secrets** (one-time setup):
+
    ```
    Go to: GitHub repo → Settings → Secrets and variables → Actions → New repository secret
 
@@ -52,6 +54,7 @@ Caddy (Port 443/80) → HTTPS + Reverse Proxy + ads.txt redirect
    ```
 
 2. **Deploy**:
+
    ```bash
    # Simply push to main branch
    git add .
@@ -92,6 +95,7 @@ ssh sosquishy-server 'bash -s' < migrate-to-docker.sh
 ```
 
 This will:
+
 - Install Docker and docker-compose
 - Create `/opt/image-optimizer-docker/` directory
 - Migrate database from `/opt/image-optimizer/data/` to Docker volume
@@ -136,10 +140,11 @@ Located in `docker-compose.prod.yml`:
 | `RATE_LIMIT_WINDOW` | 1m | Rate limit time window |
 | `API_KEY_AUTH_ENABLED` | true | Require API keys |
 | `PUBLIC_OPTIMIZATION_ENABLED` | true | Allow public /optimize access |
-| `TRUSTED_ORIGINS` | https://sosquishy.io,... | CORS allowed origins |
+| `TRUSTED_ORIGINS` | <https://sosquishy.io>,... | CORS allowed origins |
 | `ALLOWED_DOMAINS` | cloudinary.com,... | Domains for URL fetching |
 
 To update environment variables:
+
 1. Edit `docker-compose.prod.yml`
 2. Redeploy (push to GitHub or run `./deploy-docker-hetzner.sh`)
 
@@ -161,6 +166,7 @@ deploy:
 ### Docker Volume
 
 Database is persisted in:
+
 - **Host path**: `/opt/image-optimizer-docker/data/`
 - **Container path**: `/app/data/`
 - **File**: `api_keys.db`
@@ -201,12 +207,14 @@ api.sosquishy.io {
 Located at `.github/workflows/deploy-api-hetzner.yml`
 
 **Triggers**:
+
 - Push to `main` branch
 - Changes in `api/**` directory
 - Changes in `docker-compose.prod.yml`
 - Manual trigger via GitHub UI
 
 **Steps**:
+
 1. Checkout code
 2. Get version info from git
 3. Setup SSH to Hetzner
@@ -218,6 +226,7 @@ Located at `.github/workflows/deploy-api-hetzner.yml`
 5. Verify deployment via HTTPS health endpoint
 
 **Secrets Required**:
+
 - `HETZNER_HOST`: Server IP or hostname (e.g., `123.45.67.89` or `sosquishy-server`)
 - `HETZNER_USER`: SSH username (usually `root`)
 - `HETZNER_SSH_KEY`: Private SSH key (full content including `-----BEGIN` and `-----END`)
@@ -555,6 +564,7 @@ source ~/.bashrc
 ### Optimize Image Size
 
 Currently using multi-stage builds:
+
 - Build stage: golang:1.24-alpine
 - Runtime stage: alpine:latest
 - Final image size: ~50MB
@@ -581,6 +591,7 @@ Docker deployment has no additional cost - runs on same server.
 ## Support
 
 For issues:
+
 1. Check logs: `docker logs squish-api`
 2. Check GitHub Actions: repo → Actions tab
 3. Review this documentation
@@ -588,8 +599,8 @@ For issues:
 
 ## Useful Links
 
-- **Production API**: https://api.sosquishy.io
-- **API Docs**: https://api.sosquishy.io/swagger/index.html
-- **Frontend**: https://sosquishy.io
-- **GitHub Actions**: https://github.com/keif/image-optimizer/actions
-- **Hetzner Console**: https://console.hetzner.cloud
+- **Production API**: <https://api.sosquishy.io>
+- **API Docs**: <https://api.sosquishy.io/swagger/index.html>
+- **Frontend**: <https://sosquishy.io>
+- **GitHub Actions**: <https://github.com/keif/image-optimizer/actions>
+- **Hetzner Console**: <https://console.hetzner.cloud>

@@ -3,6 +3,7 @@
 Quick reference guide for managing and monitoring usage metrics in production.
 
 ## Table of Contents
+
 - [Daily Operations](#daily-operations)
 - [Monitoring Commands](#monitoring-commands)
 - [Troubleshooting](#troubleshooting)
@@ -13,6 +14,7 @@ Quick reference guide for managing and monitoring usage metrics in production.
 ## Daily Operations
 
 ### Check System Health
+
 ```bash
 # API health check
 curl https://api.sosquishy.io/health | jq
@@ -25,6 +27,7 @@ ssh your-server "tail -20 /var/log/metrics-cleanup.log"
 ```
 
 ### Quick Status Check
+
 ```bash
 # On production server
 ssh your-server
@@ -46,6 +49,7 @@ curl http://localhost:8080/metrics/summary?days=1 | jq '.metrics.total_requests'
 ### View Metrics Data
 
 **Summary Statistics:**
+
 ```bash
 # Last 7 days
 curl "http://localhost:8080/metrics/summary?days=7" | jq
@@ -58,6 +62,7 @@ curl "https://api.sosquishy.io/metrics/summary?days=7" | jq
 ```
 
 **Time-Series Data:**
+
 ```bash
 # Hourly data for last 7 days
 curl "http://localhost:8080/metrics/timeline?days=7&interval=hour" | jq
@@ -67,6 +72,7 @@ curl "http://localhost:8080/metrics/timeline?days=30&interval=day" | jq
 ```
 
 **Format Conversion Stats:**
+
 ```bash
 # See which formats are most popular
 curl "http://localhost:8080/metrics/formats?days=30" | jq '.conversions[] | {input: .input_format, output: .output_format, count: .conversion_count}'
@@ -75,6 +81,7 @@ curl "http://localhost:8080/metrics/formats?days=30" | jq '.conversions[] | {inp
 ### Check Data Retention
 
 **Verify 30-day retention is working:**
+
 ```bash
 # Should return empty or minimal data (older than 30 days)
 curl "http://localhost:8080/metrics/summary?days=31" | jq '.metrics.total_requests'
@@ -86,6 +93,7 @@ curl "http://localhost:8080/metrics/summary?days=30" | jq '.metrics.total_reques
 ### Monitor Cleanup Process
 
 **View cleanup logs:**
+
 ```bash
 # Last 50 lines
 tail -50 /var/log/metrics-cleanup.log
@@ -101,6 +109,7 @@ grep "✓ Cleanup successful" /var/log/metrics-cleanup.log | tail -1
 ```
 
 **Check when cleanup last ran:**
+
 ```bash
 # View cron execution history
 grep "cleanup-metrics" /var/log/syslog | tail -5
@@ -113,6 +122,7 @@ grep "cleanup-metrics" /var/log/syslog | tail -5
 ### Problem: Cleanup not running
 
 **Diagnosis:**
+
 ```bash
 # 1. Verify cron job exists
 crontab -l | grep cleanup
@@ -128,6 +138,7 @@ ls -la /opt/image-optimizer-docker/cleanup-metrics.sh
 ```
 
 **Fix:**
+
 ```bash
 # Ensure script is executable
 chmod +x /opt/image-optimizer-docker/cleanup-metrics.sh
@@ -143,6 +154,7 @@ API_KEY="your-key" ./cleanup-metrics.sh
 ### Problem: Authentication failures
 
 **Diagnosis:**
+
 ```bash
 # 1. Test API key validity
 curl -H "Authorization: Bearer sk_your_key" \
@@ -157,6 +169,7 @@ grep "401\|Unauthorized\|Invalid" /var/log/metrics-cleanup.log
 ```
 
 **Fix:**
+
 ```bash
 # Create new API key
 curl -X POST "http://localhost:8080/api/keys" \
@@ -171,6 +184,7 @@ crontab -e
 ### Problem: Old data not being deleted
 
 **Diagnosis:**
+
 ```bash
 # 1. Check how old the data is
 curl "http://localhost:8080/metrics/summary?days=60" | jq
@@ -184,6 +198,7 @@ grep -E "error|fail|Error|FAIL" /var/log/metrics-cleanup.log | tail -10
 ```
 
 **Fix:**
+
 ```bash
 # Run cleanup manually with verbose output
 cd /opt/image-optimizer-docker
@@ -199,6 +214,7 @@ API_KEY="your-key" ./cleanup-metrics.sh 7
 ### Problem: No metrics data
 
 **Diagnosis:**
+
 ```bash
 # 1. Check if metrics collection is enabled
 docker exec squish-api env | grep METRICS
@@ -211,6 +227,7 @@ sqlite3 /opt/image-optimizer-docker/api/data/api_keys.db ".tables"
 ```
 
 **Fix:**
+
 ```bash
 # Ensure METRICS_ENABLED=true in docker-compose.prod.yml
 # Restart API if needed
@@ -222,6 +239,7 @@ docker-compose -f docker-compose.prod.yml restart api
 ## Maintenance Tasks
 
 ### Weekly Checks
+
 ```bash
 # 1. Review cleanup logs for any failures
 ssh your-server "grep -E 'fail|error' /var/log/metrics-cleanup.log | tail -20"
@@ -234,6 +252,7 @@ ssh your-server "ls -lh /opt/image-optimizer-docker/api/data/api_keys.db"
 ```
 
 ### Monthly Tasks
+
 ```bash
 # 1. Review metrics trends
 curl "https://api.sosquishy.io/metrics/summary?days=30" | jq
@@ -247,6 +266,7 @@ ssh your-server "ls -lh /var/log/metrics-cleanup.log"
 ```
 
 ### Manual Cleanup
+
 ```bash
 # Run cleanup immediately (doesn't wait for cron)
 ssh your-server
@@ -262,6 +282,7 @@ curl -X POST "http://localhost:8080/admin/cleanup-metrics?days=30" \
 ```
 
 ### Database Inspection
+
 ```bash
 # Connect to database
 ssh your-server
@@ -281,6 +302,7 @@ sqlite> .quit
 ## Emergency Procedures
 
 ### Database Growing Too Large
+
 ```bash
 # 1. Check current size
 ssh your-server "du -sh /opt/image-optimizer-docker/api/data/api_keys.db"
@@ -298,6 +320,7 @@ du -sh api/data/api_keys.db
 ```
 
 ### Complete Metrics Reset (Nuclear Option)
+
 ```bash
 # WARNING: This deletes ALL metrics data!
 ssh your-server
@@ -326,24 +349,28 @@ docker-compose -f docker-compose.prod.yml start api
 ## Quick Reference
 
 ### Important Files
+
 - **Database**: `/opt/image-optimizer-docker/api/data/api_keys.db`
 - **Cleanup Script**: `/opt/image-optimizer-docker/cleanup-metrics.sh`
 - **Cleanup Log**: `/var/log/metrics-cleanup.log`
 - **Cron Schedule**: `crontab -l`
 
 ### Important Endpoints
+
 - **Metrics Summary**: `GET /metrics/summary?days=30`
 - **Format Stats**: `GET /metrics/formats?days=30`
 - **Timeline Data**: `GET /metrics/timeline?days=7&interval=hour`
 - **Cleanup**: `POST /admin/cleanup-metrics?days=30` (requires API key)
 
 ### Default Settings
+
 - **Retention Period**: 30 days
 - **Cleanup Schedule**: Daily at 2:00 AM
 - **Aggregation**: Hourly buckets
 - **Privacy**: No PII, anonymized data only
 
 ### Support
+
 - **Documentation**: See main README.md
-- **Issues**: https://github.com/keif/image-optimizer/issues
-- **Privacy Policy**: https://sosquishy.io/privacy
+- **Issues**: <https://github.com/keif/image-optimizer/issues>
+- **Privacy Policy**: <https://sosquishy.io/privacy>

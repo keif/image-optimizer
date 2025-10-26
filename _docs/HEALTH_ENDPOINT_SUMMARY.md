@@ -9,6 +9,7 @@ A production-ready `/health` endpoint with build-time version information for th
 ## 📦 Files Created/Modified
 
 ### Created Files
+
 1. **`api/version.go`** - Build-time version variables
 2. **`api/routes/health.go`** - Health endpoint handler
 3. **`api/routes/health_test.go`** - Comprehensive tests (4 test cases)
@@ -17,6 +18,7 @@ A production-ready `/health` endpoint with build-time version information for th
 6. **`HEALTH_ENDPOINT_SUMMARY.md`** - This file
 
 ### Modified Files
+
 1. **`api/main.go`** - Updated to use new health handler with version logging
 2. **`api/Dockerfile`** - Added build args and ldflags for version injection
 
@@ -34,6 +36,7 @@ A production-ready `/health` endpoint with build-time version information for th
 ```
 
 **Fields:**
+
 - `status`: Always "ok" (indicates API is healthy)
 - `version`: Git tag or commit hash (from `git describe --tags --always`)
 - `commit`: Short git commit hash (from `git rev-parse --short HEAD`)
@@ -62,6 +65,7 @@ cd /Users/keif/projects/git/image-optimizer/api
 ```
 
 The script will:
+
 1. ✅ Get version info from git
 2. ✅ Show build information
 3. ✅ Ask for confirmation
@@ -94,6 +98,7 @@ fi
 ```
 
 **Expected Response:**
+
 ```json
 {
   "status": "ok",
@@ -128,6 +133,7 @@ go tool cover -html=coverage.out
 ### Test Results
 
 All 4 test cases passing:
+
 - ✅ `TestHealthHandler/health_check_with_production_version`
 - ✅ `TestHealthHandler/health_check_with_dev_version`
 - ✅ `TestHealthHandler/health_check_with_git_describe_version`
@@ -161,6 +167,7 @@ cd api
 ### Without Tags (Development)
 
 If you don't create tags, the version will be the commit hash:
+
 ```json
 {
   "version": "a6353bc",
@@ -171,6 +178,7 @@ If you don't create tags, the version will be the commit hash:
 ### Between Tags
 
 If you're 5 commits ahead of v1.0.0:
+
 ```bash
 git describe --tags --always
 # Output: v1.0.0-5-g1234567
@@ -189,6 +197,7 @@ git describe --tags --always
 ### 1. Build-Time Variable Injection
 
 **Dockerfile** receives build arguments:
+
 ```dockerfile
 ARG APP_VERSION=dev
 ARG GIT_COMMIT=none
@@ -196,6 +205,7 @@ ARG BUILD_TIME=unknown
 ```
 
 **Go build** injects them via ldflags:
+
 ```dockerfile
 RUN go build \
   -ldflags="-X main.version=${APP_VERSION} -X main.commit=${GIT_COMMIT} -X main.buildTime=${BUILD_TIME}" \
@@ -203,6 +213,7 @@ RUN go build \
 ```
 
 **Go variables** in `api/version.go`:
+
 ```go
 var (
     version   = "dev"     // Replaced at build time
@@ -214,6 +225,7 @@ var (
 ### 2. Startup Logging
 
 When the API starts, it logs version information:
+
 ```
 Image Optimizer API
 Version: v1.0.0
@@ -223,6 +235,7 @@ Starting server on port 8080
 ```
 
 View logs:
+
 ```bash
 flyctl logs
 ```
@@ -230,6 +243,7 @@ flyctl logs
 ### 3. Runtime Response
 
 The `/health` endpoint returns version info on each request:
+
 ```go
 func HealthHandler(version, commit string) fiber.Handler {
     return func(c *fiber.Ctx) error {
@@ -251,12 +265,14 @@ func HealthHandler(version, commit string) fiber.Handler {
 ### What This Endpoint Exposes
 
 ✅ **Safe to expose (public information):**
+
 - Application version
 - Git commit hash
 - Current timestamp
 - Health status
 
 ❌ **Does NOT expose:**
+
 - Environment variables
 - Database credentials
 - API keys
@@ -267,6 +283,7 @@ func HealthHandler(version, commit string) fiber.Handler {
 ### Rate Limiting
 
 The endpoint is:
+
 - ✅ Exempt from API key authentication (for monitoring services)
 - ✅ Still subject to rate limiting (prevents abuse)
 
@@ -277,6 +294,7 @@ The endpoint is:
 ### Fly.io Health Checks
 
 Already configured in `fly.toml`:
+
 ```toml
 [[services.http_checks]]
   interval = "30s"
@@ -290,11 +308,13 @@ Already configured in `fly.toml`:
 ### External Monitoring (Recommended)
 
 **UptimeRobot:**
+
 - URL: `https://api.sosquishy.io/health`
 - Interval: 5 minutes
 - Keyword check: `"ok"`
 
 **Pingdom:**
+
 - URL: `https://api.sosquishy.io/health`
 - Interval: 1 minute
 - String to expect: `"status":"ok"`
@@ -359,10 +379,12 @@ flyctl logs
 ## 📚 Documentation
 
 ### Quick Reference
+
 - **`HEALTH_ENDPOINT_SUMMARY.md`** (this file) - Quick overview
 - **`HEALTH_ENDPOINT.md`** - Complete documentation with examples
 
 ### Key Sections in Full Documentation
+
 1. Response Format
 2. Implementation Details
 3. Build Configuration
@@ -384,6 +406,7 @@ flyctl logs
 **Cause:** Build args not passed during deployment
 
 **Solution:**
+
 ```bash
 # Always use build args
 flyctl deploy \
@@ -400,6 +423,7 @@ flyctl deploy \
 **Cause:** Missing dependencies
 
 **Solution:**
+
 ```bash
 cd /Users/keif/projects/git/image-optimizer/api
 go mod tidy
@@ -411,6 +435,7 @@ go test ./routes -run TestHealth -v
 **Cause:** App not deployed or route not registered
 
 **Solution:**
+
 ```bash
 # Check deployment status
 flyctl status
@@ -427,18 +452,21 @@ flyctl logs
 ## ✨ Next Steps
 
 ### Immediate
+
 1. ✅ Code is ready - all tests passing
 2. ✅ Documentation complete
 3. 🎯 **Deploy to production** using `./deploy.sh`
-4. 🎯 **Verify** at https://api.sosquishy.io/health
+4. 🎯 **Verify** at <https://api.sosquishy.io/health>
 5. 🎯 **Create first git tag** (v1.0.0)
 
 ### Short-term
+
 1. Set up external monitoring (UptimeRobot/Pingdom)
 2. Create release workflow with semantic versioning
 3. Add health endpoint to frontend status page
 
 ### Optional Enhancements
+
 1. Add database connectivity check to health endpoint
 2. Add response time metrics
 3. Add version comparison API (check if update available)
@@ -449,10 +477,11 @@ flyctl logs
 ## 📞 Support
 
 **Issues or Questions?**
+
 - Full documentation: `HEALTH_ENDPOINT.md`
-- Fly.io docs: https://fly.io/docs/
-- Community: https://community.fly.io/
-- Project issues: https://github.com/keif/image-optimizer/issues
+- Fly.io docs: <https://fly.io/docs/>
+- Community: <https://community.fly.io/>
+- Project issues: <https://github.com/keif/image-optimizer/issues>
 
 ---
 
@@ -464,4 +493,4 @@ flyctl logs
 
 **Deploy Command:** `cd api && ./deploy.sh`
 
-**Verification URL:** https://api.sosquishy.io/health
+**Verification URL:** <https://api.sosquishy.io/health>

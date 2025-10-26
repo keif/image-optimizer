@@ -55,6 +55,7 @@ Use the deployment script to build and deploy code changes:
 ```
 
 This script will:
+
 1. Copy source code to server
 2. Build the Go binary on the server
 3. Deploy to `/usr/local/bin/image-optimizer`
@@ -76,6 +77,7 @@ CORS_ORIGINS=https://sosquishy.io,https://www.sosquishy.io
 ```
 
 This configuration:
+
 - ✅ Requires API keys for all requests
 - ✅ Allows sosquishy.io frontend to bypass API keys (origin-based auth)
 - ✅ Blocks all other domains from accessing without API keys
@@ -91,6 +93,7 @@ TRUSTED_ORIGINS=https://*.sosquishy.io
 ```
 
 This will match:
+
 - `https://sosquishy.io`
 - `https://www.sosquishy.io`
 - `https://api.sosquishy.io`
@@ -125,23 +128,27 @@ docker-compose up
 ```
 
 Local configuration (already set in docker-compose.yml):
+
 - API_KEY_AUTH_ENABLED=false (easier testing)
-- TRUSTED_ORIGINS=http://localhost:3000,http://localhost:8080
+- TRUSTED_ORIGINS=<http://localhost:3000>,<http://localhost:8080>
 - PUBLIC_OPTIMIZATION_ENABLED=true
 
 ### Troubleshooting
 
 **Service won't start:**
+
 ```bash
 journalctl -u image-optimizer -n 50
 ```
 
 **Check environment variables:**
+
 ```bash
 systemctl show image-optimizer | grep Environment
 ```
 
 **Test API key requirement:**
+
 ```bash
 # Without API key (from untrusted origin)
 curl https://api.sosquishy.io/api/keys
@@ -161,17 +168,20 @@ curl -H "Origin: https://sosquishy.io" https://api.sosquishy.io/optimize
 After updating the systemd service file with TRUSTED_ORIGINS:
 
 1. **Update systemd service** (one-time):
+
    ```bash
    scp api/image-optimizer.service root@sosquishy-server:/etc/systemd/system/
    ssh root@sosquishy-server "systemctl daemon-reload && systemctl restart image-optimizer"
    ```
 
 2. **Deploy code changes**:
+
    ```bash
    ./deploy-hetzner.sh
    ```
 
 3. **Verify**:
+
    ```bash
    curl -H "Origin: https://sosquishy.io" https://api.sosquishy.io/health
    ```

@@ -1,4 +1,5 @@
 # Custom Domain Setup for Fly.io
+
 ## Connecting api.sosquishy.io to Your Image Optimizer API
 
 ---
@@ -8,6 +9,7 @@
 This guide walks through connecting your custom domain `api.sosquishy.io` to your Fly.io application.
 
 **What You'll Get:**
+
 - ✅ HTTPS automatically enabled with Let's Encrypt certificates
 - ✅ Auto-renewal of certificates (every 90 days)
 - ✅ HTTP → HTTPS redirects
@@ -31,6 +33,7 @@ flyctl certs add api.sosquishy.io
 ```
 
 **Expected output:**
+
 ```
 Your certificate for api.sosquishy.io is being issued.
 
@@ -42,6 +45,7 @@ CNAME record:
 ```
 
 **What this does:**
+
 - Requests a TLS certificate from Let's Encrypt
 - Provides DNS configuration needed to verify domain ownership
 - Starts certificate issuance process (takes 1-5 minutes after DNS is configured)
@@ -55,11 +59,13 @@ You have **two options** for DNS configuration:
 ### Option A: CNAME Record (Recommended)
 
 **Pros:**
+
 - ✅ Automatically follows if Fly IPs change
 - ✅ Easier to manage
 - ✅ Standard for subdomains
 
 **Cons:**
+
 - ❌ Won't work for apex domain (sosquishy.io without subdomain)
 - ❌ May not work with some CDNs (like Cloudflare Proxy)
 
@@ -76,19 +82,23 @@ You have **two options** for DNS configuration:
 ### Option B: A and AAAA Records
 
 **Pros:**
+
 - ✅ Works with Cloudflare proxy
 - ✅ More control
 
 **Cons:**
+
 - ❌ Must update if Fly IPs change
 - ❌ Two records to manage
 
 **Get Fly.io IPs:**
+
 ```bash
 flyctl ips list
 ```
 
 **Example output:**
+
 ```
 VERSION IP                      TYPE    REGION  CREATED AT
 v6      2a09:8280:1::3:abcd     public  global  2025-10-19T00:00:00Z
@@ -123,6 +133,7 @@ v4      66.241.125.123          public  global  2025-10-19T00:00:00Z
 4. Click **Add record**
 
 **For CNAME:**
+
 ```
 Type: CNAME
 Name: api
@@ -132,6 +143,7 @@ TTL: Auto
 ```
 
 **For A/AAAA:**
+
 ```
 Type: A
 Name: api
@@ -149,6 +161,7 @@ Click **Save**
 3. Click **Manage** → **Advanced DNS** tab
 
 **For CNAME:**
+
 ```
 Type: CNAME Record
 Host: api
@@ -157,6 +170,7 @@ TTL: Automatic
 ```
 
 **For A/AAAA:**
+
 ```
 Type: A Record
 Host: api
@@ -173,6 +187,7 @@ Click **Save All Changes**
 3. Click **Create record**
 
 **For CNAME:**
+
 ```
 Record name: api
 Record type: CNAME
@@ -182,6 +197,7 @@ Routing policy: Simple routing
 ```
 
 **For A/AAAA:**
+
 ```
 Record name: api
 Record type: A
@@ -198,6 +214,7 @@ Click **Create records**
 3. Click **DNS** or **Manage**
 
 **For CNAME:**
+
 ```
 Resource type: CNAME
 Name: api.sosquishy.io.
@@ -206,6 +223,7 @@ TTL: 5 minutes
 ```
 
 **For A/AAAA:**
+
 ```
 Resource type: A
 Name: api.sosquishy.io.
@@ -216,6 +234,7 @@ TTL: 5 minutes
 ### Other DNS Providers
 
 General format:
+
 ```
 Type: CNAME
 Name/Host: api
@@ -228,6 +247,7 @@ TTL: 300-600 seconds
 ## Step 4: Verify DNS Propagation
 
 **Check DNS configuration:**
+
 ```bash
 # Using dig (macOS/Linux)
 dig api.sosquishy.io
@@ -243,11 +263,13 @@ api.sosquishy.io.  300  IN  A  66.241.125.123
 ```
 
 **Online DNS checkers:**
-- https://dnschecker.org/
-- https://mxtoolbox.com/DNSLookup.aspx
-- https://www.whatsmydns.net/
+
+- <https://dnschecker.org/>
+- <https://mxtoolbox.com/DNSLookup.aspx>
+- <https://www.whatsmydns.net/>
 
 **Wait for propagation:**
+
 - Usually: 5-10 minutes
 - Maximum: 24-48 hours (rare)
 - TTL determines cache duration
@@ -261,15 +283,18 @@ flyctl certs show api.sosquishy.io
 ```
 
 **Status progression:**
+
 1. `Pending` → DNS not configured yet
 2. `Validating` → DNS configured, waiting for Let's Encrypt
 3. `Issued` → Certificate ready! ✅
 
 **Troubleshooting statuses:**
+
 - `Failed` → Check DNS configuration
 - `Timeout` → DNS not propagating, wait longer
 
 **Force certificate refresh:**
+
 ```bash
 flyctl certs remove api.sosquishy.io
 flyctl certs add api.sosquishy.io
@@ -297,11 +322,13 @@ curl -v https://api.sosquishy.io/health
 ```
 
 **Test in browser:**
+
 ```
 https://api.sosquishy.io/swagger/index.html
 ```
 
 Should show:
+
 - ✅ Padlock icon in address bar
 - ✅ "Connection is secure"
 - ✅ Certificate valid for api.sosquishy.io
@@ -325,16 +352,19 @@ This will restart the app automatically.
 Update your frontend to use the new domain:
 
 **Before:**
+
 ```javascript
 const API_URL = "https://image-optimizer.fly.dev";
 ```
 
 **After:**
+
 ```javascript
 const API_URL = "https://api.sosquishy.io";
 ```
 
 Or use environment variables:
+
 ```bash
 # .env.production
 NEXT_PUBLIC_API_URL=https://api.sosquishy.io
@@ -345,38 +375,45 @@ NEXT_PUBLIC_API_URL=https://api.sosquishy.io
 ## Verification Checklist
 
 - [ ] DNS resolves to correct target
+
   ```bash
   dig api.sosquishy.io
   ```
 
 - [ ] Certificate issued
+
   ```bash
   flyctl certs show api.sosquishy.io | grep "issued"
   ```
 
 - [ ] HTTPS works
+
   ```bash
   curl https://api.sosquishy.io/health
   ```
 
 - [ ] HTTP redirects to HTTPS
+
   ```bash
   curl -I http://api.sosquishy.io/health
   # Should show: Location: https://api.sosquishy.io/health
   ```
 
 - [ ] CORS headers present
+
   ```bash
   curl -H "Origin: https://sosquishy.io" -I https://api.sosquishy.io/health
   # Should show: Access-Control-Allow-Origin: https://sosquishy.io
   ```
 
 - [ ] Swagger docs accessible
+
   ```bash
   open https://api.sosquishy.io/swagger/index.html
   ```
 
 - [ ] API endpoints work
+
   ```bash
   curl -X POST https://api.sosquishy.io/optimize \
     -F "image=@test.jpg" \
@@ -441,12 +478,14 @@ Then update DNS for each domain.
 ### Issue: "DNS verification failed"
 
 **Check:**
+
 ```bash
 dig api.sosquishy.io
 nslookup api.sosquishy.io
 ```
 
 **Solutions:**
+
 1. Wait for DNS propagation (up to 48h, usually 5-10 min)
 2. Verify DNS record is correct
 3. If using Cloudflare, disable proxy (orange cloud → gray cloud)
@@ -455,6 +494,7 @@ nslookup api.sosquishy.io
 ### Issue: "Certificate stuck in pending"
 
 **Solution:**
+
 ```bash
 # Remove and re-add
 flyctl certs remove api.sosquishy.io
@@ -472,6 +512,7 @@ flyctl certs show api.sosquishy.io
 **Cause:** Certificate not issued yet
 
 **Solution:**
+
 ```bash
 flyctl certs show api.sosquishy.io
 # If status is not "issued", wait for completion
@@ -480,11 +521,13 @@ flyctl certs show api.sosquishy.io
 ### Issue: CORS errors from frontend
 
 **Check CORS origins:**
+
 ```bash
 flyctl secrets list | grep CORS
 ```
 
 **Update if needed:**
+
 ```bash
 flyctl secrets set CORS_ORIGINS="https://sosquishy.io,https://api.sosquishy.io"
 ```
@@ -494,12 +537,14 @@ flyctl secrets set CORS_ORIGINS="https://sosquishy.io,https://api.sosquishy.io"
 **Cause:** Cloudflare proxy + Fly.io both forcing HTTPS
 
 **Solutions:**
+
 1. Disable Cloudflare proxy (recommended for API)
 2. Or set Cloudflare SSL mode to "Full (strict)"
 
 ### Issue: DNS not propagating
 
 **Check TTL:**
+
 ```bash
 dig api.sosquishy.io | grep TTL
 ```
@@ -507,9 +552,11 @@ dig api.sosquishy.io | grep TTL
 High TTL (e.g., 86400 = 24 hours) means slow propagation.
 
 **Solutions:**
+
 1. Lower TTL before making changes (e.g., 300 = 5 minutes)
 2. Wait for old TTL to expire
 3. Flush DNS cache:
+
    ```bash
    # macOS
    sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
@@ -540,6 +587,7 @@ https://image-optimizer.fly.dev
 ## Cost
 
 **All of this is FREE:**
+
 - ✅ HTTPS certificates (Let's Encrypt)
 - ✅ Auto-renewal
 - ✅ Unlimited domains
@@ -547,6 +595,7 @@ https://image-optimizer.fly.dev
 - ✅ Certificate management
 
 You only pay for:
+
 - VM runtime (~$5-10/month for 2GB)
 - Bandwidth (generous free tier)
 - Persistent storage (~$0.15/GB/month)
@@ -555,10 +604,10 @@ You only pay for:
 
 ## Reference Links
 
-- Fly.io Custom Domains: https://fly.io/docs/networking/custom-domain/
-- Let's Encrypt: https://letsencrypt.org/
-- DNS Checker: https://dnschecker.org/
-- SSL Test: https://www.ssllabs.com/ssltest/
+- Fly.io Custom Domains: <https://fly.io/docs/networking/custom-domain/>
+- Let's Encrypt: <https://letsencrypt.org/>
+- DNS Checker: <https://dnschecker.org/>
+- SSL Test: <https://www.ssllabs.com/ssltest/>
 
 ---
 

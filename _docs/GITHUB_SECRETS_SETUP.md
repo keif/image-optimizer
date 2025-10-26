@@ -28,6 +28,7 @@ hcloud server ip sosquishy-server
 ```
 
 **Example values:**
+
 - Hostname: `sosquishy-server` (if configured in /etc/hosts or DNS)
 - IP: `123.45.67.89` (direct IP address)
 
@@ -66,6 +67,7 @@ cat ~/.ssh/id_ed25519
 ```
 
 **Expected output:**
+
 ```
 -----BEGIN OPENSSH PRIVATE KEY-----
 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
@@ -75,6 +77,7 @@ NhAAAAAwEAAQAAAYEA1234567890abcdef...
 ```
 
 **IMPORTANT:**
+
 - Copy the **ENTIRE** key including `-----BEGIN` and `-----END` lines
 - Include all newlines (the key is multiple lines)
 - This is your **private key**, not the `.pub` file
@@ -94,6 +97,7 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub root@sosquishy-server
 ### Step 4: Add Secrets to GitHub
 
 1. **Go to your GitHub repository**:
+
    ```
    https://github.com/YOUR_USERNAME/image-optimizer
    ```
@@ -166,6 +170,7 @@ git push origin main
 **Cause:** SSH key doesn't match what's on the server
 
 **Solution:**
+
 1. Verify you copied the correct private key (not the `.pub` file)
 2. Ensure the corresponding public key is in server's `~/.ssh/authorized_keys`
 
@@ -249,6 +254,7 @@ cat ~/.ssh/github_actions_hetzner
 ```
 
 Benefits:
+
 - Can revoke without affecting your personal SSH access
 - Easier to audit (know which key was used)
 - Can restrict permissions for this specific key

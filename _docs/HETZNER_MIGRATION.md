@@ -5,6 +5,7 @@ Complete guide for migrating the Image Optimizer API from Fly.io to Hetzner Clou
 ## Migration Context
 
 **Reason for migration:** Memory limitations on Fly.io (2GB VM) causing OOM (Out of Memory) errors during large image processing operations, particularly with:
+
 - Large sprites (10766×9913 pixels)
 - Auto-resize operations with padding calculations
 - Multiple concurrent optimization requests
@@ -73,6 +74,7 @@ hcloud server ip image-optimizer-api
 ```
 
 **Expected output:**
+
 ```
 Server ID: 12345678
 Server IP: 123.45.67.89
@@ -143,6 +145,7 @@ ufw status verbose
 ```
 
 **Expected output:**
+
 ```
 Status: active
 
@@ -192,6 +195,7 @@ vips --version
 ```
 
 **Expected output:**
+
 ```
 vips-8.12.2-Fri Jan 28 15:38:40 UTC 2022
 ```
@@ -369,6 +373,7 @@ EOF
 ```
 
 **Key configuration notes:**
+
 - `User=appuser`: Runs as non-root user
 - `EnvironmentFile`: Loads environment variables from `.env`
 - `Restart=always`: Auto-restart on failure
@@ -521,6 +526,7 @@ journalctl -u caddy -f
 ```
 
 **Expected log output:**
+
 ```
 certificate obtained successfully
 serving HTTPS on :443
@@ -627,6 +633,7 @@ journalctl -u image-optimizer -f
 ```
 
 **Expected output:**
+
 ```
 ● image-optimizer.service - Image Optimizer API Server
      Loaded: loaded (/etc/systemd/system/image-optimizer.service; enabled)
@@ -645,6 +652,7 @@ Jan 15 10:30:00 image-optimizer-api image-optimizer[12345]: Server starting on :
 ### 6.2. Log Management
 
 **View logs in real-time:**
+
 ```bash
 # Follow application logs
 journalctl -u image-optimizer -f
@@ -663,6 +671,7 @@ journalctl -u image-optimizer -p err
 ```
 
 **Log rotation (journald handles this automatically):**
+
 ```bash
 # Check journal disk usage
 journalctl --disk-usage
@@ -679,6 +688,7 @@ systemctl restart systemd-journald
 ```
 
 **Caddy logs location:**
+
 ```bash
 # View Caddy access logs
 tail -f /var/log/caddy/api.sosquishy.io.log
@@ -704,6 +714,7 @@ EOF
 ### 6.3. Monitoring Commands
 
 **System resources:**
+
 ```bash
 # Real-time system monitor
 htop
@@ -722,6 +733,7 @@ systemd-cgtop
 ```
 
 **Application health:**
+
 ```bash
 # Health check (internal)
 curl http://localhost:8080/health
@@ -1141,6 +1153,7 @@ curl -X POST "https://api.sosquishy.io/optimize?format=webp&quality=80" \
 ### 8.4. Performance Comparison
 
 **Fly.io baseline (before migration):**
+
 ```bash
 # Test response time
 time curl -s https://api.sosquishy.io/health
@@ -1152,6 +1165,7 @@ time curl -X POST "https://api.sosquishy.io/optimize?format=webp" \
 ```
 
 **Hetzner (after migration):**
+
 ```bash
 # Same tests - compare timings
 # Expected: Similar or better performance with 4GB RAM vs 2GB
@@ -1190,7 +1204,7 @@ ps aux | grep image-optimizer
 
 The frontend is already configured to use `https://api.sosquishy.io`, so no changes should be needed. Test the full stack:
 
-1. Visit https://sosquishy.io
+1. Visit <https://sosquishy.io>
 2. Upload a test image
 3. Click "Optimize"
 4. Verify results display correctly
@@ -1301,11 +1315,13 @@ flyctl apps destroy image-optimizer-billowing-waterfall-5108
 ### 10.3. Cost Comparison
 
 **Fly.io (previous):**
+
 - VM: 2GB RAM, 1 vCPU
 - Cost: ~$12/month
 - Limitation: OOM errors with large images
 
 **Hetzner Cloud CX22 (new):**
+
 - VM: 4GB RAM, 2 vCPU, 40GB SSD
 - Cost: €5.83/month (~$6.50)
 - Benefit: 2x RAM, no OOM errors
@@ -1387,6 +1403,7 @@ EOF
 #### Issue: "Connection refused" when accessing API
 
 **Diagnosis:**
+
 ```bash
 # Check if app is running
 systemctl status image-optimizer
@@ -1399,6 +1416,7 @@ systemctl status caddy
 ```
 
 **Solution:**
+
 ```bash
 # Restart services
 systemctl restart image-optimizer
@@ -1413,6 +1431,7 @@ journalctl -u image-optimizer -n 50
 **Cause:** Binary was built on macOS instead of Linux server
 
 **Diagnosis:**
+
 ```bash
 # Check binary format
 file /usr/local/bin/image-optimizer
@@ -1426,6 +1445,7 @@ uname -m
 ```
 
 **Solution:**
+
 ```bash
 # Remove wrong binary
 rm /usr/local/bin/image-optimizer
@@ -1453,6 +1473,7 @@ chmod +x /usr/local/bin/image-optimizer
 **Cause:** Log directory doesn't exist or has wrong permissions
 
 **Diagnosis:**
+
 ```bash
 # Check if log directory exists
 ls -ld /var/log/caddy
@@ -1462,6 +1483,7 @@ journalctl -u caddy -n 50 | grep -i "permission denied"
 ```
 
 **Solution:**
+
 ```bash
 # Stop Caddy if it's stuck
 systemctl stop caddy
@@ -1479,16 +1501,19 @@ systemctl status caddy
 #### Issue: SSL certificate not issued
 
 **Diagnosis:**
+
 ```bash
 journalctl -u caddy | grep -i "certificate\|acme\|error"
 ```
 
 **Common causes:**
+
 - DNS not propagated yet (wait 30 minutes)
 - Port 80/443 blocked by firewall
 - Domain not pointing to server
 
 **Solution:**
+
 ```bash
 # Verify DNS
 dig api.sosquishy.io
@@ -1506,6 +1531,7 @@ caddy reload --config /etc/caddy/Caddyfile
 #### Issue: High memory usage
 
 **Diagnosis:**
+
 ```bash
 # Check memory
 free -h
@@ -1516,6 +1542,7 @@ systemctl status image-optimizer
 ```
 
 **Solution:**
+
 ```bash
 # Adjust memory limits in systemd service
 # Edit /etc/systemd/system/image-optimizer.service
@@ -1528,12 +1555,14 @@ systemctl restart image-optimizer
 #### Issue: Rate limiting too aggressive
 
 **Diagnosis:**
+
 ```bash
 # Check logs for 429 errors
 journalctl -u image-optimizer | grep "429\|rate limit"
 ```
 
 **Solution:**
+
 ```bash
 # Adjust rate limits in .env
 sed -i 's/RATE_LIMIT_MAX=100/RATE_LIMIT_MAX=200/' /opt/image-optimizer/.env
@@ -1614,6 +1643,7 @@ chmod +x /usr/local/bin/deploy-image-optimizer.sh
 ```
 
 **Usage:**
+
 ```bash
 # On local machine - copy source
 cd /Users/keif/projects/git/image-optimizer
@@ -1645,12 +1675,14 @@ This migration guide provides two deployment options:
    - Better isolation
 
 **Key benefits of Hetzner migration:**
+
 - ✅ 2x memory (4GB vs 2GB) - resolves OOM errors
 - ✅ Lower cost (~$6.50/month vs ~$12/month)
 - ✅ More control over infrastructure
 - ✅ Easier debugging and monitoring
 
 **Next steps:**
+
 1. Complete server provisioning
 2. Deploy application (binary or Docker)
 3. Configure Caddy and SSL
