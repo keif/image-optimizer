@@ -980,6 +980,96 @@ Add to your crontab to run daily at 2 AM:
 - `API_URL`: API endpoint URL (default: http://localhost:8080)
 - `API_KEY`: API key for authentication (required if API key auth is enabled)
 
+#### Monitoring and Troubleshooting
+
+**Check Current Metrics Data:**
+```bash
+# View last 30 days of metrics
+curl http://localhost:8080/metrics/summary?days=30 | jq
+
+# View last 7 days timeline
+curl http://localhost:8080/metrics/timeline?days=7 | jq
+
+# Check format conversion stats
+curl http://localhost:8080/metrics/formats?days=30 | jq
+```
+
+**Verify Cleanup is Working:**
+```bash
+# Check for data older than 30 days (should be empty after cleanup)
+curl http://localhost:8080/metrics/summary?days=31 | jq
+
+# Check for data within retention period (should have data)
+curl http://localhost:8080/metrics/summary?days=30 | jq
+```
+
+**Check Cleanup Logs:**
+```bash
+# View recent cleanup runs
+tail -50 /var/log/metrics-cleanup.log
+
+# Follow cleanup logs in real-time
+tail -f /var/log/metrics-cleanup.log
+
+# Check last cleanup status
+grep -E "✓|✗" /var/log/metrics-cleanup.log | tail -1
+```
+
+**Manual Cleanup (if needed):**
+```bash
+# Clean up immediately
+API_KEY="your-api-key" ./cleanup-metrics.sh
+
+# Custom retention (e.g., 7 days)
+API_KEY="your-api-key" ./cleanup-metrics.sh 7
+
+# Direct API call
+curl -X POST "http://localhost:8080/admin/cleanup-metrics?days=30" \
+  -H "Authorization: Bearer your-api-key"
+```
+
+**Verify Cron Job:**
+```bash
+# List current cron jobs
+crontab -l
+
+# Check if cron daemon is running
+sudo systemctl status cron  # or: sudo service cron status
+
+# Check syslog for cron execution
+grep -i cron /var/log/syslog | tail -20
+```
+
+**Database Inspection:**
+```bash
+# Check metrics database size
+ls -lh api/data/api_keys.db
+
+# Inspect database directly (if needed)
+sqlite3 api/data/api_keys.db "SELECT COUNT(*) FROM metrics_hourly;"
+sqlite3 api/data/api_keys.db "SELECT MIN(timestamp), MAX(timestamp) FROM metrics_hourly;"
+```
+
+**Common Issues:**
+
+1. **Cleanup not running:**
+   - Verify cron job: `crontab -l`
+   - Check cron logs: `grep CRON /var/log/syslog`
+   - Ensure script is executable: `chmod +x cleanup-metrics.sh`
+
+2. **Authentication failures:**
+   - Verify API key is valid: `curl -H "Authorization: Bearer sk_..." http://localhost:8080/metrics/summary`
+   - Check if API key was revoked: `curl http://localhost:8080/api/keys` (with valid key)
+
+3. **No metrics data:**
+   - Verify metrics collection is enabled: Check `METRICS_ENABLED` environment variable
+   - Check if API is receiving requests: `curl http://localhost:8080/health`
+
+4. **Old data not being deleted:**
+   - Check cleanup logs for errors
+   - Manually run cleanup script with verbose output
+   - Verify retention period: Data older than `X` days should be deleted
+
 ## Configuration
 
 The service can be configured using environment variables. See `.env.example` for all available options.
