@@ -5,6 +5,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
@@ -78,8 +79,14 @@ func TestDecompressionBombProtection(t *testing.T) {
 
 // TestSSRFProtection tests Server-Side Request Forgery protection
 func TestSSRFProtection(t *testing.T) {
-	// Initialize config with default whitelist
-	InitializeConfig()
+	// Ensure clean environment - explicitly set to defaults
+	// This prevents pollution from other tests that modify ALLOWED_DOMAINS
+	os.Setenv("ALLOWED_DOMAINS", "cloudinary.com,imgur.com,unsplash.com,pexels.com")
+	os.Unsetenv("ALLOW_PRIVATE_IPS")
+	defer func() {
+		os.Unsetenv("ALLOWED_DOMAINS")
+		os.Unsetenv("ALLOW_PRIVATE_IPS")
+	}()
 
 	app := fiber.New()
 	RegisterOptimizeRoutes(app)
@@ -164,8 +171,14 @@ func TestSSRFProtection(t *testing.T) {
 
 // TestDomainWhitelistEdgeCases tests edge cases in domain whitelist matching
 func TestDomainWhitelistEdgeCases(t *testing.T) {
-	// Initialize config
-	InitializeConfig()
+	// Ensure clean environment - explicitly set to defaults
+	// This prevents pollution from other tests that modify ALLOWED_DOMAINS
+	os.Setenv("ALLOWED_DOMAINS", "cloudinary.com,imgur.com,unsplash.com,pexels.com")
+	os.Unsetenv("ALLOW_PRIVATE_IPS")
+	defer func() {
+		os.Unsetenv("ALLOWED_DOMAINS")
+		os.Unsetenv("ALLOW_PRIVATE_IPS")
+	}()
 
 	app := fiber.New()
 	RegisterOptimizeRoutes(app)
