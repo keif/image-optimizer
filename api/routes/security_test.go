@@ -54,7 +54,12 @@ func TestDecompressionBombProtection(t *testing.T) {
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
 
-		part, err := writer.CreateFormFile("image", "normal_image.jpg")
+		// Create multipart part with proper Content-Type header
+		h := make(map[string][]string)
+		h["Content-Disposition"] = []string{`form-data; name="image"; filename="normal_image.jpg"`}
+		h["Content-Type"] = []string{"image/jpeg"}
+
+		part, err := writer.CreatePart(h)
 		assert.NoError(t, err)
 		_, err = part.Write(testImage)
 		assert.NoError(t, err)
@@ -215,7 +220,9 @@ func TestDomainWhitelistEdgeCases(t *testing.T) {
 
 // TestFileSizeLimits tests that file size limits are enforced
 func TestFileSizeLimits(t *testing.T) {
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		BodyLimit: 20 * 1024 * 1024, // 20MB limit to match production
+	})
 	RegisterOptimizeRoutes(app)
 
 	t.Run("Reject file larger than 10MB", func(t *testing.T) {
@@ -254,7 +261,12 @@ func TestFileSizeLimits(t *testing.T) {
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
 
-		part, err := writer.CreateFormFile("image", "small_file.jpg")
+		// Create multipart part with proper Content-Type header
+		h := make(map[string][]string)
+		h["Content-Disposition"] = []string{`form-data; name="image"; filename="small_file.jpg"`}
+		h["Content-Type"] = []string{"image/jpeg"}
+
+		part, err := writer.CreatePart(h)
 		assert.NoError(t, err)
 		_, err = part.Write(testImage)
 		assert.NoError(t, err)
