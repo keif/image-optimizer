@@ -943,12 +943,35 @@ Returns time-series data for charting and trend analysis.
 - `METRICS_ENABLED`: Enable/disable metrics collection (default: true)
 
 **Data Retention:**
-Metrics are stored indefinitely by default. To enable automatic cleanup, add a cron job or scheduled task to call the cleanup function:
+Metrics data is automatically deleted after 30 days to match our privacy policy. You can configure a different retention period using the cleanup script.
 
-```go
-// Clean up metrics older than 90 days
-db.CleanupOldMetrics(90)
+**Manual Cleanup:**
+```bash
+# Clean up metrics older than 30 days (default)
+./cleanup-metrics.sh
+
+# Custom retention period (e.g., 90 days)
+./cleanup-metrics.sh 90
+
+# With API key authentication
+API_KEY="your-api-key" ./cleanup-metrics.sh
 ```
+
+**API Endpoint:**
+```bash
+POST /admin/cleanup-metrics?days=30
+Authorization: Bearer your-api-key
+```
+
+**Automated Cleanup via Cron:**
+Add to your crontab to run daily at 2 AM:
+```cron
+0 2 * * * API_KEY="your-api-key" /path/to/cleanup-metrics.sh >> /var/log/metrics-cleanup.log 2>&1
+```
+
+**Environment Variables:**
+- `API_URL`: API endpoint URL (default: http://localhost:8080)
+- `API_KEY`: API key for authentication (required if API key auth is enabled)
 
 ## Configuration
 

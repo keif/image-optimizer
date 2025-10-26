@@ -148,7 +148,7 @@ export default function PrivacyPage() {
                 <p className="mt-2 text-sm">
                   These metrics are <strong>aggregated by hour</strong> with no individual request tracking,
                   IP addresses, or personally identifiable information. They help us monitor service
-                  health and optimize performance.
+                  health and optimize performance. <strong>Metrics data is automatically deleted after 30 days.</strong>
                 </p>
               </li>
               <li>

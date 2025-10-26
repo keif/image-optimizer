@@ -193,6 +193,42 @@ info:
   title: Image Optimizer API
   version: "1.0"
 paths:
+  /admin/cleanup-metrics:
+    post:
+      consumes:
+      - application/json
+      description: Delete metrics data older than the specified retention period
+      parameters:
+      - default: 30
+        description: 'Retention period in days (default: 30)'
+        in: query
+        maximum: 365
+        minimum: 1
+        name: days
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Cleanup successful
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid parameters
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cleanup old metrics data
+      tags:
+      - admin
   /api/keys:
     get:
       description: Get a list of all API keys (excluding actual key values for security)

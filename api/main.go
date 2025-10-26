@@ -124,6 +124,7 @@ func main() {
 	routes.RegisterAPIKeyRoutes(app)
 	routes.SetupSpritesheetRoutes(app)
 	routes.SetupMetricsRoutes(app)
+	routes.SetupAdminRoutes(app)
 
 	// Start server
 	port := os.Getenv("PORT")
