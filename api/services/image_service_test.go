@@ -11,6 +11,7 @@ import (
 // loadTestFixture loads a test image fixture
 func loadTestFixture(t *testing.T, filename string) []byte {
 	t.Helper()
+	// #nosec G304 - Test fixture path is controlled and safe
 	data, err := os.ReadFile("../tests/fixtures/" + filename)
 	if err != nil {
 		t.Fatalf("Failed to load test fixture %s: %v", filename, err)

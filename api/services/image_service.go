@@ -383,6 +383,7 @@ func optimizePNGWithOxipng(inputBuffer []byte, level int) ([]byte, error) {
 	// --strip all: remove all metadata - hardcoded string
 	// --stdout: write to stdout instead of file - prevents file system writes
 	// "-": read from stdin - prevents path traversal attacks
+	// #nosec G204 - Command arguments are validated/hardcoded, no user input in command path
 	cmd := exec.Command("oxipng", "-o", fmt.Sprintf("%d", level), "--strip", "all", "--stdout", "-")
 
 	// Set up stdin/stdout pipes
@@ -444,6 +445,7 @@ func optimizeJPEGWithMozJPEG(inputBuffer []byte, quality int) ([]byte, error) {
 	// -optimize: optimize Huffman tables - hardcoded flag
 	// -progressive: create progressive JPEG - hardcoded flag
 	// -outfile "-": write to stdout - prevents file system writes
+	// #nosec G204 - Command arguments are validated/hardcoded, no user input in command path
 	cmd := exec.Command("cjpeg",
 		"-quality", fmt.Sprintf("%d", quality),
 		"-optimize",

@@ -35,7 +35,7 @@ const (
 	MetricsStartTimeKey  = "metrics_start_time"
 	MetricsEndpointKey   = "metrics_endpoint"
 	MetricsSuccessKey    = "metrics_success"
-	MetricsAPIKeyIDKey   = "metrics_api_key_id"
+	MetricsAPIKeyIDKey   = "metrics_api_key_id" // #nosec G101 - This is a context key name, not credentials
 )
 
 // NewMetricsCollector creates middleware that collects metrics for each request
