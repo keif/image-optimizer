@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Squish - Modern image optimization web interface",
   "private": true,
+  "packageManager": "pnpm@10.19.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
