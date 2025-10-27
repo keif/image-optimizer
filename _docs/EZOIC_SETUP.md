@@ -80,7 +80,7 @@ This guide explains the Ezoic ad integration with ad blocker detection and donat
 
 ### Ad Loading Flow
 
-```
+```text
 User visits page
     ↓
 Ezoic privacy scripts load (GDPR compliance)

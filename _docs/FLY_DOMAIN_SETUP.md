@@ -34,7 +34,7 @@ flyctl certs add api.sosquishy.io
 
 **Expected output:**
 
-```
+```text
 Your certificate for api.sosquishy.io is being issued.
 
 Add the following DNS records to your domain:
@@ -99,7 +99,7 @@ flyctl ips list
 
 **Example output:**
 
-```
+```text
 VERSION IP                      TYPE    REGION  CREATED AT
 v6      2a09:8280:1::3:abcd     public  global  2025-10-19T00:00:00Z
 v4      66.241.125.123          public  global  2025-10-19T00:00:00Z
@@ -134,7 +134,7 @@ v4      66.241.125.123          public  global  2025-10-19T00:00:00Z
 
 **For CNAME:**
 
-```
+```text
 Type: CNAME
 Name: api
 Target: image-optimizer.fly.dev
@@ -144,7 +144,7 @@ TTL: Auto
 
 **For A/AAAA:**
 
-```
+```text
 Type: A
 Name: api
 IPv4 address: <from flyctl ips list>
@@ -162,7 +162,7 @@ Click **Save**
 
 **For CNAME:**
 
-```
+```text
 Type: CNAME Record
 Host: api
 Value: image-optimizer.fly.dev
@@ -171,7 +171,7 @@ TTL: Automatic
 
 **For A/AAAA:**
 
-```
+```text
 Type: A Record
 Host: api
 Value: <IPv4 from flyctl ips list>
@@ -188,7 +188,7 @@ Click **Save All Changes**
 
 **For CNAME:**
 
-```
+```text
 Record name: api
 Record type: CNAME
 Value: image-optimizer.fly.dev
@@ -198,7 +198,7 @@ Routing policy: Simple routing
 
 **For A/AAAA:**
 
-```
+```text
 Record name: api
 Record type: A
 Value: <IPv4 from flyctl ips list>
@@ -215,7 +215,7 @@ Click **Create records**
 
 **For CNAME:**
 
-```
+```text
 Resource type: CNAME
 Name: api.sosquishy.io.
 Data: image-optimizer.fly.dev.
@@ -224,7 +224,7 @@ TTL: 5 minutes
 
 **For A/AAAA:**
 
-```
+```text
 Resource type: A
 Name: api.sosquishy.io.
 Data: <IPv4>
@@ -235,7 +235,7 @@ TTL: 5 minutes
 
 General format:
 
-```
+```text
 Type: CNAME
 Name/Host: api
 Value/Points to: image-optimizer.fly.dev
@@ -323,7 +323,7 @@ curl -v https://api.sosquishy.io/health
 
 **Test in browser:**
 
-```
+```text
 https://api.sosquishy.io/swagger/index.html
 ```
 

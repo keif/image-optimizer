@@ -58,7 +58,7 @@ Every contribution, no matter how small, is greatly appreciated and helps keep t
 
 ## Project Structure
 
-```
+```text
 image-optimizer/
 ├── api/
 │   ├── main.go              # Application entry point
@@ -355,7 +355,7 @@ Optimized images are saved to:
 
 **Example Output:**
 
-```
+```text
 Optimizing 3 file(s)...
 
 [1/3] Processing photo1.jpg... ✓ Saved 74.91% (74.91% reduction, 32ms)
@@ -1283,7 +1283,7 @@ go test -v ./routes/
 
 **Test Structure:**
 
-```
+```text
 api/
 ├── middleware/
 │   └── api_key_test.go           # Security and auth middleware tests

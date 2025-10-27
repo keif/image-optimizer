@@ -16,7 +16,7 @@ This deployment uses:
 
 ## Architecture
 
-```
+```text
 Internet
    ↓
 Caddy (Port 443/80) → HTTPS + Reverse Proxy + ads.txt redirect
@@ -44,7 +44,7 @@ Caddy (Port 443/80) → HTTPS + Reverse Proxy + ads.txt redirect
 
 1. **Set up GitHub Secrets** (one-time setup):
 
-   ```
+   ```text
    Go to: GitHub repo → Settings → Secrets and variables → Actions → New repository secret
 
    Add these secrets:

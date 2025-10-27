@@ -41,7 +41,7 @@ The `/health` endpoint provides a comprehensive health check for the Image Optim
 
 ### File Structure
 
-```
+```text
 api/
 ├── version.go              # Build-time version variables
 ├── main.go                 # Main application (uses HealthHandler)
@@ -113,7 +113,7 @@ func main() {
 
 **Startup logs example:**
 
-```
+```text
 Image Optimizer API
 Version: v1.3.2
 Commit: c1a2b3c
@@ -345,7 +345,7 @@ go tool cover -html=coverage.out
 
 ### Test Output Example
 
-```
+```text
 === RUN   TestHealthHandler
 === RUN   TestHealthHandler/health_check_with_production_version
 === RUN   TestHealthHandler/health_check_with_dev_version
@@ -394,9 +394,9 @@ curl -s https://api.sosquishy.io/health | jq .
 # Check HTTP status code
 curl -I https://api.sosquishy.io/health
 
-# Expected:
-HTTP/2 200
-content-type: application/json; charset=utf-8
+# Expected output:
+# HTTP/2 200
+# content-type: application/json; charset=utf-8
 ```
 
 ### Verify Version Matches Deployment
@@ -445,7 +445,7 @@ curl -w "\nResponse Time: %{time_total}s\n" -s https://api.sosquishy.io/health
 
 Simply open in your browser:
 
-```
+```text
 https://api.sosquishy.io/health
 ```
 

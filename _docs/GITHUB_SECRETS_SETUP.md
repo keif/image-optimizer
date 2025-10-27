@@ -68,7 +68,7 @@ cat ~/.ssh/id_ed25519
 
 **Expected output:**
 
-```
+```text
 -----BEGIN OPENSSH PRIVATE KEY-----
 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
 NhAAAAAwEAAQAAAYEA1234567890abcdef...
@@ -98,7 +98,7 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub root@sosquishy-server
 
 1. **Go to your GitHub repository**:
 
-   ```
+   ```text
    https://github.com/YOUR_USERNAME/image-optimizer
    ```
 
@@ -132,7 +132,7 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub root@sosquishy-server
 
 After adding all three secrets, you should see:
 
-```
+```text
 HETZNER_HOST         Updated X minutes ago
 HETZNER_SSH_KEY      Updated X minutes ago
 HETZNER_USER         Updated X minutes ago
@@ -271,7 +271,7 @@ nano ~/.ssh/authorized_keys
 
 Add restrictions before the key:
 
-```
+```text
 from="140.82.112.0/20,143.55.64.0/20" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5...
 ```
 

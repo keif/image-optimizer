@@ -75,7 +75,7 @@ hcloud server ip image-optimizer-api
 
 **Expected output:**
 
-```
+```text
 Server ID: 12345678
 Server IP: 123.45.67.89
 ```
@@ -146,7 +146,7 @@ ufw status verbose
 
 **Expected output:**
 
-```
+```text
 Status: active
 
 To                         Action      From
@@ -196,7 +196,7 @@ vips --version
 
 **Expected output:**
 
-```
+```text
 vips-8.12.2-Fri Jan 28 15:38:40 UTC 2022
 ```
 
@@ -527,7 +527,7 @@ journalctl -u caddy -f
 
 **Expected log output:**
 
-```
+```text
 certificate obtained successfully
 serving HTTPS on :443
 ```
@@ -634,7 +634,7 @@ journalctl -u image-optimizer -f
 
 **Expected output:**
 
-```
+```text
 ● image-optimizer.service - Image Optimizer API Server
      Loaded: loaded (/etc/systemd/system/image-optimizer.service; enabled)
      Active: active (running) since Wed 2025-01-15 10:30:00 UTC; 5s ago

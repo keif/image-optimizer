@@ -239,7 +239,7 @@ flyctl certs add api.sosquishy.io
 
 **Example output:**
 
-```
+```text
 Your certificate for api.sosquishy.io is being issued.
 Add the following DNS records to your domain:
 
@@ -256,7 +256,7 @@ Go to your DNS provider (e.g., Cloudflare, Namecheap, Route53) and add:
 
 **Option A: CNAME Record (Recommended)**
 
-```
+```text
 Type: CNAME
 Name: api (or api.sosquishy.io)
 Value: image-optimizer.fly.dev

@@ -65,7 +65,7 @@ sudo journalctl -u image-optimizer -f --lines=50
 
 Check the logs for this line:
 
-```
+```text
 CORS Origins: https://sosquishy.io,https://www.sosquishy.io
 ```
 

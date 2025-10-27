@@ -82,7 +82,7 @@ flyctl certs show api.sosquishy.io
 
 **Add this to your DNS:**
 
-```
+```text
 Type: CNAME
 Name: api
 Value: image-optimizer.fly.dev
@@ -273,7 +273,7 @@ curl https://api.sosquishy.io/health
 
 **For Cloudflare, Namecheap, Route53, etc.:**
 
-```
+```text
 Record Type: CNAME
 Name: api
 Target: image-optimizer.fly.dev

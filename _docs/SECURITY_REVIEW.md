@@ -141,7 +141,7 @@ if !validTypes[contentType] {
 
 All database queries use **parameterized statements** with placeholder arguments:
 
-```go
+```text
 // Examples from db/api_keys.go
 
 // CREATE (line 37)
@@ -315,7 +315,7 @@ func isProduction() bool {
 
 #### Environment Variables Used
 
-```
+```text
 PORT                    - Server port
 DB_PATH                 - Database file path
 GO_ENV                  - Environment mode (production/prod/development)
@@ -383,7 +383,7 @@ app.Use(cors.New(cors.Config{
 
 **Key Dependencies:**
 
-```go
+```text
 github.com/gofiber/fiber/v2 v2.52.9    // Latest: v2.52.9 ✅
 github.com/h2non/bimg v1.1.9           // Image processing (libvips wrapper)
 github.com/mattn/go-sqlite3 v1.14.32   // SQLite driver

@@ -226,7 +226,7 @@ var (
 
 When the API starts, it logs version information:
 
-```
+```text
 Image Optimizer API
 Version: v1.0.0
 Commit: a6353bc
