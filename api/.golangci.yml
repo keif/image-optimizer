@@ -1,15 +1,4 @@
-version: 2
-
-linters-settings:
-  gosec:
-    excludes:
-      - G204
-      - G304
-      - G101
-  revive:
-    rules:
-      - name: exported
-        disabled: true
+version: "2"
 
 linters:
   enable:
@@ -21,6 +10,16 @@ linters:
     - misspell
     - revive
     - gosec
+  settings:
+    gosec:
+      excludes:
+        - G204
+        - G304
+        - G101
+    revive:
+      rules:
+        - name: exported
+          disabled: true
 
 formatters:
   enable:
@@ -30,10 +29,3 @@ formatters:
 run:
   timeout: 5m
   tests: true
-
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - gosec
-        - errcheck
