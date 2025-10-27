@@ -26,46 +26,222 @@ Caddy (Port 443/80) → HTTPS + Reverse Proxy + ads.txt redirect
                           Docker Volume (/app/data) → SQLite Database
 ```
 
-## Prerequisites
+## Pre-Deployment Checklist
 
-1. Hetzner Cloud server (CX22 or higher recommended)
-2. **DNS configured** (CRITICAL - see [DNS_SETUP.md](DNS_SETUP.md)):
-   - `sosquishy.io` A record → Hetzner server IP
-   - `www.sosquishy.io` A record → Hetzner server IP
-   - `api.sosquishy.io` A record → Hetzner server IP
-3. Caddy installed on server
-4. SSH access to server
-5. GitHub repository with code
-6. GitHub Secrets configured (see [GITHUB_SECRETS_SETUP.md](GITHUB_SECRETS_SETUP.md))
+### 1. Server Setup
+
+- [ ] Hetzner Cloud server provisioned (CX22 or higher recommended)
+- [ ] SSH access configured
+- [ ] Caddy installed
+- [ ] Firewall (UFW) configured (ports 22, 80, 443)
+
+### 2. DNS Configuration (CRITICAL - Must Complete Before Deployment)
+
+See [DNS_SETUP.md](DNS_SETUP.md) for detailed instructions.
+
+- [ ] Get Hetzner server IP address
+- [ ] Update DNS records:
+  - [ ] `sosquishy.io` A record → Hetzner IP
+  - [ ] `www.sosquishy.io` A record → Hetzner IP
+  - [ ] `api.sosquishy.io` A record → Hetzner IP
+- [ ] Wait for DNS propagation (5-30 minutes)
+- [ ] Verify DNS with `dig sosquishy.io A +short`
+
+### 3. GitHub Secrets Configuration
+
+See [GitHub Secrets Setup](#github-secrets-setup) section below for detailed instructions.
+
+- [ ] Get Hetzner server IP or hostname
+- [ ] Get SSH private key
+- [ ] Add GitHub Secrets:
+  - [ ] `HETZNER_HOST` = Server IP
+  - [ ] `HETZNER_USER` = SSH user (usually `root`)
+  - [ ] `HETZNER_SSH_KEY` = Private SSH key (entire content)
+
+### 4. Server Preparation
+
+SSH into server and run:
+
+```bash
+ssh sosquishy-server
+
+# Create deployment directory
+sudo mkdir -p /opt/image-optimizer-docker/data
+sudo chown -R $USER:$USER /opt/image-optimizer-docker
+
+# Install Docker if not installed
+if ! command -v docker &> /dev/null; then
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sh get-docker.sh
+    rm get-docker.sh
+fi
+
+# Install docker-compose if not installed
+if ! command -v docker-compose &> /dev/null; then
+    apt-get update
+    apt-get install -y docker-compose
+fi
+
+# Verify installations
+docker --version
+docker-compose --version
+caddy version
+
+# Check if old systemd service is running (will be stopped during deployment)
+systemctl status image-optimizer || echo "No old service found"
+```
+
+### 5. Migrate Existing Database (If Applicable)
+
+If you have an existing database from binary deployment:
+
+```bash
+# On server
+ssh sosquishy-server
+
+# Check if old database exists
+ls -la /opt/image-optimizer/data/api_keys.db
+
+# If it exists, copy to Docker directory
+sudo cp /opt/image-optimizer/data/api_keys.db /opt/image-optimizer-docker/data/
+sudo chown -R $USER:$USER /opt/image-optimizer-docker/data
+```
+
+## GitHub Secrets Setup
+
+GitHub Actions needs three secrets to deploy your application to Hetzner.
+
+### Required Secrets
+
+| Secret Name | Example Value | Description |
+|-------------|---------------|-------------|
+| `HETZNER_HOST` | `123.45.67.89` | Server IP address or hostname |
+| `HETZNER_USER` | `root` | SSH username |
+| `HETZNER_SSH_KEY` | `-----BEGIN...` | Private SSH key (full content) |
+
+### Step 1: Get Your Server Information
+
+**Find Server IP/Hostname:**
+
+```bash
+# Option 1: Use hostname from ~/.ssh/config
+cat ~/.ssh/config | grep -A 2 "sosquishy-server"
+
+# Option 2: Get IP from Hetzner Cloud Console
+# Go to: https://console.hetzner.cloud → Select server → Copy IP
+
+# Option 3: Get IP via hcloud CLI
+hcloud server ip sosquishy-server
+```
+
+**Find SSH User:**
+
+```bash
+# Test SSH connection
+ssh root@sosquishy-server whoami
+# Should output: root
+```
+
+### Step 2: Get Your SSH Private Key
+
+```bash
+# Display your private key
+cat ~/.ssh/id_rsa
+# OR
+cat ~/.ssh/id_ed25519
+```
+
+**Expected output:**
+
+```text
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
+... (many more lines) ...
+-----END OPENSSH PRIVATE KEY-----
+```
+
+**IMPORTANT:**
+
+- Copy the **ENTIRE** key including `-----BEGIN` and `-----END` lines
+- Include all newlines (the key is multiple lines)
+- This is your **private key**, not the `.pub` file
+
+### Step 3: Verify SSH Key Works
+
+```bash
+# Test SSH connection
+ssh -i ~/.ssh/id_rsa root@sosquishy-server "echo 'SSH works!'"
+
+# If you get "Permission denied", add the public key to server:
+ssh-copy-id -i ~/.ssh/id_rsa.pub root@sosquishy-server
+```
+
+### Step 4: Add Secrets to GitHub
+
+1. Go to your GitHub repository: `https://github.com/YOUR_USERNAME/image-optimizer`
+2. Navigate to **Settings** → **Secrets and variables** → **Actions**
+3. Click **"New repository secret"** for each:
+
+**HETZNER_HOST:**
+
+- Name: `HETZNER_HOST`
+- Value: Your server IP or hostname (e.g., `123.45.67.89`)
+
+**HETZNER_USER:**
+
+- Name: `HETZNER_USER`
+- Value: `root` (or your SSH username)
+
+**HETZNER_SSH_KEY:**
+
+- Name: `HETZNER_SSH_KEY`
+- Value: Paste your entire private key (include BEGIN and END lines)
+
+### Step 5: Test the Setup
+
+**Option A: Manual workflow trigger:**
+
+1. Go to **Actions** tab
+2. Select **"Deploy API to Hetzner (Docker)"**
+3. Click **"Run workflow"** → Select branch: `main` → **"Run workflow"**
+
+**Option B: Push to main:**
+
+```bash
+git add .
+git commit -m "test: trigger deployment"
+git push origin main
+```
+
+### Troubleshooting GitHub Secrets
+
+**"Permission denied (publickey)"**
+
+- Verify you copied the correct private key (not the `.pub` file)
+- Ensure the corresponding public key is in server's `~/.ssh/authorized_keys`
+
+**"Could not resolve hostname"**
+
+- Use the server's IP address instead of hostname in `HETZNER_HOST`
+
+**"Connection timed out"**
+
+- Ensure UFW allows SSH: `sudo ufw allow 22/tcp`
 
 ## Quick Start
 
 ### Option 1: GitHub Actions (Recommended)
 
-1. **Set up GitHub Secrets** (one-time setup):
-
-   ```text
-   Go to: GitHub repo → Settings → Secrets and variables → Actions → New repository secret
-
-   Add these secrets:
-   - HETZNER_HOST: Your server IP or hostname
-   - HETZNER_USER: SSH user (usually 'root')
-   - HETZNER_SSH_KEY: Your private SSH key (entire content)
-   ```
-
-2. **Deploy**:
+1. Complete the [Pre-Deployment Checklist](#pre-deployment-checklist) above
+2. Push to main branch:
 
    ```bash
-   # Simply push to main branch
    git add .
    git commit -m "deploy: update API"
    git push origin main
-
-   # Or trigger manually:
-   # GitHub → Actions → Deploy API to Hetzner → Run workflow
    ```
 
-3. **Monitor deployment**:
+3. Monitor deployment:
    - Go to GitHub → Actions tab
    - Watch the deployment progress
    - Check for success ✅ or failure ❌
@@ -292,7 +468,6 @@ docker-compose -f docker-compose.prod.yml exec api sh
 # Inside container:
 ls -la /app
 ls -la /app/data
-cat /app/data/api_keys.db  # Don't actually do this - binary file
 ```
 
 ### Database Management
@@ -351,7 +526,7 @@ df -h
 free -h
 ```
 
-### Automated Monitoring
+### Automated Monitoring Script
 
 Set up a simple monitoring script:
 
@@ -386,6 +561,66 @@ chmod +x /usr/local/bin/monitor-docker-api.sh
 
 # Add to crontab (every 5 minutes)
 (crontab -l 2>/dev/null; echo "*/5 * * * * /usr/local/bin/monitor-docker-api.sh >> /var/log/docker-api-monitor.log 2>&1") | crontab -
+```
+
+## Post-Deployment Verification
+
+### Service Health Checks
+
+```bash
+# Frontend (if deployed)
+curl https://sosquishy.io
+
+# API Health
+curl https://api.sosquishy.io/health
+# Expected: {"status":"ok","version":"..."}
+
+# API Swagger
+open https://api.sosquishy.io/swagger/index.html
+```
+
+### Docker Container Status
+
+```bash
+ssh sosquishy-server
+cd /opt/image-optimizer-docker
+docker-compose -f docker-compose.prod.yml ps
+
+# Expected output:
+# NAME         STATUS       PORTS
+# squish-api   Up (healthy) 127.0.0.1:8080->8080/tcp
+```
+
+### SSL Certificates
+
+```bash
+# Check API certificate
+openssl s_client -connect api.sosquishy.io:443 -servername api.sosquishy.io < /dev/null 2>/dev/null | openssl x509 -noout -dates
+
+# Should show Let's Encrypt certificate with ~90 days validity
+```
+
+### Functional Testing
+
+- [ ] API health endpoint responds
+- [ ] Image optimization works
+- [ ] API documentation (Swagger) loads
+- [ ] No errors in logs
+
+### Logs Review
+
+```bash
+# SSH to server
+ssh sosquishy-server
+cd /opt/image-optimizer-docker
+
+# Check API logs
+docker logs squish-api --tail=50
+
+# Check Caddy logs
+sudo tail -f /var/log/caddy/api.sosquishy.io.log
+
+# Look for any errors or warnings
 ```
 
 ## Troubleshooting
@@ -457,6 +692,43 @@ Common issues:
    - Check GitHub Actions logs for specific error
    - May need to clear Docker cache on server
    - Ensure server has enough disk space
+
+### DNS Not Resolving
+
+```bash
+# Verify DNS
+dig sosquishy.io A +short
+dig api.sosquishy.io A +short
+
+# Should both show your Hetzner server IP
+# If not, wait longer or check DNS provider dashboard
+```
+
+### SSL Certificate Fails
+
+```bash
+# Check Caddy logs
+ssh sosquishy-server
+sudo journalctl -u caddy -n 100
+
+# Common issues:
+# - DNS not propagated yet
+# - Ports 80/443 blocked
+# - Cloudflare proxy enabled (disable for Let's Encrypt)
+```
+
+### 502 Bad Gateway
+
+```bash
+# Check if containers are healthy
+docker ps
+
+# Check if ports are listening
+ss -tlnp | grep -E '(3000|8080)'
+
+# Restart Caddy
+sudo systemctl restart caddy
+```
 
 ## Rollback Procedure
 
@@ -537,6 +809,31 @@ git push origin main
 - GitHub Secrets for SSH keys
 - Database file permissions: 600 (owner read/write only)
 
+### SSH Key Best Practices
+
+**Use dedicated SSH key for GitHub Actions (recommended):**
+
+```bash
+# Generate new key
+ssh-keygen -t ed25519 -f ~/.ssh/github_actions_hetzner -C "github-actions"
+
+# Add public key to server
+ssh-copy-id -i ~/.ssh/github_actions_hetzner.pub root@sosquishy-server
+
+# Use this key in HETZNER_SSH_KEY secret
+cat ~/.ssh/github_actions_hetzner
+```
+
+Benefits:
+
+- Can revoke without affecting personal SSH access
+- Easier to audit
+- Can restrict permissions for this specific key
+
+**Rotate keys regularly:**
+
+- Good practice: Rotate SSH keys every 6-12 months
+
 ## Performance Tuning
 
 ### Increase Resource Limits
@@ -579,14 +876,45 @@ Currently using multi-stage builds:
 
 Docker deployment has no additional cost - runs on same server.
 
-## Next Steps
+## Next Steps After Deployment
 
-1. ✅ Set up GitHub Secrets
-2. ✅ Run first deployment
-3. Monitor for 1 week
-4. Set up automated backups
-5. Configure monitoring/alerting (optional)
-6. Document any custom configurations
+1. **Monitor for 24 hours**
+   - Check logs periodically
+   - Verify no errors
+   - Test all functionality
+
+2. **Set up automated backups**
+   - Database backups (automated)
+   - Configuration backups
+   - Use monitoring script above
+
+3. **Performance monitoring**
+   - Check response times
+   - Monitor resource usage
+   - Optimize if needed
+
+4. **Update documentation**
+   - Document any custom changes
+   - Note any issues encountered
+
+## Quick Reference Commands
+
+```bash
+# View logs
+ssh sosquishy-server 'docker logs -f squish-api'
+
+# Restart services
+ssh sosquishy-server 'cd /opt/image-optimizer-docker && docker-compose -f docker-compose.prod.yml restart'
+
+# Check status
+ssh sosquishy-server 'cd /opt/image-optimizer-docker && docker-compose -f docker-compose.prod.yml ps'
+
+# Rebuild and redeploy
+./deploy-docker-hetzner.sh
+
+# View Caddy logs
+ssh sosquishy-server 'sudo journalctl -u caddy -f'
+```
 
 ## Support
 
