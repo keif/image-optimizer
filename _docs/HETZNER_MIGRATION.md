@@ -236,7 +236,7 @@ rm go1.22.0.linux-amd64.tar.gz
 
 **Important:** The app uses `bimg` which requires CGO (C bindings to libvips). You **must** build on the Linux server, not on your local Mac. Cross-compilation with CGO is complex and error-prone.
 
-**Option A: Copy source and build (Recommended)**
+#### Option A: Copy source and build (Recommended)
 
 ```bash
 # On local machine - copy source to server
@@ -280,7 +280,7 @@ curl http://localhost:8080/health
 pkill image-optimizer
 ```
 
-**Option B: Clone from Git and build**
+#### Option B: Clone from Git and build
 
 ```bash
 # On server
@@ -948,7 +948,7 @@ chown -R appuser:appuser /opt/image-optimizer-docker
 
 ### 7.6. Deploy with Docker Compose
 
-**Option 1: Build from source on server**
+#### Option 1: Build from source on server
 
 ```bash
 # Copy source code to server
@@ -970,7 +970,7 @@ docker-compose logs -f
 docker-compose ps
 ```
 
-**Option 2: Build locally and push image**
+#### Option 2: Build locally and push image
 
 ```bash
 # On local machine - build image

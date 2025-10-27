@@ -215,16 +215,16 @@ git push origin main
 
 ### Troubleshooting GitHub Secrets
 
-**"Permission denied (publickey)"**
+#### Permission denied (publickey)
 
 - Verify you copied the correct private key (not the `.pub` file)
 - Ensure the corresponding public key is in server's `~/.ssh/authorized_keys`
 
-**"Could not resolve hostname"**
+#### Could not resolve hostname
 
 - Use the server's IP address instead of hostname in `HETZNER_HOST`
 
-**"Connection timed out"**
+#### Connection timed out
 
 - Ensure UFW allows SSH: `sudo ufw allow 22/tcp`
 
