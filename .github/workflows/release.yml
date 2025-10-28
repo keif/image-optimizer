@@ -70,10 +70,15 @@ jobs:
 
       - name: Install libvips (Windows)
         if: runner.os == 'Windows'
+        shell: powershell
         run: |
-          choco install vips
-          echo "PKG_CONFIG_PATH=C:\tools\vips-dev-8.15\lib\pkgconfig" >> $GITHUB_ENV
-          echo "PATH=C:\tools\vips-dev-8.15\bin;$PATH" >> $GITHUB_ENV
+          # Download and extract libvips prebuilt binaries
+          $vipsVersion = "8.15.5"
+          $vipsUrl = "https://github.com/libvips/build-win64-mxe/releases/download/v$vipsVersion/vips-dev-w64-all-$vipsVersion.zip"
+          Invoke-WebRequest -Uri $vipsUrl -OutFile vips.zip
+          Expand-Archive -Path vips.zip -DestinationPath C:\vips
+          echo "PKG_CONFIG_PATH=C:\vips\vips-dev-$vipsVersion\lib\pkgconfig" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "C:\vips\vips-dev-$vipsVersion\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Get version
         id: version
@@ -146,11 +151,12 @@ jobs:
           fi
 
       - name: Build CLI binary
+        working-directory: ./cli
         env:
           GOOS: ${{ matrix.platform }}
           GOARCH: ${{ matrix.arch }}
         run: |
-          mkdir -p dist
+          mkdir -p ../dist
           output_name="imgopt-${{ matrix.platform }}-${{ matrix.arch }}"
           if [ "${{ matrix.platform }}" = "windows" ]; then
             output_name="${output_name}.exe"
@@ -158,8 +164,8 @@ jobs:
 
           CGO_ENABLED=0 go build \
             -ldflags "-X main.version=${{ steps.version.outputs.version }}" \
-            -o "dist/${output_name}" \
-            ./cli
+            -o "../dist/${output_name}" \
+            .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -212,10 +218,15 @@ jobs:
 
       - name: Install libvips (Windows)
         if: runner.os == 'Windows'
+        shell: powershell
         run: |
-          choco install vips
-          echo "PKG_CONFIG_PATH=C:\tools\vips-dev-8.15\lib\pkgconfig" >> $GITHUB_ENV
-          echo "PATH=C:\tools\vips-dev-8.15\bin;$PATH" >> $GITHUB_ENV
+          # Download and extract libvips prebuilt binaries
+          $vipsVersion = "8.15.5"
+          $vipsUrl = "https://github.com/libvips/build-win64-mxe/releases/download/v$vipsVersion/vips-dev-w64-all-$vipsVersion.zip"
+          Invoke-WebRequest -Uri $vipsUrl -OutFile vips.zip
+          Expand-Archive -Path vips.zip -DestinationPath C:\vips
+          echo "PKG_CONFIG_PATH=C:\vips\vips-dev-$vipsVersion\lib\pkgconfig" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "C:\vips\vips-dev-$vipsVersion\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Get version
         id: version
@@ -228,12 +239,13 @@ jobs:
           fi
 
       - name: Build API server binary
+        working-directory: ./api
         shell: bash
         env:
           GOOS: ${{ matrix.platform }}
           GOARCH: ${{ matrix.arch }}
         run: |
-          mkdir -p dist
+          mkdir -p ../dist
           output_name="image-optimizer-server-${{ matrix.platform }}-${{ matrix.arch }}"
           if [ "${{ matrix.platform }}" = "windows" ]; then
             output_name="${output_name}.exe"
@@ -241,8 +253,8 @@ jobs:
 
           CGO_ENABLED=1 go build \
             -ldflags "-X main.version=${{ steps.version.outputs.version }}" \
-            -o "dist/${output_name}" \
-            ./api
+            -o "../dist/${output_name}" \
+            .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
