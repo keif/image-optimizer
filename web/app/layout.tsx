@@ -50,6 +50,12 @@ export default function RootLayout({
                     >
                       Articles
                     </Link>
+                    <Link
+                      href="/feedback"
+                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                    >
+                      Feedback
+                    </Link>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -91,6 +97,22 @@ export default function RootLayout({
                   >
                     Privacy Policy
                   </Link>
+                  <a
+                    href="https://github.com/keif/image-optimizer/issues/new?labels=bug&template=bug_report.md"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                  >
+                    Report Bug
+                  </a>
+                  <a
+                    href="https://github.com/keif/image-optimizer/issues/new?labels=enhancement&template=feature_request.md"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                  >
+                    Request Feature
+                  </a>
                 </div>
 
                 {/* Social Media Links */}
