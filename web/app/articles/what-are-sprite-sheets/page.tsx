@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "What Are Sprite Sheets? Complete Guide for Web & Game Developers",
-  description: "Learn what sprite sheets are, how they work, and why they're essential for web performance and game development. Includes examples from Friday Night Funkin and modern web apps.",
+  title: "What Are Sprite Sheets? Guide for Web & Game Developers",
+  description: "Learn what sprite sheets are, how they work, and why they matter for web performance and game development. Includes modern web app and game examples.",
 };
 
 export default function WhatAreSpriteSheets() {
@@ -76,9 +76,9 @@ export default function WhatAreSpriteSheets() {
           Fast forward to today: sprite sheets are everywhere, from HTML5 Canvas games and WebGL apps to modern web interfaces. Game engines use them for lightning-fast character animations and effects; web apps still use them for icons and UI, though HTTP/2 and HTTP/3 have changed the calculus a bit.
         </p>
 
-        <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-6">
-          <strong>Pro Tip:</strong> Even in the HTTP/2 and HTTP/3 era, sprite sheets still outperform multiple requests when you're dealing with large icon sets.
-        </blockquote>
+        <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
+          Even with HTTP/2 and HTTP/3 letting browsers fetch multiple files at once, sprite sheets still win for large icon sets. One file, one cache entry, one request—it adds up.
+        </p>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">How Sprite Sheets Actually Work</h2>

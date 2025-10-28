@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Metadata } from "next";
 export const metadata: Metadata = {
-  title: "Sprite Sheets vs Individual Images: Performance Analysis for Web & Games",
-  description: "Comprehensive performance comparison of sprite sheets vs individual images for web development and game development. Includes real benchmarks, memory analysis, and modern HTTP/2 considerations.",
+  title: "Sprite Sheets vs Individual Images: Performance Analysis",
+  description: "Performance comparison of sprite sheets vs individual images for web and game development. Includes benchmarks, memory analysis, and HTTP/2 considerations.",
 };
 export default function SpriteSheetVsIndividualImages() {
   return (
@@ -34,13 +34,13 @@ export default function SpriteSheetVsIndividualImages() {
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">The Great Sprite Sheet Debate</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Sprite sheets once ruled the world of web and game performance. Back in the day, if you wanted your site or game to load fast, you packed your icons and animation frames into a single image. It was gospel.
+          Sprite sheets used to be gospel. If you wanted your site or game to load fast, you packed everything into a single image. No debate.
         </p>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          But the web moves fast. HTTP/2, HTTP/3, and better image formats have changed the rules. Some developers have ditched sprite sheets entirely. Others cling to them for dear life—especially in game development.
+          Then HTTP/2, HTTP/3, and better image formats changed the game. Some developers ditched sprite sheets entirely. Game developers mostly stuck with them. Now nobody agrees on what's "best."
         </p>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          So, who's right? In this feature, we'll unpack the real data—across network speed, memory, rendering, and workflow. You'll see benchmarks, case studies, and a decision matrix to help you choose the right tool for your project.
+          So what's the real answer? We'll dig into the data—network performance, memory usage, rendering speed, and workflow trade-offs. Benchmarks, case studies, and a decision matrix to help you pick the right approach.
         </p>
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Network Performance: Old Rules vs New Realities</h2>

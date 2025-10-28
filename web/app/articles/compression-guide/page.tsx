@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Understanding Lossy vs Lossless Compression - Image Optimization Guide",
-  description: "Learn the difference between lossy and lossless image compression, how compression algorithms work, and when to use each method for optimal results.",
+  title: "Understanding Lossy vs Lossless Compression",
+  description: "Learn the difference between lossy and lossless compression, how they work, and when to use each for optimal image quality and file size.",
 };
 
 export default function CompressionGuide() {
@@ -38,24 +38,24 @@ export default function CompressionGuide() {
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">What Is Image Compression?</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Image compression reduces the size of an image file without sacrificing too much quality. It does this by finding patterns and redundant data in an image and storing that information more efficiently. Without it, even a standard 1080p photo could weigh in at more than 6 MB—far too heavy for a fast-loading website.
+          Image compression shrinks file sizes by finding patterns and redundancy in your image data, then storing that information more efficiently. Without compression, a standard 1080p photo could easily hit 6 MB—way too heavy for the web.
         </p>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          There are two main types of image compression—lossy and lossless. Knowing the difference between them helps you choose the right balance between speed, quality, and file size for every image on your site.
+          There are two main types: lossy and lossless. Understanding the difference is key to picking the right balance between quality and file size for each image.
         </p>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Lossless Compression: Flawless Quality, Bigger Files</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Lossless compression shrinks image files without throwing away any data. When you decompress a lossless image, you get an exact replica of the original—every pixel and every bit is preserved. Think of it like zipping a file: once unzipped, nothing is missing or changed.
+          Lossless compression shrinks files without discarding any data. Decompress a lossless image and you get an exact replica—every pixel, every bit, preserved. It's like zipping a file: unzip it and nothing's missing.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">How Lossless Compression Works</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Lossless algorithms work by spotting repetition and patterns in your image data. For example, if a sky is a single shade of blue, instead of saving “blue, blue, blue…” thousands of times, the algorithm simply notes “blue, 2,500 times.” This is called run-length encoding, but there are many more advanced methods at play.
+          Lossless algorithms spot repetition and patterns in your image data. If a sky is a single shade of blue, instead of saving "blue, blue, blue..." thousands of times, the algorithm just notes "blue, 2,500 times." That's run-length encoding. Modern methods get way more sophisticated.
         </p>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Today’s lossless compression relies on a mix of clever techniques, such as:
+          Today's lossless compression uses techniques like:
         </p>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
@@ -110,36 +110,31 @@ export default function CompressionGuide() {
         </p>
         <ul className="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 mb-6">
           <li>
-            <strong>Quality is paramount:</strong> Product images, medical imagery, archival
-            photos, or any content where every detail matters
+            <strong>Quality is critical.</strong> Product images, medical imagery, archival photos—anything where every detail counts.
           </li>
           <li>
-            <strong>You have text or sharp lines:</strong> Logos, icons, screenshots, infographics,
-            or diagrams where lossy artifacts would be very visible
+            <strong>You have text or sharp lines.</strong> Logos, icons, screenshots, diagrams. Lossy compression creates visible artifacts around crisp edges.
           </li>
           <li>
-            <strong>You need transparency:</strong> PNG is the most compatible format for images
-            with transparent backgrounds
+            <strong>You need transparency.</strong> PNG is the most compatible format for transparent backgrounds.
           </li>
           <li>
-            <strong>Images will be edited repeatedly:</strong> Lossless formats don't degrade
-            with multiple save cycles
+            <strong>Images will be edited repeatedly.</strong> Lossless formats don't degrade with multiple save cycles.
           </li>
           <li>
-            <strong>File size is secondary:</strong> For logos and icons, the slight size penalty
-            is worth perfect quality
+            <strong>File size is secondary.</strong> For logos and icons, the slight size penalty is worth perfect quality.
           </li>
         </ul>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Lossy Compression: Tiny Files, Some Quality Tradeoff</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Lossy compression slashes file sizes by permanently removing some image information. The secret is to throw away details your viewers won’t notice—subtle textures or colors our eyes aren’t sensitive to. Done right, lossy compression can shrink images by 10 to 20 times while keeping them looking great.
+          Lossy compression slashes file sizes by permanently discarding some image information. The trick? Throw away details viewers won't notice—subtle textures or colors our eyes aren't sensitive to. Done right, you can shrink images by 10–20× while keeping them looking great.
         </p>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">How Lossy Compression Works</h3>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Lossy algorithms take advantage of how our eyes work. We’re more sensitive to shifts in brightness than in color, and we notice big shapes more than tiny details. Lossy compression leans into these quirks:
+          Lossy algorithms exploit how our eyes work. We're more sensitive to brightness than color, and we notice large shapes more than tiny details. Lossy compression takes advantage:
         </p>
 
         <h4 className="text-xl font-semibold mt-6 mb-2 text-gray-800 dark:text-gray-200">JPEG's Approach</h4>

@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Image Formats Explained: JPEG, PNG, WebP, AVIF & GIF - Complete Guide",
-  description: "Comprehensive guide to image formats on the web. Learn the differences between JPEG, PNG, WebP, AVIF, and GIF, and when to use each format for optimal results.",
+  title: "Image Formats Explained: JPEG, PNG, WebP, AVIF & GIF",
+  description: "Guide to web image formats — JPEG, PNG, WebP, AVIF, and GIF. Learn the differences and when to use each for optimal results.",
 };
 
 export default function ImageFormatsGuide() {
@@ -37,10 +37,10 @@ export default function ImageFormatsGuide() {
 
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Introduction</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Picking the right image format is essential for fast, beautiful websites. Each format has its own way of compressing images, its own strengths, and its own quirks. Choose poorly, and you might end up with slow load times, blurry pictures, or missing features like transparency.
+          Picking the right image format matters. Each one compresses differently, has different strengths, and comes with trade-offs. Choose poorly and you'll end up with slow load times, blurry pictures, or missing features like transparency.
         </p>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          In this guide, we’ll walk through the five formats you’ll see most often on the web: JPEG, PNG, WebP, AVIF, and GIF. You’ll see what makes each one tick, where it shines, and when it’s the right tool for the job.
+          This guide covers the five formats you'll use most: JPEG, PNG, WebP, AVIF, and GIF. What makes each one work, where it excels, and when to reach for it.
         </p>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -88,11 +88,8 @@ export default function ImageFormatsGuide() {
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">When to Use JPEG</h3>
-        <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4">
-          <p><strong>Pro Tip:</strong> Let the content decide the format—photos and graphics have different needs.</p>
-        </blockquote>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          JPEG is perfect for photos, images with lots of colors or gradients, and anything where a bit of quality loss is worth the smaller size. Reach for JPEG with hero images, product shots, user uploads, or backgrounds.
+          JPEG is perfect for photos, images with lots of colors or gradients, and anything where a bit of quality loss is worth the file size savings. Use it for hero images, product shots, user uploads, or backgrounds. Just keep it away from logos and text—that's where you'll see ugly artifacts.
         </p>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
@@ -142,11 +139,8 @@ export default function ImageFormatsGuide() {
         </ul>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">When to Use PNG</h3>
-        <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4">
-          <p><strong>Pro Tip:</strong> PNG shines with crisp graphics and transparency—not with photos.</p>
-        </blockquote>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
-          Reach for PNG with logos, icons, screenshots, illustrations, or any image that needs transparency or perfect quality. If you’ll be editing an image repeatedly, PNG is a safe bet—it never loses quality.
+          Use PNG for logos, icons, screenshots, illustrations, or anything that needs transparency or perfect quality. If you'll be editing an image repeatedly, PNG is a safe bet—it never degrades. Just don't use it for photos unless you absolutely need lossless quality and don't mind the file size.
         </p>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
