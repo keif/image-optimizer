@@ -36,6 +36,7 @@ api/imgopt
 cli/imgopt
 dist/
 build/
+cmd/standalone/embedded/
 
 # Environment files
 .env

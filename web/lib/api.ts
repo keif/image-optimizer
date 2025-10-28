@@ -7,7 +7,8 @@ class ApiClient {
 
   constructor() {
     // Start with default, will be updated by loadConfig
-    this.baseUrl = 'http://localhost:8080';
+    // Empty string means same-origin (for standalone binary)
+    this.baseUrl = '';
     this.apiKey = typeof window !== 'undefined'
       ? localStorage.getItem('apiKey')
       : null;
@@ -27,16 +28,17 @@ class ApiClient {
       const response = await fetch('/api/config');
       const config = await response.json();
       console.log('[ApiClient] Config loaded:', config);
-      if (config.apiUrl) {
+      if (config.apiUrl !== undefined) {
+        // apiUrl can be empty string for same-origin (standalone)
         this.baseUrl = config.apiUrl;
         this.configLoaded = true;
-        console.log('[ApiClient] Updated baseUrl to:', this.baseUrl);
+        console.log('[ApiClient] Updated baseUrl to:', this.baseUrl || '(same-origin)');
       } else {
         console.warn('[ApiClient] No apiUrl in config, using default');
       }
     } catch (error) {
       console.error('[ApiClient] Failed to load runtime config:', error);
-      console.warn('[ApiClient] Using default API URL:', this.baseUrl);
+      console.warn('[ApiClient] Using default API URL:', this.baseUrl || '(same-origin)');
     }
   }
 

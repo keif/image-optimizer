@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Use 'standalone' for Docker deployment (Tilt/docker-compose)
-  // Use 'export' for GitHub Pages static deployment
-  output: process.env.GITHUB_ACTIONS ? 'export' : 'standalone',
+  // Use 'export' for GitHub Pages static deployment and standalone binary
+  output: (process.env.GITHUB_ACTIONS || process.env.NEXT_PUBLIC_API_URL === '') ? 'export' : 'standalone',
   // Custom domain (sosquishy.io) serves from root - no basePath needed
   images: {
-    unoptimized: process.env.GITHUB_ACTIONS ? true : false,
+    unoptimized: (process.env.GITHUB_ACTIONS || process.env.NEXT_PUBLIC_API_URL === '') ? true : false,
   },
   async headers() {
     return [
