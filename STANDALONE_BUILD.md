@@ -100,7 +100,7 @@ This will create binaries in the `dist/` directory.
 
 The build script successfully builds for the current platform (darwin/arm64 in this case):
 
-```
+```text
 Binary: dist/image-optimizer-darwin-arm64
 Size: 29MB
 ```

@@ -25,7 +25,7 @@ A single all-in-one binary that combines the Image Optimizer API and web interfa
 image-optimizer-windows-amd64.exe
 ```
 
-3. Open your browser to `http://localhost:3000`
+1. Open your browser to `http://localhost:3000`
 
 That's it! The application is now running locally.
 
