@@ -92,9 +92,15 @@ jobs:
 
       - name: Build standalone binary
         shell: bash
+        env:
+          GOOS: ${{ matrix.platform }}
+          GOARCH: ${{ matrix.arch }}
         run: |
           chmod +x scripts/build-standalone.sh
-          ./scripts/build-standalone.sh ${{ steps.version.outputs.version }}
+          VERSION=${{ steps.version.outputs.version }}
+          # Only build for the current platform/arch combo
+          # Cross-compilation with CGO is complex, so build natively
+          ./scripts/build-standalone.sh "$VERSION"
 
       - name: Rename binary
         shell: bash

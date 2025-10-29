@@ -87,61 +87,43 @@ LDFLAGS="$LDFLAGS -X main.buildTime=$BUILD_TIME"
 OUTPUT_DIR="$PROJECT_ROOT/dist"
 mkdir -p "$OUTPUT_DIR"
 
-# Build for each platform
-platforms=(
-    "darwin/amd64"
-    "darwin/arm64"
-    "linux/amd64"
-    "linux/arm64"
-    "windows/amd64"
-)
+# Determine target platform
+# If GOOS/GOARCH are set (from CI), use those. Otherwise build for current platform.
+if [ -z "$GOOS" ]; then
+    GOOS=$(go env GOOS)
+fi
+if [ -z "$GOARCH" ]; then
+    GOARCH=$(go env GOARCH)
+fi
 
 echo "Building binaries with:"
 echo "  Version: $VERSION"
 echo "  Commit: $COMMIT"
 echo "  Build Time: $BUILD_TIME"
+echo "  Target: $GOOS/$GOARCH"
 echo ""
 
-for platform in "${platforms[@]}"; do
-    IFS='/' read -r GOOS GOARCH <<< "$platform"
-    output_name="image-optimizer-$GOOS-$GOARCH"
+output_name="image-optimizer-$GOOS-$GOARCH"
 
-    if [ "$GOOS" = "windows" ]; then
-        output_name="$output_name.exe"
-    fi
+if [ "$GOOS" = "windows" ]; then
+    output_name="$output_name.exe"
+fi
 
-    echo "Building for $GOOS/$GOARCH..."
+echo "Building for $GOOS/$GOARCH..."
 
-    # Set CGO_ENABLED based on platform
-    # SQLite requires CGO, so we need to handle cross-compilation carefully
-    # Build from the api directory since that's where go.mod is
-    cd "$PROJECT_ROOT/api"
+# Build from the api directory since that's where go.mod is
+cd "$PROJECT_ROOT/api"
 
-    if [ "$GOOS" = "$(go env GOOS)" ] && [ "$GOARCH" = "$(go env GOARCH)" ]; then
-        # Building for current platform - use CGO
-        CGO_ENABLED=1 GOOS=$GOOS GOARCH=$GOARCH go build \
-            -ldflags "$LDFLAGS" \
-            -o "$OUTPUT_DIR/$output_name" \
-            "$PROJECT_ROOT/cmd/standalone/main.go"
-    else
-        # Cross-compiling - disable CGO (SQLite will use pure Go fallback if available)
-        # Note: This may not work perfectly for all platforms. For production,
-        # consider building on each platform natively or using a cross-compilation toolchain.
-        CGO_ENABLED=1 GOOS=$GOOS GOARCH=$GOARCH go build \
-            -ldflags "$LDFLAGS" \
-            -o "$OUTPUT_DIR/$output_name" \
-            "$PROJECT_ROOT/cmd/standalone/main.go" || {
-                echo -e "${YELLOW}Warning: Failed to build for $GOOS/$GOARCH (this is expected for cross-platform SQLite builds)${NC}"
-                echo -e "${YELLOW}For production builds, compile on the target platform or use a cross-compilation toolchain${NC}"
-                continue
-            }
-    fi
+# Always enable CGO for libvips support
+CGO_ENABLED=1 GOOS=$GOOS GOARCH=$GOARCH go build \
+    -ldflags "$LDFLAGS" \
+    -o "$OUTPUT_DIR/$output_name" \
+    "$PROJECT_ROOT/cmd/standalone/main.go"
 
-    if [ -f "$OUTPUT_DIR/$output_name" ]; then
-        size=$(du -h "$OUTPUT_DIR/$output_name" | cut -f1)
-        echo -e "${GREEN}  ✓ $output_name ($size)${NC}"
-    fi
-done
+if [ -f "$OUTPUT_DIR/$output_name" ]; then
+    size=$(du -h "$OUTPUT_DIR/$output_name" | cut -f1)
+    echo -e "${GREEN}  ✓ $output_name ($size)${NC}"
+fi
 
 echo ""
 echo -e "${GREEN}Build complete!${NC}"
