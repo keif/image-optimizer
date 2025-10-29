@@ -30,9 +30,8 @@ jobs:
           - os: ubuntu-latest
             platform: linux
             arch: amd64
-          - os: windows-latest
-            platform: windows
-            arch: amd64
+          # Windows builds excluded - bimg/libvips has poor Windows CGO support
+          # Use CLI tool on Windows instead (pure Go, no libvips dependency)
 
     steps:
       - name: Checkout code
@@ -65,28 +64,6 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install vips
 
-      - name: Install libvips and pkg-config (Windows)
-        if: runner.os == 'Windows'
-        shell: powershell
-        run: |
-          # Install pkg-config via chocolatey
-          choco install pkgconfiglite -y
-
-          # Download and extract libvips prebuilt binaries
-          $vipsVersion = "8.15.5"
-          $vipsUrl = "https://github.com/libvips/build-win64-mxe/releases/download/v$vipsVersion/vips-dev-w64-all-$vipsVersion.zip"
-          Write-Host "Downloading libvips from $vipsUrl"
-          Invoke-WebRequest -Uri $vipsUrl -OutFile vips.zip
-          Write-Host "Extracting to C:\vips"
-          Expand-Archive -Path vips.zip -DestinationPath C:\vips -Force
-
-          # Set up environment
-          $vipsDir = "C:\vips\vips-dev-$vipsVersion"
-          echo "PKG_CONFIG_PATH=C:\vips\vips-dev-$vipsVersion\lib\pkgconfig" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          echo "C:\vips\vips-dev-$vipsVersion\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-          Write-Host "libvips and pkg-config installed successfully"
-
       - name: Get version
         id: version
         shell: bash
@@ -103,34 +80,9 @@ jobs:
           GOOS: ${{ matrix.platform }}
           GOARCH: ${{ matrix.arch }}
         run: |
-          # Set CGO flags for Windows
-          if [ "${{ matrix.platform }}" = "windows" ]; then
-            # Convert Windows path to Unix-style (replace backslashes with forward slashes)
-            VIPS_DIR_UNIX=$(echo "$VIPS_DIR" | sed 's|\\|/|g')
-
-            export PKG_CONFIG_PATH="$VIPS_DIR_UNIX/lib/pkgconfig"
-            export PATH="$VIPS_DIR_UNIX/bin:$PATH"
-
-            # Try to use pkg-config if available
-            if pkg-config --exists vips 2>/dev/null; then
-              export CGO_CFLAGS="$(pkg-config --cflags vips)"
-              export CGO_LDFLAGS="$(pkg-config --libs vips)"
-              echo "Using pkg-config for Windows build"
-            else
-              export CGO_CFLAGS="-I$VIPS_DIR_UNIX/include"
-              export CGO_LDFLAGS="-L$VIPS_DIR_UNIX/lib -lvips-42"
-              echo "Using manual flags for Windows build"
-            fi
-
-            echo "VIPS_DIR_UNIX: $VIPS_DIR_UNIX"
-            echo "CGO_CFLAGS: $CGO_CFLAGS"
-            echo "CGO_LDFLAGS: $CGO_LDFLAGS"
-          fi
-
           chmod +x scripts/build-standalone.sh
           VERSION=${{ steps.version.outputs.version }}
-          # Only build for the current platform/arch combo
-          # Cross-compilation with CGO is complex, so build natively
+          # Build for the current platform/arch combo
           ./scripts/build-standalone.sh "$VERSION"
 
       - name: Rename binary
@@ -223,9 +175,8 @@ jobs:
           - os: ubuntu-latest
             platform: linux
             arch: amd64
-          - os: windows-latest
-            platform: windows
-            arch: amd64
+          # Windows builds excluded - bimg/libvips has poor Windows CGO support
+          # Use CLI tool on Windows instead (pure Go, no libvips dependency)
 
     steps:
       - name: Checkout code
@@ -248,61 +199,6 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install vips
 
-      - name: Install libvips and pkg-config (Windows)
-        if: runner.os == 'Windows'
-        shell: powershell
-        run: |
-          # Install pkg-config via chocolatey
-          Write-Host "Installing pkg-config..."
-          choco install pkgconfiglite -y
-
-          # Add pkg-config to PATH
-          $pkgConfigPath = "C:\ProgramData\chocolatey\lib\pkgconfiglite\tools\bin"
-          if (Test-Path $pkgConfigPath) {
-            echo "$pkgConfigPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-            Write-Host "Added pkg-config to PATH: $pkgConfigPath"
-          } else {
-            Write-Host "WARNING: pkg-config not found at expected location"
-            # Try to find it
-            $found = Get-ChildItem C:\ProgramData\chocolatey -Recurse -Filter "pkg-config.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
-            if ($found) {
-              $foundPath = Split-Path $found.FullName
-              echo "$foundPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-              Write-Host "Found and added pkg-config at: $foundPath"
-            }
-          }
-
-          # Download and extract libvips prebuilt binaries
-          $vipsVersion = "8.15.5"
-          $vipsUrl = "https://github.com/libvips/build-win64-mxe/releases/download/v$vipsVersion/vips-dev-w64-all-$vipsVersion.zip"
-          Write-Host "Downloading libvips from $vipsUrl"
-          Invoke-WebRequest -Uri $vipsUrl -OutFile vips.zip
-          Write-Host "Extracting to C:\vips"
-          Expand-Archive -Path vips.zip -DestinationPath C:\vips -Force
-
-          # Debug: Check directory structure
-          Write-Host "Checking extracted contents..."
-          $dirs = Get-ChildItem C:\vips -Directory
-          Write-Host "Found directories: $($dirs.Name -join ', ')"
-
-          # The zip contains vips-dev-8.15 folder (not vips-dev-8.15.5)
-          $actualDir = $dirs[0].FullName
-          Write-Host "Using directory: $actualDir"
-
-          # Check for pkg-config files
-          $vipsPkgConfigPath = Join-Path $actualDir "lib\pkgconfig"
-          if (Test-Path $vipsPkgConfigPath) {
-            Write-Host "Found pkg-config files:"
-            Get-ChildItem $vipsPkgConfigPath | ForEach-Object { Write-Host "  $($_.Name)" }
-          }
-
-          # Set environment (using actual directory name)
-          echo "VIPS_DIR=$actualDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          echo "PKG_CONFIG_PATH=$vipsPkgConfigPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          echo "$actualDir\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-          Write-Host "libvips installed at: $actualDir"
-
       - name: Get version
         id: version
         shell: bash
@@ -315,57 +211,12 @@ jobs:
 
       - name: Build API server binary
         working-directory: ./api
-        shell: bash
         env:
           GOOS: ${{ matrix.platform }}
           GOARCH: ${{ matrix.arch }}
         run: |
           mkdir -p ../dist
           output_name="image-optimizer-server-${{ matrix.platform }}-${{ matrix.arch }}"
-          if [ "${{ matrix.platform }}" = "windows" ]; then
-            output_name="${output_name}.exe"
-
-            # Convert VIPS_DIR to proper format for CGO
-            # On Windows, CGO expects Windows paths with forward slashes or backslashes
-            # VIPS_DIR is set by PowerShell as C:\vips\vips-dev-8.15
-            # We need to convert backslashes to forward slashes for bash/CGO
-            VIPS_DIR_UNIX=$(echo "$VIPS_DIR" | sed 's|\\|/|g')
-
-            echo "Original VIPS_DIR: $VIPS_DIR"
-            echo "Converted VIPS_DIR_UNIX: $VIPS_DIR_UNIX"
-
-            # Debug: Check if headers exist
-            echo "Checking for vips headers..."
-            if [ -f "$VIPS_DIR_UNIX/include/vips/vips7compat.h" ]; then
-              echo "Found vips7compat.h"
-            else
-              echo "ERROR: vips7compat.h not found!"
-              ls -la "$VIPS_DIR_UNIX/include" 2>&1 || echo "include directory does not exist"
-              find "$VIPS_DIR_UNIX" -name "*.h" -type f | head -5
-            fi
-
-            # Set PKG_CONFIG_PATH and add vips bin to PATH
-            export PKG_CONFIG_PATH="$VIPS_DIR_UNIX/lib/pkgconfig"
-            export PATH="$VIPS_DIR_UNIX/bin:$PATH"
-
-            # Verify pkg-config can find vips
-            echo "Testing pkg-config..."
-            pkg-config --exists vips && echo "✓ vips.pc found" || echo "✗ vips.pc not found"
-
-            # Try to use pkg-config for flags if available
-            if pkg-config --exists vips; then
-              echo "Using pkg-config for compiler flags"
-              export CGO_CFLAGS="$(pkg-config --cflags vips)"
-              export CGO_LDFLAGS="$(pkg-config --libs vips)"
-            else
-              echo "Using manual compiler flags"
-              export CGO_CFLAGS="-I$VIPS_DIR_UNIX/include"
-              export CGO_LDFLAGS="-L$VIPS_DIR_UNIX/lib -lvips-42"
-            fi
-
-            echo "CGO_CFLAGS: $CGO_CFLAGS"
-            echo "CGO_LDFLAGS: $CGO_LDFLAGS"
-          fi
 
           CGO_ENABLED=1 go build \
             -ldflags "-X main.version=${{ steps.version.outputs.version }}" \
