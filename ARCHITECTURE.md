@@ -10,7 +10,7 @@ Squish is a modern image optimization service with three deployment modes:
 
 ## System Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                     Deployment Modes                         │
 ├──────────────┬──────────────────┬──────────────────────────┤
@@ -34,7 +34,7 @@ Squish is a modern image optimization service with three deployment modes:
 
 ## Project Structure
 
-```
+```text
 image-optimizer/
 ├── api/                      # Go API server
 │   ├── main.go              # API entry point
@@ -281,7 +281,7 @@ CREATE TABLE metrics (
 
 ### Image Optimization Request
 
-```
+```text
 User Upload
     │
     ▼
@@ -312,7 +312,7 @@ User Download
 
 ### Spritesheet Packing Request
 
-```
+```text
 Multiple Images
     │
     ▼
@@ -665,25 +665,25 @@ git push origin v0.1.1
 
 ### Common Issues
 
-**1. Tilt shows "Updating" indefinitely**
+#### 1. Tilt shows "Updating" indefinitely
 
 - Known issue with Tilt v0.34.2 and docker-compose healthchecks
 - Containers are running and healthy despite UI status
 - Workaround: Verify with `docker ps` and access services directly
 
-**2. Windows libvips build failures**
+#### 2. Windows libvips build failures
 
 - Requires pkg-config and libvips prebuilt binaries
 - Set CGO_CFLAGS and CGO_LDFLAGS manually
 - See `.github/workflows/release.yml` for reference
 
-**3. Memory usage high**
+#### 3. Memory usage high
 
 - Large images processed in memory
 - Configure MAX_UPLOAD_SIZE appropriately
 - Consider worker pool size vs available RAM
 
-**4. Rate limiting too aggressive**
+#### 4. Rate limiting too aggressive
 
 - Adjust RATE_LIMIT_MAX and RATE_LIMIT_WINDOW
 - Consider Redis for distributed rate limiting
