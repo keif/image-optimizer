@@ -245,12 +245,28 @@ jobs:
           Write-Host "Extracting to C:\vips"
           Expand-Archive -Path vips.zip -DestinationPath C:\vips -Force
 
-          # Set up environment
-          $vipsDir = "C:\vips\vips-dev-$vipsVersion"
-          echo "PKG_CONFIG_PATH=C:\vips\vips-dev-$vipsVersion\lib\pkgconfig" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          echo "C:\vips\vips-dev-$vipsVersion\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          # Debug: Check directory structure
+          Write-Host "Checking extracted contents..."
+          $dirs = Get-ChildItem C:\vips -Directory
+          Write-Host "Found directories: $($dirs.Name -join ', ')"
 
-          Write-Host "libvips and pkg-config installed successfully"
+          # The zip contains vips-dev-8.15 folder (not vips-dev-8.15.5)
+          $actualDir = $dirs[0].FullName
+          Write-Host "Using directory: $actualDir"
+
+          # Check for pkg-config files
+          $pkgConfigPath = Join-Path $actualDir "lib\pkgconfig"
+          if (Test-Path $pkgConfigPath) {
+            Write-Host "Found pkg-config files:"
+            Get-ChildItem $pkgConfigPath | ForEach-Object { Write-Host "  $($_.Name)" }
+          }
+
+          # Set environment (using actual directory name)
+          echo "VIPS_DIR=$actualDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "PKG_CONFIG_PATH=$pkgConfigPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "$actualDir\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+          Write-Host "libvips installed at: $actualDir"
 
       - name: Get version
         id: version
@@ -273,9 +289,12 @@ jobs:
           output_name="image-optimizer-server-${{ matrix.platform }}-${{ matrix.arch }}"
           if [ "${{ matrix.platform }}" = "windows" ]; then
             output_name="${output_name}.exe"
-            # Set PKG_CONFIG_PATH for Windows build
-            export PKG_CONFIG_PATH="C:/vips/vips-dev-8.15.5/lib/pkgconfig"
-            export PATH="C:/vips/vips-dev-8.15.5/bin:$PATH"
+            # Use VIPS_DIR set by installation step
+            export PKG_CONFIG_PATH="$VIPS_DIR/lib/pkgconfig"
+            export PATH="$VIPS_DIR/bin:$PATH"
+            echo "Using PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
+            # Verify pkg-config can find vips
+            pkg-config --exists vips && echo "vips.pc found" || echo "WARNING: vips.pc not found"
           fi
 
           CGO_ENABLED=1 go build \
