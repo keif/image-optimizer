@@ -103,6 +103,12 @@ jobs:
           GOOS: ${{ matrix.platform }}
           GOARCH: ${{ matrix.arch }}
         run: |
+          # Set PKG_CONFIG_PATH for Windows
+          if [ "${{ matrix.platform }}" = "windows" ]; then
+            export PKG_CONFIG_PATH="C:/vips/vips-dev-8.15.5/lib/pkgconfig"
+            export PATH="C:/vips/vips-dev-8.15.5/bin:$PATH"
+          fi
+
           chmod +x scripts/build-standalone.sh
           VERSION=${{ steps.version.outputs.version }}
           # Only build for the current platform/arch combo
@@ -267,6 +273,9 @@ jobs:
           output_name="image-optimizer-server-${{ matrix.platform }}-${{ matrix.arch }}"
           if [ "${{ matrix.platform }}" = "windows" ]; then
             output_name="${output_name}.exe"
+            # Set PKG_CONFIG_PATH for Windows build
+            export PKG_CONFIG_PATH="C:/vips/vips-dev-8.15.5/lib/pkgconfig"
+            export PATH="C:/vips/vips-dev-8.15.5/bin:$PATH"
           fi
 
           CGO_ENABLED=1 go build \
