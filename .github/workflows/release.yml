@@ -105,12 +105,26 @@ jobs:
         run: |
           # Set CGO flags for Windows
           if [ "${{ matrix.platform }}" = "windows" ]; then
-            vips_dir_unix=$(cygpath -u "$VIPS_DIR")
-            export PKG_CONFIG_PATH="$vips_dir_unix/lib/pkgconfig"
-            export PATH="$vips_dir_unix/bin:$PATH"
-            export CGO_CFLAGS="-I$vips_dir_unix/include"
-            export CGO_LDFLAGS="-L$vips_dir_unix/lib -lvips-42"
-            echo "Windows build with VIPS_DIR: $vips_dir_unix"
+            # Convert Windows path to Unix-style (replace backslashes with forward slashes)
+            VIPS_DIR_UNIX=$(echo "$VIPS_DIR" | sed 's|\\|/|g')
+
+            export PKG_CONFIG_PATH="$VIPS_DIR_UNIX/lib/pkgconfig"
+            export PATH="$VIPS_DIR_UNIX/bin:$PATH"
+
+            # Try to use pkg-config if available
+            if pkg-config --exists vips 2>/dev/null; then
+              export CGO_CFLAGS="$(pkg-config --cflags vips)"
+              export CGO_LDFLAGS="$(pkg-config --libs vips)"
+              echo "Using pkg-config for Windows build"
+            else
+              export CGO_CFLAGS="-I$VIPS_DIR_UNIX/include"
+              export CGO_LDFLAGS="-L$VIPS_DIR_UNIX/lib -lvips-42"
+              echo "Using manual flags for Windows build"
+            fi
+
+            echo "VIPS_DIR_UNIX: $VIPS_DIR_UNIX"
+            echo "CGO_CFLAGS: $CGO_CFLAGS"
+            echo "CGO_LDFLAGS: $CGO_LDFLAGS"
           fi
 
           chmod +x scripts/build-standalone.sh
@@ -311,31 +325,46 @@ jobs:
           if [ "${{ matrix.platform }}" = "windows" ]; then
             output_name="${output_name}.exe"
 
+            # Convert VIPS_DIR to proper format for CGO
+            # On Windows, CGO expects Windows paths with forward slashes or backslashes
+            # VIPS_DIR is set by PowerShell as C:\vips\vips-dev-8.15
+            # We need to convert backslashes to forward slashes for bash/CGO
+            VIPS_DIR_UNIX=$(echo "$VIPS_DIR" | sed 's|\\|/|g')
+
+            echo "Original VIPS_DIR: $VIPS_DIR"
+            echo "Converted VIPS_DIR_UNIX: $VIPS_DIR_UNIX"
+
             # Debug: Check if headers exist
             echo "Checking for vips headers..."
-            if [ -f "$VIPS_DIR/include/vips/vips7compat.h" ]; then
-              echo "Found vips7compat.h at: $VIPS_DIR/include/vips/vips7compat.h"
+            if [ -f "$VIPS_DIR_UNIX/include/vips/vips7compat.h" ]; then
+              echo "Found vips7compat.h"
             else
               echo "ERROR: vips7compat.h not found!"
-              ls -la "$VIPS_DIR/include" || echo "include directory does not exist"
-              find "$VIPS_DIR" -name "vips7compat.h" || echo "Header not found anywhere"
+              ls -la "$VIPS_DIR_UNIX/include" 2>&1 || echo "include directory does not exist"
+              find "$VIPS_DIR_UNIX" -name "*.h" -type f | head -5
             fi
 
-            # Use Windows-style paths for CGO (not cygpath Unix paths)
-            export PKG_CONFIG_PATH="$VIPS_DIR/lib/pkgconfig"
-            export PATH="$VIPS_DIR/bin:$PATH"
+            # Set PKG_CONFIG_PATH and add vips bin to PATH
+            export PKG_CONFIG_PATH="$VIPS_DIR_UNIX/lib/pkgconfig"
+            export PATH="$VIPS_DIR_UNIX/bin:$PATH"
 
-            # Set CGO flags with Windows-style paths
-            export CGO_CFLAGS="-I$VIPS_DIR/include"
-            export CGO_LDFLAGS="-L$VIPS_DIR/lib -lvips-42"
+            # Verify pkg-config can find vips
+            echo "Testing pkg-config..."
+            pkg-config --exists vips && echo "✓ vips.pc found" || echo "✗ vips.pc not found"
 
-            echo "VIPS_DIR: $VIPS_DIR"
+            # Try to use pkg-config for flags if available
+            if pkg-config --exists vips; then
+              echo "Using pkg-config for compiler flags"
+              export CGO_CFLAGS="$(pkg-config --cflags vips)"
+              export CGO_LDFLAGS="$(pkg-config --libs vips)"
+            else
+              echo "Using manual compiler flags"
+              export CGO_CFLAGS="-I$VIPS_DIR_UNIX/include"
+              export CGO_LDFLAGS="-L$VIPS_DIR_UNIX/lib -lvips-42"
+            fi
+
             echo "CGO_CFLAGS: $CGO_CFLAGS"
             echo "CGO_LDFLAGS: $CGO_LDFLAGS"
-
-            # Verify pkg-config
-            pkg-config --exists vips && echo "vips.pc found" || echo "WARNING: vips.pc not found"
-            pkg-config --cflags vips 2>&1 || echo "Could not get cflags from pkg-config"
           fi
 
           CGO_ENABLED=1 go build \
