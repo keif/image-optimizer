@@ -310,22 +310,32 @@ jobs:
           output_name="image-optimizer-server-${{ matrix.platform }}-${{ matrix.arch }}"
           if [ "${{ matrix.platform }}" = "windows" ]; then
             output_name="${output_name}.exe"
-            # Use VIPS_DIR set by installation step - convert to Unix path for bash
-            vips_dir_unix=$(cygpath -u "$VIPS_DIR")
-            export PKG_CONFIG_PATH="$vips_dir_unix/lib/pkgconfig"
-            export PATH="$vips_dir_unix/bin:$PATH"
 
-            # Set CGO flags for Windows
-            export CGO_CFLAGS="-I$vips_dir_unix/include"
-            export CGO_LDFLAGS="-L$vips_dir_unix/lib -lvips-42"
+            # Debug: Check if headers exist
+            echo "Checking for vips headers..."
+            if [ -f "$VIPS_DIR/include/vips/vips7compat.h" ]; then
+              echo "Found vips7compat.h at: $VIPS_DIR/include/vips/vips7compat.h"
+            else
+              echo "ERROR: vips7compat.h not found!"
+              ls -la "$VIPS_DIR/include" || echo "include directory does not exist"
+              find "$VIPS_DIR" -name "vips7compat.h" || echo "Header not found anywhere"
+            fi
 
-            echo "Using VIPS_DIR: $vips_dir_unix"
+            # Use Windows-style paths for CGO (not cygpath Unix paths)
+            export PKG_CONFIG_PATH="$VIPS_DIR/lib/pkgconfig"
+            export PATH="$VIPS_DIR/bin:$PATH"
+
+            # Set CGO flags with Windows-style paths
+            export CGO_CFLAGS="-I$VIPS_DIR/include"
+            export CGO_LDFLAGS="-L$VIPS_DIR/lib -lvips-42"
+
+            echo "VIPS_DIR: $VIPS_DIR"
             echo "CGO_CFLAGS: $CGO_CFLAGS"
             echo "CGO_LDFLAGS: $CGO_LDFLAGS"
 
-            # Verify pkg-config can find vips
+            # Verify pkg-config
             pkg-config --exists vips && echo "vips.pc found" || echo "WARNING: vips.pc not found"
-            pkg-config --cflags vips || echo "Could not get cflags"
+            pkg-config --cflags vips 2>&1 || echo "Could not get cflags from pkg-config"
           fi
 
           CGO_ENABLED=1 go build \
