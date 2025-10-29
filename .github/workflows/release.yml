@@ -103,10 +103,14 @@ jobs:
           GOOS: ${{ matrix.platform }}
           GOARCH: ${{ matrix.arch }}
         run: |
-          # Set PKG_CONFIG_PATH for Windows
+          # Set CGO flags for Windows
           if [ "${{ matrix.platform }}" = "windows" ]; then
-            export PKG_CONFIG_PATH="C:/vips/vips-dev-8.15.5/lib/pkgconfig"
-            export PATH="C:/vips/vips-dev-8.15.5/bin:$PATH"
+            vips_dir_unix=$(cygpath -u "$VIPS_DIR")
+            export PKG_CONFIG_PATH="$vips_dir_unix/lib/pkgconfig"
+            export PATH="$vips_dir_unix/bin:$PATH"
+            export CGO_CFLAGS="-I$vips_dir_unix/include"
+            export CGO_LDFLAGS="-L$vips_dir_unix/lib -lvips-42"
+            echo "Windows build with VIPS_DIR: $vips_dir_unix"
           fi
 
           chmod +x scripts/build-standalone.sh
@@ -306,12 +310,22 @@ jobs:
           output_name="image-optimizer-server-${{ matrix.platform }}-${{ matrix.arch }}"
           if [ "${{ matrix.platform }}" = "windows" ]; then
             output_name="${output_name}.exe"
-            # Use VIPS_DIR set by installation step
-            export PKG_CONFIG_PATH="$VIPS_DIR/lib/pkgconfig"
-            export PATH="$VIPS_DIR/bin:$PATH"
-            echo "Using PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
+            # Use VIPS_DIR set by installation step - convert to Unix path for bash
+            vips_dir_unix=$(cygpath -u "$VIPS_DIR")
+            export PKG_CONFIG_PATH="$vips_dir_unix/lib/pkgconfig"
+            export PATH="$vips_dir_unix/bin:$PATH"
+
+            # Set CGO flags for Windows
+            export CGO_CFLAGS="-I$vips_dir_unix/include"
+            export CGO_LDFLAGS="-L$vips_dir_unix/lib -lvips-42"
+
+            echo "Using VIPS_DIR: $vips_dir_unix"
+            echo "CGO_CFLAGS: $CGO_CFLAGS"
+            echo "CGO_LDFLAGS: $CGO_LDFLAGS"
+
             # Verify pkg-config can find vips
             pkg-config --exists vips && echo "vips.pc found" || echo "WARNING: vips.pc not found"
+            pkg-config --cflags vips || echo "Could not get cflags"
           fi
 
           CGO_ENABLED=1 go build \
