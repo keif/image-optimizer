@@ -17,16 +17,17 @@ import (
 
 // Sprite represents a single sprite to be packed
 type Sprite struct {
-	Name      string      // Name/identifier for the sprite
-	Image     image.Image // The image data
-	Buffer    []byte      // Original image buffer
-	Width     int         // Current width (after trimming if applicable)
-	Height    int         // Current height (after trimming if applicable)
-	Trimmed   bool        // Whether transparency was trimmed
-	TrimmedX  int         // Pixels trimmed from left
-	TrimmedY  int         // Pixels trimmed from top
-	OriginalW int         // Original width before trimming
-	OriginalH int         // Original height before trimming
+	Name          string      // Name/identifier for the sprite
+	Image         image.Image // The image data
+	Buffer        []byte      // Original image buffer
+	Width         int         // Current width (after trimming if applicable)
+	Height        int         // Current height (after trimming if applicable)
+	Trimmed       bool        // Whether transparency was trimmed
+	TrimmedX      int         // Pixels trimmed from left
+	TrimmedY      int         // Pixels trimmed from top
+	OriginalW     int         // Original width before trimming
+	OriginalH     int         // Original height before trimming
+	OriginalIndex int         // Original position in source (for preserving order)
 }
 
 // PackedSprite represents a sprite with its position in the packed sheet
@@ -39,15 +40,18 @@ type PackedSprite struct {
 
 // PackingOptions contains parameters for sprite packing
 type PackingOptions struct {
-	Padding          int               // Padding between sprites (pixels)
-	PowerOfTwo       bool              // Force output dimensions to power of 2
-	TrimTransparency bool              // Trim transparent borders from sprites
-	MaxWidth         int               // Maximum sheet width (0 = unlimited)
-	MaxHeight        int               // Maximum sheet height (0 = unlimited)
-	OutputFormats    []string          // Desired output formats (json, css, csv, xml, sparrow, texturepacker, cocos2d, unity, godot)
-	AllowRotation    bool              // Allow sprite rotation for better packing
-	AutoResize       bool              // Automatically resize sprites that exceed MaxWidth/MaxHeight
-	NameMapping      map[string]string // Maps duplicate sprite names to canonical names (for deduplication)
+	Padding               int               // Padding between sprites (pixels)
+	PowerOfTwo            bool              // Force output dimensions to power of 2
+	TrimTransparency      bool              // Trim transparent borders from sprites
+	MaxWidth              int               // Maximum sheet width (0 = unlimited)
+	MaxHeight             int               // Maximum sheet height (0 = unlimited)
+	OutputFormats         []string          // Desired output formats (json, css, csv, xml, sparrow, texturepacker, cocos2d, unity, godot)
+	AllowRotation         bool              // Allow sprite rotation for better packing
+	AutoResize            bool              // Automatically resize sprites that exceed MaxWidth/MaxHeight
+	NameMapping           map[string]string // Maps duplicate sprite names to canonical names (for deduplication)
+	PreserveFrameOrder    bool              // Preserve original frame order in output (disables height sorting)
+	CompressionQuality    string            // PNG compression: "fast", "balanced", "best" (default: "balanced")
+	PreserveAnimationHold bool              // Don't deduplicate consecutive identical frames (preserves animation timing)
 }
 
 // Spritesheet represents the packed result
@@ -341,6 +345,8 @@ func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, erro
 	processedSprites := make([]Sprite, len(sprites))
 	for i, sprite := range sprites {
 		processedSprites[i] = sprite
+		// Preserve original index for frame order preservation
+		processedSprites[i].OriginalIndex = i
 
 		if options.TrimTransparency {
 			trimmed, trimX, trimY, origW, origH := TrimTransparency(sprite.Image)
@@ -357,9 +363,12 @@ func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, erro
 	}
 
 	// Sort sprites by height (descending) for better packing
-	sort.Slice(processedSprites, func(i, j int) bool {
-		return processedSprites[i].Height > processedSprites[j].Height
-	})
+	// Skip sorting if PreserveFrameOrder is enabled (for imported spritesheets)
+	if !options.PreserveFrameOrder {
+		sort.Slice(processedSprites, func(i, j int) bool {
+			return processedSprites[i].Height > processedSprites[j].Height
+		})
+	}
 
 	// Determine initial sheet dimensions
 	totalArea := 0
@@ -547,12 +556,25 @@ func packSingleSheet(sprites []Sprite, maxW, maxH int, options PackingOptions) (
 			ps.Image, ps.Image.Bounds().Min, draw.Over)
 	}
 
-	// Encode to PNG using faster encoder
-	// For spritesheets (especially FNF), we use a faster compression level
-	// Level 3 is much faster than default (9) with minimal size increase
+	// Encode to PNG with compression level based on quality setting
 	var buf bytes.Buffer
+	var compressionLevel png.CompressionLevel
+	var oxipngLevel int
+
+	switch options.CompressionQuality {
+	case "fast":
+		compressionLevel = png.BestSpeed // Level 1 - fastest
+		oxipngLevel = 1
+	case "best":
+		compressionLevel = png.BestCompression // Level 9 - best compression
+		oxipngLevel = 3
+	default: // "balanced" or empty
+		compressionLevel = png.DefaultCompression // Level 6 - good balance
+		oxipngLevel = 2
+	}
+
 	encoder := &png.Encoder{
-		CompressionLevel: png.BestSpeed, // Fast compression for large spritesheets
+		CompressionLevel: compressionLevel,
 	}
 	if err := encoder.Encode(&buf, composite); err != nil {
 		return nil, sprites
@@ -560,8 +582,7 @@ func packSingleSheet(sprites []Sprite, maxW, maxH int, options PackingOptions) (
 
 	// Post-process with OxiPNG for better compression
 	// This is worth it for spritesheets since they're downloaded once and cached
-	// Use level 1 (fast) since spritesheet generation is already slow
-	optimizedBuffer, err := optimizePNGWithOxipng(buf.Bytes(), 1)
+	optimizedBuffer, err := optimizePNGWithOxipng(buf.Bytes(), oxipngLevel)
 	if err == nil && len(optimizedBuffer) < len(buf.Bytes()) {
 		// OxiPNG succeeded and made it smaller - use it
 		buf = *bytes.NewBuffer(optimizedBuffer)
@@ -869,40 +890,78 @@ func generateSparrow(sheets []Spritesheet, nameMapping map[string]string) ([]byt
 		Sprites:   []SparrowSprite{},
 	}
 
-	// Create reverse mapping: canonical name -> list of all names (including duplicates)
+	// Build a map from sprite name to sprite data for quick lookup
+	spriteMap := make(map[string]PackedSprite)
+	for _, sprite := range sheet.Sprites {
+		spriteMap[sprite.Name] = sprite
+	}
+
+	// Create reverse mapping: canonical name -> list of all original names (including duplicates)
 	reverseMapping := make(map[string][]string)
 	for originalName, canonicalName := range nameMapping {
 		reverseMapping[canonicalName] = append(reverseMapping[canonicalName], originalName)
 	}
 
-	for _, sprite := range sheet.Sprites {
+	// Sort the duplicate names within each group to ensure consistent ordering
+	for _, names := range reverseMapping {
+		sort.Strings(names)
+	}
+
+	// Build entries sorted by OriginalIndex
+	type spriteEntry struct {
+		sprite        SparrowSprite
+		originalIndex int
+	}
+	entries := []spriteEntry{}
+
+	for _, packedSprite := range sheet.Sprites {
 		// Get all names that should reference this sprite (canonical + duplicates)
-		names := reverseMapping[sprite.Name]
+		names := reverseMapping[packedSprite.Name]
 		if len(names) == 0 {
-			// No mapping, just use the sprite's name
-			names = []string{sprite.Name}
+			// No mapping, just use the sprite's name with its original index
+			names = []string{packedSprite.Name}
 		}
 
-		// Create an entry for each name (preserves duplicate frames in XML)
+		// For each mapped name, create an entry using the packed sprite's OriginalIndex as base
+		// This ensures proper ordering
 		for _, name := range names {
 			sparrowSprite := SparrowSprite{
 				Name:   name,
-				X:      sprite.X,
-				Y:      sprite.Y,
-				Width:  sprite.Width,
-				Height: sprite.Height,
+				X:      packedSprite.X,
+				Y:      packedSprite.Y,
+				Width:  packedSprite.Width,
+				Height: packedSprite.Height,
 			}
 
 			// Add frame offset data if sprite was trimmed
-			if sprite.Trimmed {
-				sparrowSprite.FrameX = -sprite.TrimmedX      // Negative offset from left
-				sparrowSprite.FrameY = -sprite.TrimmedY      // Negative offset from top
-				sparrowSprite.FrameWidth = sprite.OriginalW  // Original width
-				sparrowSprite.FrameHeight = sprite.OriginalH // Original height
+			if packedSprite.Trimmed {
+				sparrowSprite.FrameX = -packedSprite.TrimmedX      // Negative offset from left
+				sparrowSprite.FrameY = -packedSprite.TrimmedY      // Negative offset from top
+				sparrowSprite.FrameWidth = packedSprite.OriginalW  // Original width
+				sparrowSprite.FrameHeight = packedSprite.OriginalH // Original height
 			}
 
-			atlas.Sprites = append(atlas.Sprites, sparrowSprite)
+			// Use the packedSprite's OriginalIndex for all its duplicates
+			entries = append(entries, spriteEntry{
+				sprite:        sparrowSprite,
+				originalIndex: packedSprite.OriginalIndex,
+			})
 		}
+	}
+
+	// Sort entries by original index to preserve frame order
+	sort.Slice(entries, func(i, j int) bool {
+		// First sort by original index
+		if entries[i].originalIndex != entries[j].originalIndex {
+			return entries[i].originalIndex < entries[j].originalIndex
+		}
+		// If same original index (duplicates), sort by name for consistency
+		return entries[i].sprite.Name < entries[j].sprite.Name
+	})
+
+	// Add sorted sprites to atlas
+	for _, entry := range entries {
+		atlas.Sprites = append(atlas.Sprites, entry.sprite)
 	}
 
 	return xml.MarshalIndent(atlas, "", "  ")
@@ -1111,11 +1170,12 @@ func ExtractFramesFromSheet(sheetImage image.Image, frames []FrameData) ([]Sprit
 		}
 
 		sprites[i] = Sprite{
-			Name:   frame.Name,
-			Image:  frameImg,
-			Buffer: buf.Bytes(),
-			Width:  frame.Width,
-			Height: frame.Height,
+			Name:          frame.Name,
+			Image:         frameImg,
+			Buffer:        buf.Bytes(),
+			Width:         frame.Width,
+			Height:        frame.Height,
+			OriginalIndex: i, // Preserve extraction order
 		}
 
 		// Store original trim data if present
@@ -1131,7 +1191,15 @@ func ExtractFramesFromSheet(sheetImage image.Image, frames []FrameData) ([]Sprit
 	return sprites, nil
 }
 
-// DeduplicateSprites removes duplicate sprites and returns unique ones with name mapping
+// FrameNameInfo stores information about a frame name for XML output ordering
+type FrameNameInfo struct {
+	Name          string // Frame name
+	CanonicalName string // Name of the unique sprite this frame maps to
+	OriginalIndex int    // Original position in the sprite sequence
+}
+
+// DeduplicateSprites removes duplicate sprites and returns unique ones with frame info
+// The returned map contains ALL frame names (including duplicates) with their original indices
 func DeduplicateSprites(sprites []Sprite) ([]Sprite, map[string]string) {
 	type spriteHash struct {
 		hash   string
@@ -1139,7 +1207,7 @@ func DeduplicateSprites(sprites []Sprite) ([]Sprite, map[string]string) {
 	}
 
 	seen := make(map[string]spriteHash)
-	nameMapping := make(map[string]string) // Maps duplicate names to canonical name
+	nameMapping := make(map[string]string) // Maps all names (duplicate or not) to canonical name
 	uniqueSprites := []Sprite{}
 
 	for _, sprite := range sprites {
@@ -1155,10 +1223,11 @@ func DeduplicateSprites(sprites []Sprite) ([]Sprite, map[string]string) {
 			}
 		}
 
-		// New unique sprite
-		seen[hash] = spriteHash{hash: hash, sprite: sprite}
-		uniqueSprites = append(uniqueSprites, sprite)
-		nameMapping[sprite.Name] = sprite.Name // Maps to itself
+		// New unique sprite - preserve original index from first occurrence
+		spriteToAdd := sprite
+		uniqueSprites = append(uniqueSprites, spriteToAdd)
+		seen[hash] = spriteHash{hash: hash, sprite: spriteToAdd}
+		nameMapping[sprite.Name] = sprite.Name // Maps to itself (canonical)
 	}
 
 	return uniqueSprites, nameMapping

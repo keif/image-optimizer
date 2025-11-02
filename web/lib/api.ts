@@ -285,6 +285,12 @@ class ApiClient {
     if (options.autoResize) {
       params.append('autoResize', 'true');
     }
+    if (options.preserveFrameOrder !== undefined) {
+      params.append('preserveFrameOrder', options.preserveFrameOrder.toString());
+    }
+    if (options.compressionQuality) {
+      params.append('compressionQuality', options.compressionQuality);
+    }
 
     const url = `${this.baseUrl}/pack-sprites?${params.toString()}`;
     console.log('[ApiClient] packSprites - Calling URL:', url);
@@ -337,6 +343,15 @@ class ApiClient {
     params.append('maxWidth', options.maxWidth.toString());
     params.append('maxHeight', options.maxHeight.toString());
     params.append('outputFormats', options.outputFormats.join(','));
+    // Default to true for imported spritesheets to preserve animation sequences
+    if (options.preserveFrameOrder !== undefined) {
+      params.append('preserveFrameOrder', options.preserveFrameOrder.toString());
+    } else {
+      params.append('preserveFrameOrder', 'true');
+    }
+    if (options.compressionQuality) {
+      params.append('compressionQuality', options.compressionQuality);
+    }
 
     const url = `${this.baseUrl}/optimize-spritesheet?${params.toString()}`;
     console.log('[ApiClient] optimizeSpritesheet - Calling URL:', url);

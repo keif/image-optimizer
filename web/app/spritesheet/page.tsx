@@ -31,6 +31,8 @@ export default function SpritesheetPage() {
     maxWidth: 2048,
     maxHeight: 2048,
     outputFormats: ['json'],
+    preserveFrameOrder: false,
+    compressionQuality: 'balanced',
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStage, setProcessingStage] = useState(0);
@@ -123,6 +125,8 @@ export default function SpritesheetPage() {
       const optimizationOptions: SpritesheetOptimizationOptions = {
         ...options,
         deduplicate,
+        // Default to true for imported spritesheets to preserve animation sequences
+        preserveFrameOrder: options.preserveFrameOrder !== undefined ? options.preserveFrameOrder : true,
       };
 
       // Start the API call and stage progression in parallel

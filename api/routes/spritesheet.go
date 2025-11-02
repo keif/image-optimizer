@@ -71,6 +71,8 @@ func SetupSpritesheetRoutes(app *fiber.App) {
 // @Param maxHeight query int false "Maximum sheet height in pixels (256-12288)" default(2048)
 // @Param autoResize query bool false "Automatically resize sprites exceeding 12288x12288 to fit. Resize details returned in response." default(false)
 // @Param outputFormats query string false "Comma-separated list of output formats: json,css,csv,xml,sparrow,texturepacker,cocos2d,unity,godot" default("json")
+// @Param preserveFrameOrder query bool false "Preserve sprite upload order (disable height-based sorting for better animation support)" default(false)
+// @Param compressionQuality query string false "PNG compression quality: fast, balanced, best" default("balanced")
 // @Success 200 {object} PackSpritesResponse "Success response includes resizedSprites array if any sprites were auto-resized"
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
@@ -92,14 +94,23 @@ func PackSprites(c *fiber.Ctx) error {
 	}
 
 	// Parse packing options from query parameters
+	compressionQuality := c.Query("compressionQuality", "balanced")
+
+	// Validate compression quality
+	if compressionQuality != "fast" && compressionQuality != "balanced" && compressionQuality != "best" {
+		compressionQuality = "balanced"
+	}
+
 	options := services.PackingOptions{
-		Padding:          parseInt(c.Query("padding", "2")),
-		PowerOfTwo:       parseBool(c.Query("powerOfTwo", "false")),
-		TrimTransparency: parseBool(c.Query("trimTransparency", "false")),
-		MaxWidth:         parseInt(c.Query("maxWidth", "2048")),
-		MaxHeight:        parseInt(c.Query("maxHeight", "2048")),
-		OutputFormats:    parseOutputFormats(c.Query("outputFormats", "json")),
-		AutoResize:       parseBool(c.Query("autoResize", "false")),
+		Padding:            parseInt(c.Query("padding", "2")),
+		PowerOfTwo:         parseBool(c.Query("powerOfTwo", "false")),
+		TrimTransparency:   parseBool(c.Query("trimTransparency", "false")),
+		MaxWidth:           parseInt(c.Query("maxWidth", "2048")),
+		MaxHeight:          parseInt(c.Query("maxHeight", "2048")),
+		OutputFormats:      parseOutputFormats(c.Query("outputFormats", "json")),
+		AutoResize:         parseBool(c.Query("autoResize", "false")),
+		PreserveFrameOrder: parseBool(c.Query("preserveFrameOrder", "false")),
+		CompressionQuality: compressionQuality,
 	}
 
 	// Validate options
@@ -394,7 +405,7 @@ func GetSpritesheetFormats(c *fiber.Ctx) error {
 
 // OptimizeSpritesheet handles importing an existing spritesheet and re-optimizing it
 // @Summary Optimize an existing spritesheet
-// @Description Accepts a spritesheet PNG and its XML, extracts frames, optionally deduplicates, and repacks optimally
+// @Description Accepts a spritesheet PNG and its XML, extracts frames, optionally deduplicates, and repacks optimally. Frame order is preserved by default to maintain animation sequences.
 // @Tags spritesheet
 // @Accept multipart/form-data
 // @Produce json
@@ -407,6 +418,8 @@ func GetSpritesheetFormats(c *fiber.Ctx) error {
 // @Param maxWidth query int false "Maximum sheet width in pixels" default(2048)
 // @Param maxHeight query int false "Maximum sheet height in pixels" default(2048)
 // @Param outputFormats query string false "Comma-separated list of output formats" default("sparrow")
+// @Param preserveFrameOrder query bool false "Preserve original frame order (recommended for animations)" default(true)
+// @Param compressionQuality query string false "PNG compression quality: fast, balanced, best" default("balanced")
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
@@ -511,14 +524,25 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 	}
 
 	// Parse packing options (same as PackSprites)
+	// Default preserveFrameOrder to true for imported spritesheets to maintain animation sequences
+	preserveFrameOrder := c.Query("preserveFrameOrder", "true")
+	compressionQuality := c.Query("compressionQuality", "balanced")
+
+	// Validate compression quality
+	if compressionQuality != "fast" && compressionQuality != "balanced" && compressionQuality != "best" {
+		compressionQuality = "balanced"
+	}
+
 	options := services.PackingOptions{
-		Padding:          parseInt(c.Query("padding", "2")),
-		PowerOfTwo:       parseBool(c.Query("powerOfTwo", "false")),
-		TrimTransparency: parseBool(c.Query("trimTransparency", "false")),
-		MaxWidth:         parseInt(c.Query("maxWidth", "2048")),
-		MaxHeight:        parseInt(c.Query("maxHeight", "2048")),
-		OutputFormats:    parseOutputFormats(c.Query("outputFormats", "sparrow")),
-		NameMapping:      nameMapping, // Pass deduplication mapping to preserve all frame names in XML
+		Padding:            parseInt(c.Query("padding", "2")),
+		PowerOfTwo:         parseBool(c.Query("powerOfTwo", "false")),
+		TrimTransparency:   parseBool(c.Query("trimTransparency", "false")),
+		MaxWidth:           parseInt(c.Query("maxWidth", "2048")),
+		MaxHeight:          parseInt(c.Query("maxHeight", "2048")),
+		OutputFormats:      parseOutputFormats(c.Query("outputFormats", "sparrow")),
+		NameMapping:        nameMapping, // Pass deduplication mapping to preserve all frame names in XML
+		PreserveFrameOrder: parseBool(preserveFrameOrder),
+		CompressionQuality: compressionQuality,
 	}
 
 	// Pack the sprites using existing packing logic

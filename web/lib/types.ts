@@ -77,6 +77,8 @@ export interface PackingOptions {
   maxHeight: number;
   outputFormats: string[];
   autoResize?: boolean;
+  preserveFrameOrder?: boolean;
+  compressionQuality?: 'fast' | 'balanced' | 'best';
 }
 
 export interface ResizeInfo {

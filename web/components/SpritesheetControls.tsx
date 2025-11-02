@@ -207,6 +207,40 @@ export default function SpritesheetControls({ options, onChange }: SpritesheetCo
             </div>
           </div>
         </label>
+
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={options.preserveFrameOrder || false}
+            onChange={(e) => onChange({ ...options, preserveFrameOrder: e.target.checked })}
+            className="w-4 h-4"
+          />
+          <div className="flex-1">
+            <div className="text-sm font-medium">Preserve Frame Order</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Maintain original sprite order for animations (recommended for imported spritesheets)
+            </div>
+          </div>
+        </label>
+      </div>
+
+      {/* Compression Quality */}
+      <div>
+        <label className="block text-sm font-medium mb-2">
+          Compression Quality
+        </label>
+        <select
+          value={options.compressionQuality || 'balanced'}
+          onChange={(e) => onChange({ ...options, compressionQuality: e.target.value as 'fast' | 'balanced' | 'best' })}
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm"
+        >
+          <option value="fast">Fast - Quick processing, larger file size</option>
+          <option value="balanced">Balanced - Good compromise (recommended)</option>
+          <option value="best">Best - Slowest, smallest file size</option>
+        </select>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          Higher quality = smaller files but slower processing
+        </p>
       </div>
 
       {/* Output Formats */}

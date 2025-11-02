@@ -1,0 +1,511 @@
+package services
+
+import (
+	"bytes"
+	"encoding/xml"
+	"image"
+	"image/color"
+	"image/png"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+// createTestSprite creates a simple test sprite with a specific color
+func createTestSprite(name string, width, height int, fillColor color.RGBA) Sprite {
+	img := image.NewRGBA(image.Rect(0, 0, width, height))
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
+			img.Set(x, y, fillColor)
+		}
+	}
+
+	// Encode to PNG buffer for deduplication to work
+	var buf bytes.Buffer
+	encoder := &png.Encoder{CompressionLevel: png.BestSpeed}
+	_ = encoder.Encode(&buf, img)
+
+	return Sprite{
+		Name:   name,
+		Image:  img,
+		Buffer: buf.Bytes(),
+		Width:  width,
+		Height: height,
+	}
+}
+
+// TestPreserveFrameOrder tests that frame order is preserved when PreserveFrameOrder is enabled
+func TestPreserveFrameOrder(t *testing.T) {
+	sprites := []Sprite{
+		createTestSprite("frame0000", 100, 100, color.RGBA{255, 0, 0, 255}),
+		createTestSprite("frame0001", 200, 50, color.RGBA{0, 255, 0, 255}),  // Different height
+		createTestSprite("frame0002", 150, 150, color.RGBA{0, 0, 255, 255}), // Different height
+		createTestSprite("frame0003", 100, 100, color.RGBA{255, 255, 0, 255}),
+	}
+
+	options := PackingOptions{
+		Padding:            2,
+		PowerOfTwo:         false,
+		TrimTransparency:   false,
+		MaxWidth:           2048,
+		MaxHeight:          2048,
+		OutputFormats:      []string{"sparrow"},
+		PreserveFrameOrder: true,
+	}
+
+	result, err := PackSprites(sprites, options)
+	if err != nil {
+		t.Fatalf("Failed to pack sprites with PreserveFrameOrder: %v", err)
+	}
+
+	if len(result.Sheets) == 0 {
+		t.Fatal("No sheets generated")
+	}
+
+	// Parse the generated Sparrow XML to verify frame order
+	sparrowXML, ok := result.Formats["sparrow"]
+	if !ok {
+		t.Fatal("Sparrow format not generated")
+	}
+
+	type SubTexture struct {
+		Name string `xml:"name,attr"`
+	}
+	type TextureAtlas struct {
+		XMLName     xml.Name     `xml:"TextureAtlas"`
+		SubTextures []SubTexture `xml:"SubTexture"`
+	}
+
+	var atlas TextureAtlas
+	if err := xml.Unmarshal(sparrowXML, &atlas); err != nil {
+		t.Fatalf("Failed to parse Sparrow XML: %v", err)
+	}
+
+	// Verify frame order matches original
+	expectedOrder := []string{"frame0000", "frame0001", "frame0002", "frame0003"}
+	if len(atlas.SubTextures) != len(expectedOrder) {
+		t.Fatalf("Expected %d frames, got %d", len(expectedOrder), len(atlas.SubTextures))
+	}
+
+	for i, expected := range expectedOrder {
+		if atlas.SubTextures[i].Name != expected {
+			t.Errorf("Frame %d: expected %s, got %s", i, expected, atlas.SubTextures[i].Name)
+		}
+	}
+}
+
+// TestFrameOrderNotPreserved tests that frames are reordered by height when PreserveFrameOrder is disabled
+func TestFrameOrderNotPreserved(t *testing.T) {
+	sprites := []Sprite{
+		createTestSprite("small", 100, 50, color.RGBA{255, 0, 0, 255}),
+		createTestSprite("large", 100, 200, color.RGBA{0, 255, 0, 255}),
+		createTestSprite("medium", 100, 100, color.RGBA{0, 0, 255, 255}),
+	}
+
+	options := PackingOptions{
+		Padding:            2,
+		PowerOfTwo:         false,
+		TrimTransparency:   false,
+		MaxWidth:           2048,
+		MaxHeight:          2048,
+		OutputFormats:      []string{"sparrow"},
+		PreserveFrameOrder: false, // Allow reordering
+	}
+
+	result, err := PackSprites(sprites, options)
+	if err != nil {
+		t.Fatalf("Failed to pack sprites: %v", err)
+	}
+
+	// When PreserveFrameOrder is false, sprites are sorted by height (descending)
+	// So the packing order should be: large (200), medium (100), small (50)
+	// However, the Sparrow XML should still be sorted by OriginalIndex
+	// to maintain the original frame sequence in the XML output
+
+	sparrowXML := result.Formats["sparrow"]
+	type SubTexture struct {
+		Name string `xml:"name,attr"`
+	}
+	type TextureAtlas struct {
+		XMLName     xml.Name     `xml:"TextureAtlas"`
+		SubTextures []SubTexture `xml:"SubTexture"`
+	}
+
+	var atlas TextureAtlas
+	if err := xml.Unmarshal(sparrowXML, &atlas); err != nil {
+		t.Fatalf("Failed to parse Sparrow XML: %v", err)
+	}
+
+	// Even with PreserveFrameOrder=false, the XML output should maintain original order
+	expectedOrder := []string{"small", "large", "medium"}
+	for i, expected := range expectedOrder {
+		if atlas.SubTextures[i].Name != expected {
+			t.Errorf("Frame %d: expected %s, got %s", i, expected, atlas.SubTextures[i].Name)
+		}
+	}
+}
+
+// TestDuplicateFramePreservation tests that duplicate frames are preserved in XML with deduplication
+func TestDuplicateFramePreservation(t *testing.T) {
+	// Create sprites where some are identical (simulating animation on 2's)
+	sprites := []Sprite{
+		createTestSprite("frame0000", 100, 100, color.RGBA{255, 0, 0, 255}),
+		createTestSprite("frame0001", 100, 100, color.RGBA{0, 255, 0, 255}),
+		createTestSprite("frame0002", 100, 100, color.RGBA{0, 255, 0, 255}), // Duplicate of frame0001
+		createTestSprite("frame0003", 100, 100, color.RGBA{0, 0, 255, 255}),
+	}
+
+	// Deduplicate sprites
+	uniqueSprites, nameMapping := DeduplicateSprites(sprites)
+
+	// Should have 3 unique sprites (frame0001 and frame0002 are duplicates)
+	if len(uniqueSprites) != 3 {
+		t.Fatalf("Expected 3 unique sprites, got %d", len(uniqueSprites))
+	}
+
+	options := PackingOptions{
+		Padding:            2,
+		PowerOfTwo:         false,
+		TrimTransparency:   false,
+		MaxWidth:           2048,
+		MaxHeight:          2048,
+		OutputFormats:      []string{"sparrow"},
+		NameMapping:        nameMapping,
+		PreserveFrameOrder: true,
+	}
+
+	result, err := PackSprites(uniqueSprites, options)
+	if err != nil {
+		t.Fatalf("Failed to pack sprites: %v", err)
+	}
+
+	sparrowXML := result.Formats["sparrow"]
+	type SubTexture struct {
+		Name string `xml:"name,attr"`
+		X    int    `xml:"x,attr"`
+		Y    int    `xml:"y,attr"`
+	}
+	type TextureAtlas struct {
+		XMLName     xml.Name     `xml:"TextureAtlas"`
+		SubTextures []SubTexture `xml:"SubTexture"`
+	}
+
+	var atlas TextureAtlas
+	if err := xml.Unmarshal(sparrowXML, &atlas); err != nil {
+		t.Fatalf("Failed to parse Sparrow XML: %v", err)
+	}
+
+	// Should have 4 SubTexture entries (preserving duplicates)
+	if len(atlas.SubTextures) != 4 {
+		t.Fatalf("Expected 4 SubTexture entries, got %d", len(atlas.SubTextures))
+	}
+
+	// frame0001 and frame0002 should have same coordinates
+	frame1 := atlas.SubTextures[1]
+	frame2 := atlas.SubTextures[2]
+	if frame1.X != frame2.X || frame1.Y != frame2.Y {
+		t.Errorf("Duplicate frames should have same coordinates: frame0001(%d,%d) != frame0002(%d,%d)",
+			frame1.X, frame1.Y, frame2.X, frame2.Y)
+	}
+}
+
+// TestCompressionQuality tests different compression quality settings
+func TestCompressionQuality(t *testing.T) {
+	sprite := createTestSprite("test", 256, 256, color.RGBA{128, 128, 128, 255})
+
+	testCases := []struct {
+		name               string
+		compressionQuality string
+	}{
+		{"fast", "fast"},
+		{"balanced", "balanced"},
+		{"best", "best"},
+		{"default", ""}, // Should default to balanced
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			options := PackingOptions{
+				Padding:            2,
+				PowerOfTwo:         false,
+				TrimTransparency:   false,
+				MaxWidth:           2048,
+				MaxHeight:          2048,
+				OutputFormats:      []string{"json"},
+				CompressionQuality: tc.compressionQuality,
+			}
+
+			result, err := PackSprites([]Sprite{sprite}, options)
+			if err != nil {
+				t.Fatalf("Failed to pack sprite with compression %s: %v", tc.compressionQuality, err)
+			}
+
+			if len(result.Sheets) == 0 {
+				t.Fatal("No sheets generated")
+			}
+
+			if len(result.Sheets[0].ImageBuffer) == 0 {
+				t.Fatal("Image buffer is empty")
+			}
+
+			// Just verify it produces valid output - size comparison is difficult
+			// because OxiPNG may optimize differently
+			t.Logf("Compression %s: buffer size = %d bytes", tc.compressionQuality, len(result.Sheets[0].ImageBuffer))
+		})
+	}
+}
+
+// TestRealSpritesheetOptimization tests optimization with real test data
+func TestRealSpritesheetOptimization(t *testing.T) {
+	testDataPath := filepath.Join("..", "testdata", "spritesheets")
+
+	testCases := []struct {
+		name       string
+		pngFile    string
+		xmlFile    string
+		dedupe     bool
+		expectDupe bool // Whether we expect duplicates to be found
+	}{
+		{
+			name:       "SmolSprite_Pikafriend",
+			pngFile:    "smol_sprite_pikafriend.png",
+			xmlFile:    "smol_sprite_pikafriend.xml",
+			dedupe:     true,
+			expectDupe: true, // This file has duplicate frames
+		},
+		{
+			name:       "NormSprite_Turmoil",
+			pngFile:    "norm_sprite_Turmoil_stand.png",
+			xmlFile:    "norm_sprite_Turmoil_stand.xml",
+			dedupe:     true,
+			expectDupe: true, // This file has many duplicate frames
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Check if test files exist
+			pngPath := filepath.Join(testDataPath, tc.pngFile)
+			xmlPath := filepath.Join(testDataPath, tc.xmlFile)
+
+			if _, err := os.Stat(pngPath); os.IsNotExist(err) {
+				t.Skipf("Test file not found: %s", pngPath)
+			}
+			if _, err := os.Stat(xmlPath); os.IsNotExist(err) {
+				t.Skipf("Test file not found: %s", xmlPath)
+			}
+
+			// Load PNG
+			pngFile, err := os.Open(pngPath)
+			if err != nil {
+				t.Fatalf("Failed to open PNG: %v", err)
+			}
+			defer func() {
+				if err := pngFile.Close(); err != nil {
+					t.Logf("Warning: failed to close PNG file: %v", err)
+				}
+			}()
+
+			sheetImg, err := png.Decode(pngFile)
+			if err != nil {
+				t.Fatalf("Failed to decode PNG: %v", err)
+			}
+
+			// Load XML
+			xmlData, err := os.ReadFile(xmlPath)
+			if err != nil {
+				t.Fatalf("Failed to read XML: %v", err)
+			}
+
+			// Parse XML
+			frames, err := ParseSparrowXML(xmlData)
+			if err != nil {
+				t.Fatalf("Failed to parse XML: %v", err)
+			}
+
+			originalFrameCount := len(frames)
+			t.Logf("Original frame count: %d", originalFrameCount)
+
+			// Extract frames
+			sprites, err := ExtractFramesFromSheet(sheetImg, frames)
+			if err != nil {
+				t.Fatalf("Failed to extract frames: %v", err)
+			}
+
+			// Deduplicate if requested
+			var nameMapping map[string]string
+			if tc.dedupe {
+				sprites, nameMapping = DeduplicateSprites(sprites)
+				t.Logf("After deduplication: %d unique sprites", len(sprites))
+
+				if tc.expectDupe && len(sprites) >= originalFrameCount {
+					t.Errorf("Expected deduplication to reduce sprite count, but got %d sprites from %d frames",
+						len(sprites), originalFrameCount)
+				}
+			}
+
+			// Pack with PreserveFrameOrder enabled
+			options := PackingOptions{
+				Padding:            2,
+				PowerOfTwo:         false,
+				TrimTransparency:   false,
+				MaxWidth:           4096,
+				MaxHeight:          4096,
+				OutputFormats:      []string{"sparrow"},
+				NameMapping:        nameMapping,
+				PreserveFrameOrder: true,
+				CompressionQuality: "balanced",
+			}
+
+			result, err := PackSprites(sprites, options)
+			if err != nil {
+				t.Fatalf("Failed to pack sprites: %v", err)
+			}
+
+			// Verify Sparrow XML
+			sparrowXML := result.Formats["sparrow"]
+			type SubTexture struct {
+				Name string `xml:"name,attr"`
+			}
+			type TextureAtlas struct {
+				XMLName     xml.Name     `xml:"TextureAtlas"`
+				SubTextures []SubTexture `xml:"SubTexture"`
+			}
+
+			var atlas TextureAtlas
+			if err := xml.Unmarshal(sparrowXML, &atlas); err != nil {
+				t.Fatalf("Failed to parse generated Sparrow XML: %v", err)
+			}
+
+			// Verify frame count (should match original even with deduplication)
+			if len(atlas.SubTextures) != originalFrameCount {
+				t.Errorf("Expected %d frames in output XML, got %d", originalFrameCount, len(atlas.SubTextures))
+			}
+
+			// Verify all frame names are present (order may differ with deduplication)
+			expectedNames := make(map[string]bool)
+			for _, frame := range frames {
+				expectedNames[frame.Name] = true
+			}
+
+			outputNames := make(map[string]bool)
+			for _, subTexture := range atlas.SubTextures {
+				outputNames[subTexture.Name] = true
+			}
+
+			// Check that all expected names are in the output
+			for name := range expectedNames {
+				if !outputNames[name] {
+					t.Errorf("Missing frame name in output: %s", name)
+				}
+			}
+
+			// Check that no unexpected names are in the output
+			for name := range outputNames {
+				if !expectedNames[name] {
+					t.Errorf("Unexpected frame name in output: %s", name)
+				}
+			}
+
+			t.Logf("Successfully repacked %s: %d unique sprites -> %d output frames",
+				tc.name, len(sprites), len(atlas.SubTextures))
+		})
+	}
+}
+
+// TestOriginalIndexPreservation tests that OriginalIndex is preserved through processing
+func TestOriginalIndexPreservation(t *testing.T) {
+	sprites := []Sprite{
+		createTestSprite("a", 50, 50, color.RGBA{255, 0, 0, 255}),
+		createTestSprite("b", 100, 100, color.RGBA{0, 255, 0, 255}),
+		createTestSprite("c", 75, 75, color.RGBA{0, 0, 255, 255}),
+	}
+
+	// Manually set OriginalIndex
+	for i := range sprites {
+		sprites[i].OriginalIndex = i
+	}
+
+	options := PackingOptions{
+		Padding:            2,
+		PowerOfTwo:         false,
+		TrimTransparency:   false,
+		MaxWidth:           2048,
+		MaxHeight:          2048,
+		OutputFormats:      []string{},
+		PreserveFrameOrder: false, // Allow height sorting
+	}
+
+	result, err := PackSprites(sprites, options)
+	if err != nil {
+		t.Fatalf("Failed to pack sprites: %v", err)
+	}
+
+	// Verify OriginalIndex is preserved in packed sprites
+	for _, packed := range result.Sheets[0].Sprites {
+		originalName := packed.Name
+		expectedIndex := -1
+		for i, s := range sprites {
+			if s.Name == originalName {
+				expectedIndex = i
+				break
+			}
+		}
+
+		if packed.OriginalIndex != expectedIndex {
+			t.Errorf("Sprite %s: expected OriginalIndex %d, got %d",
+				packed.Name, expectedIndex, packed.OriginalIndex)
+		}
+	}
+}
+
+// TestSparrowXMLFrameSequence verifies that sequential duplicate frames are output correctly
+func TestSparrowXMLFrameSequence(t *testing.T) {
+	// Simulate animation on 2's: frame A, frame B, frame B (hold), frame C
+	sprites := []Sprite{
+		createTestSprite("anim0000", 100, 100, color.RGBA{255, 0, 0, 255}),
+		createTestSprite("anim0001", 100, 100, color.RGBA{0, 255, 0, 255}),
+		createTestSprite("anim0002", 100, 100, color.RGBA{0, 255, 0, 255}), // Same as 0001
+		createTestSprite("anim0003", 100, 100, color.RGBA{0, 0, 255, 255}),
+	}
+
+	uniqueSprites, nameMapping := DeduplicateSprites(sprites)
+
+	options := PackingOptions{
+		Padding:            2,
+		PowerOfTwo:         false,
+		TrimTransparency:   false,
+		MaxWidth:           2048,
+		MaxHeight:          2048,
+		OutputFormats:      []string{"sparrow"},
+		NameMapping:        nameMapping,
+		PreserveFrameOrder: true,
+	}
+
+	result, err := PackSprites(uniqueSprites, options)
+	if err != nil {
+		t.Fatalf("Failed to pack sprites: %v", err)
+	}
+
+	sparrowXML := result.Formats["sparrow"]
+	xmlStr := string(sparrowXML)
+
+	// Verify all frame names appear in order
+	expectedFrames := []string{"anim0000", "anim0001", "anim0002", "anim0003"}
+	for i, frameName := range expectedFrames {
+		if !strings.Contains(xmlStr, frameName) {
+			t.Errorf("Frame %d (%s) not found in XML output", i, frameName)
+		}
+	}
+
+	// Verify sequence order by checking that frames appear in XML in the expected order
+	lastIndex := -1
+	for _, frameName := range expectedFrames {
+		index := strings.Index(xmlStr, `name="`+frameName+`"`)
+		if index <= lastIndex {
+			t.Errorf("Frame %s appears out of order in XML (index %d <= %d)", frameName, index, lastIndex)
+		}
+		lastIndex = index
+	}
+}
