@@ -632,7 +632,8 @@ paths:
       consumes:
       - multipart/form-data
       description: Accepts a spritesheet PNG and its XML, extracts frames, optionally
-        deduplicates, and repacks optimally
+        deduplicates, and repacks optimally. Frame order is preserved by default to
+        maintain animation sequences.
       parameters:
       - description: Spritesheet PNG image
         in: formData
@@ -678,6 +679,16 @@ paths:
         description: Comma-separated list of output formats
         in: query
         name: outputFormats
+        type: string
+      - default: true
+        description: Preserve original frame order (recommended for animations)
+        in: query
+        name: preserveFrameOrder
+        type: boolean
+      - default: '"balanced"'
+        description: 'PNG compression quality: fast, balanced, best'
+        in: query
+        name: compressionQuality
         type: string
       produces:
       - application/json
@@ -751,6 +762,17 @@ paths:
         description: 'Comma-separated list of output formats: json,css,csv,xml,sparrow,texturepacker,cocos2d,unity,godot'
         in: query
         name: outputFormats
+        type: string
+      - default: false
+        description: Preserve sprite upload order (disable height-based sorting for
+          better animation support)
+        in: query
+        name: preserveFrameOrder
+        type: boolean
+      - default: '"balanced"'
+        description: 'PNG compression quality: fast, balanced, best'
+        in: query
+        name: compressionQuality
         type: string
       produces:
       - application/json

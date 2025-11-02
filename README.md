@@ -671,6 +671,16 @@ Pack multiple sprite images into optimized spritesheets using the MaxRects bin p
   - Range: 256-8192 pixels
 - `outputFormats` (string): Comma-separated list of output formats (default: "json")
   - Available: `json`, `css`, `csv`, `xml`, `sparrow`, `texturepacker`, `cocos2d`, `unity`, `godot`
+- `preserveFrameOrder` (boolean): Preserve sprite upload order instead of height-based sorting (default: false)
+  - **Important for animations**: Enable this to maintain frame sequences
+  - When enabled, sprites are packed in upload order
+  - When disabled, sprites are sorted by height for better packing efficiency
+- `compressionQuality` (string): PNG compression quality setting (default: "balanced")
+  - Options: `fast` (fastest, larger files), `balanced` (recommended), `best` (slowest, smallest files)
+  - Controls PNG compression level and OxiPNG optimization level
+  - `fast`: PNG level 1, OxiPNG level 1 (~50ms faster, ~5-10% larger)
+  - `balanced`: PNG level 6, OxiPNG level 2 (recommended default)
+  - `best`: PNG level 9, OxiPNG level 6 (~200ms slower, ~2-5% smaller)
 
 **Examples:**
 
@@ -704,6 +714,30 @@ curl -X POST "http://localhost:8080/pack-sprites?trimTransparency=true&outputFor
 
 ```bash
 curl -X POST "http://localhost:8080/pack-sprites?maxWidth=4096&maxHeight=4096&padding=8" \
+  -F "images=@*.png"
+```
+
+**5. Pack animation frames with frame order preservation:**
+
+```bash
+curl -X POST "http://localhost:8080/pack-sprites?preserveFrameOrder=true&outputFormats=sparrow" \
+  -F "images=@frame001.png" \
+  -F "images=@frame002.png" \
+  -F "images=@frame003.png"
+```
+
+**6. Pack with best compression quality:**
+
+```bash
+curl -X POST "http://localhost:8080/pack-sprites?compressionQuality=best" \
+  -F "images=@sprite1.png" \
+  -F "images=@sprite2.png"
+```
+
+**7. Pack animation with frame order and compression:**
+
+```bash
+curl -X POST "http://localhost:8080/pack-sprites?preserveFrameOrder=true&compressionQuality=balanced&outputFormats=sparrow,json" \
   -F "images=@*.png"
 ```
 
@@ -768,6 +802,117 @@ Visit `/spritesheet` on the web interface for a visual drag-and-drop sprite pack
 - **Transparency Trimming**: Removes transparent borders while preserving original dimensions in metadata
 - **Multi-Format Export**: Generate all output formats in a single API call
 - **GPU Optimization**: Power-of-2 dimensions for optimal GPU texture performance
+
+### Optimize Existing Spritesheet
+
+```bash
+POST /optimize-spritesheet?deduplicate={bool}&padding={pixels}&preserveFrameOrder={bool}&compressionQuality={fast|balanced|best}
+Content-Type: multipart/form-data
+```
+
+Import and re-optimize an existing spritesheet. Extracts frames from a spritesheet PNG using its XML metadata, optionally deduplicates frames, and repacks them optimally. **Frame order is preserved by default** to maintain animation sequences.
+
+**Form Parameters:**
+
+- `spritesheet` (file): The spritesheet PNG image (required)
+- `xml` (file): The spritesheet XML metadata in Sparrow format (required)
+
+**Query Parameters (all optional):**
+
+- `deduplicate` (boolean): Remove duplicate frames to save space (default: false)
+  - Maintains all frame names in output XML via name mapping
+  - Useful for reducing file size when frames are reused
+- `preserveFrameOrder` (boolean): Preserve original frame order (default: **true** for imports)
+  - **Recommended for animations**: Keeps frame sequences intact
+  - Disable only if you want height-based sorting for better packing
+- `compressionQuality` (string): PNG compression quality (default: "balanced")
+  - Options: `fast`, `balanced`, `best` (same as `/pack-sprites`)
+- `padding` (integer): Padding between sprites in pixels (default: 2)
+- `powerOfTwo` (boolean): Force power-of-2 dimensions (default: false)
+- `trimTransparency` (boolean): Trim transparent pixels (default: false)
+- `maxWidth` (integer): Maximum sheet width in pixels (default: 2048)
+- `maxHeight` (integer): Maximum sheet height in pixels (default: 2048)
+- `outputFormats` (string): Comma-separated list of output formats (default: "sparrow")
+
+**Examples:**
+
+**1. Basic spritesheet optimization:**
+
+```bash
+curl -X POST "http://localhost:8080/optimize-spritesheet" \
+  -F "spritesheet=@character.png" \
+  -F "xml=@character.xml"
+```
+
+**2. Optimize with deduplication and best compression:**
+
+```bash
+curl -X POST "http://localhost:8080/optimize-spritesheet?deduplicate=true&compressionQuality=best" \
+  -F "spritesheet=@animation.png" \
+  -F "xml=@animation.xml"
+```
+
+**3. Re-optimize preserving frame order for animation:**
+
+```bash
+curl -X POST "http://localhost:8080/optimize-spritesheet?preserveFrameOrder=true&compressionQuality=balanced&outputFormats=sparrow,json" \
+  -F "spritesheet=@idle_animation.png" \
+  -F "xml=@idle_animation.xml"
+```
+
+**Response:**
+
+```json
+{
+  "sheets": [
+    "iVBORw0KGgoAAAANSUhEUgAA..."
+  ],
+  "metadata": [
+    {
+      "index": 0,
+      "width": 1024,
+      "height": 512,
+      "spriteCount": 24,
+      "efficiency": 0.92
+    }
+  ],
+  "outputFiles": {
+    "sparrow": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>...",
+    "json": "{\"frames\": {...}}"
+  },
+  "totalSprites": 24,
+  "originalCount": 32,
+  "duplicatesRemoved": 8
+}
+```
+
+**Use Cases:**
+
+- **Reduce file size**: Import bloated spritesheets and repack with better compression
+- **Fix broken animations**: Preserve frame order when original sheet has incorrect sorting
+- **Remove duplicates**: Deduplicate frames while maintaining all frame names in XML
+- **Change format**: Convert between different spritesheet formats (Sparrow, Unity, Godot, etc.)
+- **Optimize for game engines**: Add power-of-2 dimensions and adjust padding for GPU optimization
+
+**Troubleshooting Animation Issues:**
+
+If your animations are broken after optimization:
+
+1. **Frame order scrambled** ("< shape" or wrong sequence):
+   - **Solution**: Enable `preserveFrameOrder=true` (default for imports)
+   - **Why**: Height-based sorting breaks animation sequences
+
+2. **Animation plays at wrong framerate** (e.g., "on 2's" becomes "on 1's"):
+   - **Solution**: Avoid using `deduplicate=true` for animations with intentional duplicate frames
+   - **Why**: Deduplication removes duplicate frame entries from sequences
+
+3. **File size increased**:
+   - **Solution**: Use `compressionQuality=best` instead of `fast`
+   - **Why**: Better compression reduces file size (2-5% smaller, ~200ms slower)
+
+4. **Need both deduplication AND frame preservation**:
+   - **Solution**: Use `deduplicate=true` with `preserveFrameOrder=true`
+   - **How it works**: Deduplicates sprite data but preserves all frame names in XML
 
 ### API Key Management
 

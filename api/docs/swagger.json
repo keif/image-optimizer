@@ -660,7 +660,7 @@
         },
         "/optimize-spritesheet": {
             "post": {
-                "description": "Accepts a spritesheet PNG and its XML, extracts frames, optionally deduplicates, and repacks optimally",
+                "description": "Accepts a spritesheet PNG and its XML, extracts frames, optionally deduplicates, and repacks optimally. Frame order is preserved by default to maintain animation sequences.",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -733,6 +733,20 @@
                         "default": "\"sparrow\"",
                         "description": "Comma-separated list of output formats",
                         "name": "outputFormats",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Preserve original frame order (recommended for animations)",
+                        "name": "preserveFrameOrder",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "\"balanced\"",
+                        "description": "PNG compression quality: fast, balanced, best",
+                        "name": "compressionQuality",
                         "in": "query"
                     }
                 ],
@@ -829,6 +843,20 @@
                         "default": "\"json\"",
                         "description": "Comma-separated list of output formats: json,css,csv,xml,sparrow,texturepacker,cocos2d,unity,godot",
                         "name": "outputFormats",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "Preserve sprite upload order (disable height-based sorting for better animation support)",
+                        "name": "preserveFrameOrder",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "\"balanced\"",
+                        "description": "PNG compression quality: fast, balanced, best",
+                        "name": "compressionQuality",
                         "in": "query"
                     }
                 ],
