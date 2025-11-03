@@ -92,6 +92,15 @@ definitions:
         example: v1.3.2
         type: string
     type: object
+  routes.OutputFileInfo:
+    properties:
+      content:
+        type: string
+      extension:
+        type: string
+      mimeType:
+        type: string
+    type: object
   routes.PackSpritesResponse:
     properties:
       metadata:
@@ -101,8 +110,8 @@ definitions:
         type: array
       outputFiles:
         additionalProperties:
-          type: string
-        description: Format name -> file content
+          $ref: '#/definitions/routes.OutputFileInfo'
+        description: Format name -> file info (content, extension, mime type)
         type: object
       resizedSprites:
         description: Info about auto-resized sprites

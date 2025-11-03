@@ -1048,6 +1048,20 @@ const docTemplate = `{
                 }
             }
         },
+        "routes.OutputFileInfo": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "extension": {
+                    "type": "string"
+                },
+                "mimeType": {
+                    "type": "string"
+                }
+            }
+        },
         "routes.PackSpritesResponse": {
             "type": "object",
             "properties": {
@@ -1059,10 +1073,10 @@ const docTemplate = `{
                     }
                 },
                 "outputFiles": {
-                    "description": "Format name -\u003e file content",
+                    "description": "Format name -\u003e file info (content, extension, mime type)",
                     "type": "object",
                     "additionalProperties": {
-                        "type": "string"
+                        "$ref": "#/definitions/routes.OutputFileInfo"
                     }
                 },
                 "resizedSprites": {

@@ -32,13 +32,20 @@ type ResizeInfo struct {
 	NewHeight      int    `json:"newHeight"`
 }
 
+// OutputFileInfo contains metadata about an output format file
+type OutputFileInfo struct {
+	Content   string `json:"content"`
+	Extension string `json:"extension"`
+	MimeType  string `json:"mimeType"`
+}
+
 // PackSpritesResponse represents the response for sprite packing
 type PackSpritesResponse struct {
-	Sheets         []string          `json:"sheets"`      // Base64-encoded PNG images
-	Metadata       []SheetMetadata   `json:"metadata"`    // Metadata for each sheet
-	OutputFiles    map[string]string `json:"outputFiles"` // Format name -> file content
-	TotalSprites   int               `json:"totalSprites"`
-	ResizedSprites []ResizeInfo      `json:"resizedSprites,omitempty"` // Info about auto-resized sprites
+	Sheets         []string                  `json:"sheets"`      // Base64-encoded PNG images
+	Metadata       []SheetMetadata           `json:"metadata"`    // Metadata for each sheet
+	OutputFiles    map[string]OutputFileInfo `json:"outputFiles"` // Format name -> file info (content, extension, mime type)
+	TotalSprites   int                       `json:"totalSprites"`
+	ResizedSprites []ResizeInfo              `json:"resizedSprites,omitempty"` // Info about auto-resized sprites
 }
 
 // SheetMetadata contains information about a packed sheet
@@ -292,10 +299,15 @@ func PackSprites(c *fiber.Ctx) error {
 		}
 	}
 
-	// Convert format byte arrays to strings for JSON response
-	outputFiles := make(map[string]string)
+	// Convert format byte arrays to OutputFileInfo with metadata
+	outputFiles := make(map[string]OutputFileInfo)
 	for format, data := range result.Formats {
-		outputFiles[format] = string(data)
+		extension, mimeType := getFormatMetadata(format)
+		outputFiles[format] = OutputFileInfo{
+			Content:   string(data),
+			Extension: extension,
+			MimeType:  mimeType,
+		}
 	}
 
 	// Prepare response
@@ -355,6 +367,26 @@ func parseOutputFormats(s string) []string {
 	}
 
 	return formats
+}
+
+// getFormatMetadata returns the file extension and MIME type for a given output format
+func getFormatMetadata(format string) (string, string) {
+	switch format {
+	case "sparrow", "xml", "texturepacker":
+		return ".xml", "application/xml"
+	case "json", "unity":
+		return ".json", "application/json"
+	case "css":
+		return ".css", "text/css"
+	case "csv":
+		return ".csv", "text/csv"
+	case "cocos2d":
+		return ".plist", "application/xml"
+	case "godot":
+		return ".tres", "text/plain"
+	default:
+		return ".txt", "text/plain"
+	}
 }
 
 // GetSpritesheetFormats returns the list of supported output formats
@@ -571,10 +603,15 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 		}
 	}
 
-	// Convert output formats to map
-	outputFiles := make(map[string]string)
+	// Convert output formats to OutputFileInfo with metadata
+	outputFiles := make(map[string]OutputFileInfo)
 	for format, data := range result.Formats {
-		outputFiles[format] = string(data)
+		extension, mimeType := getFormatMetadata(format)
+		outputFiles[format] = OutputFileInfo{
+			Content:   string(data),
+			Extension: extension,
+			MimeType:  mimeType,
+		}
 	}
 
 	response := fiber.Map{
