@@ -53,6 +53,7 @@ type PackingOptions struct {
 	CompressionQuality    string            // PNG compression: "fast", "balanced", "best" (default: "balanced")
 	PreserveAnimationHold bool              // Don't deduplicate consecutive identical frames (preserves animation timing)
 	ImagePath             string            // Image path to reference in Sparrow XML (default: "spritesheet.png")
+	OriginalSize          int               // Original input file size in bytes (for compression warnings)
 }
 
 // Spritesheet represents the packed result
@@ -70,6 +71,7 @@ type PackingResult struct {
 	Sheets       []Spritesheet     // One or more sheets (if split)
 	Formats      map[string][]byte // Output format data (json, css, csv, xml)
 	TotalSprites int               // Total number of sprites packed
+	Warnings     []string          // Warnings about packing issues (e.g., size inflation)
 }
 
 // Rectangle represents a rectangular area for packing
@@ -503,10 +505,32 @@ func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, erro
 		}
 	}
 
+	// Check for size inflation warnings
+	warnings := []string{}
+	if options.OriginalSize > 0 {
+		// Calculate total output size
+		totalOutputSize := 0
+		for _, sheet := range sheets {
+			totalOutputSize += len(sheet.ImageBuffer)
+		}
+
+		// Warn if output is larger than input
+		if totalOutputSize > options.OriginalSize {
+			percentIncrease := float64(totalOutputSize-options.OriginalSize) / float64(options.OriginalSize) * 100
+			warnings = append(warnings, fmt.Sprintf(
+				"Output size (%s) is %.1f%% larger than input (%s). Consider adjusting compression settings or dimensions.",
+				formatBytes(totalOutputSize),
+				percentIncrease,
+				formatBytes(options.OriginalSize),
+			))
+		}
+	}
+
 	return &PackingResult{
 		Sheets:       sheets,
 		Formats:      formats,
 		TotalSprites: len(sprites),
+		Warnings:     warnings,
 	}, nil
 }
 
@@ -1259,4 +1283,15 @@ func bytesEqual(a, b []byte) bool {
 		}
 	}
 	return true
+}
+
+// formatBytes formats byte count as human-readable string
+func formatBytes(bytes int) string {
+	if bytes < 1024 {
+		return fmt.Sprintf("%d B", bytes)
+	} else if bytes < 1024*1024 {
+		return fmt.Sprintf("%.1f KB", float64(bytes)/1024)
+	} else {
+		return fmt.Sprintf("%.1f MB", float64(bytes)/(1024*1024))
+	}
 }

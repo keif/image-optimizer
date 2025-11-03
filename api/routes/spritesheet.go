@@ -46,6 +46,7 @@ type PackSpritesResponse struct {
 	OutputFiles    map[string]OutputFileInfo `json:"outputFiles"` // Format name -> file info (content, extension, mime type)
 	TotalSprites   int                       `json:"totalSprites"`
 	ResizedSprites []ResizeInfo              `json:"resizedSprites,omitempty"` // Info about auto-resized sprites
+	Warnings       []string                  `json:"warnings,omitempty"`       // Warnings about packing issues
 }
 
 // SheetMetadata contains information about a packed sheet
@@ -318,6 +319,7 @@ func PackSprites(c *fiber.Ctx) error {
 		OutputFiles:    outputFiles,
 		TotalSprites:   len(sprites),
 		ResizedSprites: resizedSprites,
+		Warnings:       result.Warnings,
 	}
 
 	return c.JSON(response)
@@ -577,6 +579,7 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 		PreserveFrameOrder: parseBool(preserveFrameOrder),
 		CompressionQuality: compressionQuality,
 		ImagePath:          c.Query("imagePath", "spritesheet.png"),
+		OriginalSize:       len(sheetData), // For compression warnings
 	}
 
 	// Pack the sprites using existing packing logic
@@ -627,6 +630,11 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 
 	if deduplicate == "true" {
 		response["nameMapping"] = nameMapping
+	}
+
+	// Add warnings if any
+	if len(result.Warnings) > 0 {
+		response["warnings"] = result.Warnings
 	}
 
 	return c.JSON(response)
