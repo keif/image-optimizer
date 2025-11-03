@@ -509,3 +509,142 @@ func TestSparrowXMLFrameSequence(t *testing.T) {
 		lastIndex = index
 	}
 }
+
+// createTransparentSprite creates a fully transparent sprite for testing
+func createTransparentSprite(name string, width, height int) Sprite {
+	img := image.NewRGBA(image.Rect(0, 0, width, height))
+	// All pixels are transparent by default (alpha = 0)
+
+	// Encode to PNG buffer for deduplication to work
+	var buf bytes.Buffer
+	encoder := &png.Encoder{CompressionLevel: png.BestSpeed}
+	_ = encoder.Encode(&buf, img)
+
+	return Sprite{
+		Name:   name,
+		Image:  img,
+		Buffer: buf.Bytes(),
+		Width:  width,
+		Height: height,
+	}
+}
+
+// TestTrimTransparency_FullyTransparent tests that TrimTransparency returns an error for fully transparent images
+func TestTrimTransparency_FullyTransparent(t *testing.T) {
+	transparentSprite := createTransparentSprite("transparent", 100, 100)
+
+	_, _, _, _, _, err := TrimTransparency(transparentSprite.Image)
+	if err == nil {
+		t.Error("Expected error when trimming fully transparent image, got nil")
+	}
+
+	if err != nil && !strings.Contains(err.Error(), "fully transparent") {
+		t.Errorf("Expected error message to contain 'fully transparent', got: %s", err.Error())
+	}
+}
+
+// TestTrimTransparency_PartiallyTransparent tests that TrimTransparency works correctly for partially transparent images
+func TestTrimTransparency_PartiallyTransparent(t *testing.T) {
+	// Create a sprite with transparent borders
+	img := image.NewRGBA(image.Rect(0, 0, 100, 100))
+	// Fill center with opaque red (leaving 10px transparent border)
+	for y := 10; y < 90; y++ {
+		for x := 10; x < 90; x++ {
+			img.Set(x, y, color.RGBA{255, 0, 0, 255})
+		}
+	}
+
+	trimmed, trimX, trimY, origW, origH, err := TrimTransparency(img)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	// Check trim offsets
+	if trimX != 10 || trimY != 10 {
+		t.Errorf("Expected trim offset (10, 10), got (%d, %d)", trimX, trimY)
+	}
+
+	// Check original dimensions
+	if origW != 100 || origH != 100 {
+		t.Errorf("Expected original dimensions (100, 100), got (%d, %d)", origW, origH)
+	}
+
+	// Check trimmed dimensions (should be 80x80)
+	if trimmed.Bounds().Dx() != 80 || trimmed.Bounds().Dy() != 80 {
+		t.Errorf("Expected trimmed dimensions (80, 80), got (%d, %d)", trimmed.Bounds().Dx(), trimmed.Bounds().Dy())
+	}
+}
+
+// TestPackSprites_TransparentFrameError tests that PackSprites returns an error when trimming a transparent frame
+func TestPackSprites_TransparentFrameError(t *testing.T) {
+	sprites := []Sprite{
+		createTestSprite("normal_frame", 100, 100, color.RGBA{255, 0, 0, 255}),
+		createTransparentSprite("transparent_frame", 100, 100),
+		createTestSprite("another_normal", 100, 100, color.RGBA{0, 255, 0, 255}),
+	}
+
+	options := PackingOptions{
+		Padding:          2,
+		PowerOfTwo:       false,
+		TrimTransparency: true, // Enable trimming to trigger the error
+		MaxWidth:         4096,
+		MaxHeight:        4096,
+	}
+
+	_, err := PackSprites(sprites, options)
+	if err == nil {
+		t.Error("Expected error when packing sprites with transparent frame and trimming enabled, got nil")
+	}
+
+	if err != nil {
+		if !strings.Contains(err.Error(), "transparent_frame") {
+			t.Errorf("Expected error message to contain sprite name 'transparent_frame', got: %s", err.Error())
+		}
+		if !strings.Contains(err.Error(), "fully transparent") {
+			t.Errorf("Expected error message to contain 'fully transparent', got: %s", err.Error())
+		}
+		if !strings.Contains(err.Error(), "Disable trimTransparency") {
+			t.Errorf("Expected error message to suggest disabling trimTransparency, got: %s", err.Error())
+		}
+	}
+}
+
+// TestPackSprites_TransparentFrameNoTrim tests that PackSprites works with transparent frames when trimming is disabled
+func TestPackSprites_TransparentFrameNoTrim(t *testing.T) {
+	sprites := []Sprite{
+		createTestSprite("normal_frame", 100, 100, color.RGBA{255, 0, 0, 255}),
+		createTransparentSprite("transparent_frame", 100, 100),
+		createTestSprite("another_normal", 100, 100, color.RGBA{0, 255, 0, 255}),
+	}
+
+	options := PackingOptions{
+		Padding:          2,
+		PowerOfTwo:       false,
+		TrimTransparency: false, // Disabled - should not error
+		MaxWidth:         4096,
+		MaxHeight:        4096,
+	}
+
+	result, err := PackSprites(sprites, options)
+	if err != nil {
+		t.Errorf("Unexpected error when packing sprites with transparent frame and trimming disabled: %v", err)
+	}
+
+	if result == nil {
+		t.Fatal("Expected packing result, got nil")
+	}
+
+	// Verify all 3 sprites are in the result
+	if len(result.Sheets) == 0 {
+		t.Fatal("Expected at least one sheet in result")
+	}
+
+	totalSprites := 0
+	for _, sheet := range result.Sheets {
+		totalSprites += len(sheet.Sprites)
+	}
+
+	if totalSprites != 3 {
+		t.Errorf("Expected 3 sprites in result, got %d", totalSprites)
+	}
+}

@@ -283,7 +283,7 @@ func nextPowerOfTwo(n int) int {
 }
 
 // TrimTransparency trims transparent borders from an image
-func TrimTransparency(img image.Image) (image.Image, int, int, int, int) {
+func TrimTransparency(img image.Image) (image.Image, int, int, int, int, error) {
 	bounds := img.Bounds()
 	minX, minY := bounds.Max.X, bounds.Max.Y
 	maxX, maxY := 0, 0
@@ -309,9 +309,9 @@ func TrimTransparency(img image.Image) (image.Image, int, int, int, int) {
 		}
 	}
 
-	// If no non-transparent pixels found, return original
+	// If no non-transparent pixels found, return error
 	if maxX < minX || maxY < minY {
-		return img, 0, 0, bounds.Dx(), bounds.Dy()
+		return nil, 0, 0, 0, 0, fmt.Errorf("image is fully transparent after trimming")
 	}
 
 	// Calculate trimmed dimensions
@@ -328,7 +328,7 @@ func TrimTransparency(img image.Image) (image.Image, int, int, int, int) {
 		}
 	}
 
-	return trimmed, trimmedX, trimmedY, bounds.Dx(), bounds.Dy()
+	return trimmed, trimmedX, trimmedY, bounds.Dx(), bounds.Dy(), nil
 }
 
 // PackSprites packs multiple sprites into one or more spritesheets
@@ -353,7 +353,10 @@ func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, erro
 		processedSprites[i].OriginalIndex = i
 
 		if options.TrimTransparency {
-			trimmed, trimX, trimY, origW, origH := TrimTransparency(sprite.Image)
+			trimmed, trimX, trimY, origW, origH, err := TrimTransparency(sprite.Image)
+			if err != nil {
+				return nil, fmt.Errorf("frame '%s' is fully transparent after trimming. Disable trimTransparency or check source image", sprite.Name)
+			}
 			processedSprites[i].Image = trimmed
 			processedSprites[i].Width = trimmed.Bounds().Dx()
 			processedSprites[i].Height = trimmed.Bounds().Dy()
