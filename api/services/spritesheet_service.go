@@ -542,6 +542,14 @@ func packSingleSheet(sprites []Sprite, maxW, maxH int, options PackingOptions) (
 	if options.PowerOfTwo {
 		finalW = nextPowerOfTwo(actualW)
 		finalH = nextPowerOfTwo(actualH)
+
+		// Cap at max dimensions to prevent excessive size inflation
+		if options.MaxWidth > 0 && finalW > options.MaxWidth {
+			finalW = options.MaxWidth
+		}
+		if options.MaxHeight > 0 && finalH > options.MaxHeight {
+			finalH = options.MaxHeight
+		}
 	}
 
 	// Create composite image
