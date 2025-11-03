@@ -118,6 +118,7 @@ func PackSprites(c *fiber.Ctx) error {
 		AutoResize:         parseBool(c.Query("autoResize", "false")),
 		PreserveFrameOrder: parseBool(c.Query("preserveFrameOrder", "false")),
 		CompressionQuality: compressionQuality,
+		ImagePath:          c.Query("imagePath", "spritesheet.png"),
 	}
 
 	// Validate options
@@ -575,6 +576,7 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 		NameMapping:        nameMapping, // Pass deduplication mapping to preserve all frame names in XML
 		PreserveFrameOrder: parseBool(preserveFrameOrder),
 		CompressionQuality: compressionQuality,
+		ImagePath:          c.Query("imagePath", "spritesheet.png"),
 	}
 
 	// Pack the sprites using existing packing logic

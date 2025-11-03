@@ -52,6 +52,7 @@ type PackingOptions struct {
 	PreserveFrameOrder    bool              // Preserve original frame order in output (disables height sorting)
 	CompressionQuality    string            // PNG compression: "fast", "balanced", "best" (default: "balanced")
 	PreserveAnimationHold bool              // Don't deduplicate consecutive identical frames (preserves animation timing)
+	ImagePath             string            // Image path to reference in Sparrow XML (default: "spritesheet.png")
 }
 
 // Spritesheet represents the packed result
@@ -487,8 +488,14 @@ func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, erro
 	// Generate output formats
 	formats := make(map[string][]byte)
 	if len(options.OutputFormats) > 0 {
+		// Use provided imagePath or default to "spritesheet.png"
+		imagePath := options.ImagePath
+		if imagePath == "" {
+			imagePath = "spritesheet.png"
+		}
+
 		for _, format := range options.OutputFormats {
-			data, err := generateOutputFormat(sheets, format, options.NameMapping)
+			data, err := generateOutputFormat(sheets, format, options.NameMapping, imagePath)
 			if err != nil {
 				return nil, fmt.Errorf("failed to generate %s format: %w", format, err)
 			}
@@ -621,7 +628,7 @@ func packSingleSheet(sprites []Sprite, maxW, maxH int, options PackingOptions) (
 }
 
 // generateOutputFormat generates coordinate data in the requested format
-func generateOutputFormat(sheets []Spritesheet, format string, nameMapping map[string]string) ([]byte, error) {
+func generateOutputFormat(sheets []Spritesheet, format string, nameMapping map[string]string, imagePath string) ([]byte, error) {
 	switch strings.ToLower(format) {
 	case "json":
 		return generateJSON(sheets, nameMapping)
@@ -632,7 +639,7 @@ func generateOutputFormat(sheets []Spritesheet, format string, nameMapping map[s
 	case "xml":
 		return generateXML(sheets, nameMapping)
 	case "sparrow":
-		return generateSparrow(sheets, nameMapping)
+		return generateSparrow(sheets, nameMapping, imagePath)
 	case "texturepacker":
 		return generateTexturePacker(sheets, nameMapping)
 	case "cocos2d":
@@ -868,7 +875,7 @@ func generateGodot(sheets []Spritesheet, _ map[string]string) ([]byte, error) {
 }
 
 // Sparrow/Starling XML format (used by HaxeFlixel, Friday Night Funkin', etc.)
-func generateSparrow(sheets []Spritesheet, nameMapping map[string]string) ([]byte, error) {
+func generateSparrow(sheets []Spritesheet, nameMapping map[string]string, imagePath string) ([]byte, error) {
 	type SparrowSprite struct {
 		Name        string `xml:"name,attr"`
 		X           int    `xml:"x,attr"`
@@ -894,7 +901,7 @@ func generateSparrow(sheets []Spritesheet, nameMapping map[string]string) ([]byt
 
 	sheet := sheets[0]
 	atlas := SparrowAtlas{
-		ImagePath: "spritesheet-0.png",
+		ImagePath: imagePath,
 		Sprites:   []SparrowSprite{},
 	}
 
