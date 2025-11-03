@@ -120,6 +120,7 @@ func PackSprites(c *fiber.Ctx) error {
 		PreserveFrameOrder: parseBool(c.Query("preserveFrameOrder", "false")),
 		CompressionQuality: compressionQuality,
 		ImagePath:          c.Query("imagePath", "spritesheet.png"),
+		PackingMode:        c.Query("packingMode", ""), // "optimal", "smart", "preserve"
 	}
 
 	// Validate options
@@ -580,6 +581,7 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 		CompressionQuality: compressionQuality,
 		ImagePath:          c.Query("imagePath", "spritesheet.png"),
 		OriginalSize:       len(sheetData), // For compression warnings
+		PackingMode:        c.Query("packingMode", ""),  // "optimal", "smart", "preserve"
 	}
 
 	// Pack the sprites using existing packing logic

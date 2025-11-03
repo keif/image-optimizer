@@ -49,11 +49,12 @@ type PackingOptions struct {
 	AllowRotation         bool              // Allow sprite rotation for better packing
 	AutoResize            bool              // Automatically resize sprites that exceed MaxWidth/MaxHeight
 	NameMapping           map[string]string // Maps duplicate sprite names to canonical names (for deduplication)
-	PreserveFrameOrder    bool              // Preserve original frame order in output (disables height sorting)
+	PreserveFrameOrder    bool              // Preserve original frame order in output (disables height sorting) - DEPRECATED: use PackingMode="preserve"
 	CompressionQuality    string            // PNG compression: "fast", "balanced", "best" (default: "balanced")
 	PreserveAnimationHold bool              // Don't deduplicate consecutive identical frames (preserves animation timing)
 	ImagePath             string            // Image path to reference in Sparrow XML (default: "spritesheet.png")
 	OriginalSize          int               // Original input file size in bytes (for compression warnings)
+	PackingMode           string            // Packing mode: "optimal" (default), "smart", "preserve"
 }
 
 // Spritesheet represents the packed result
@@ -365,12 +366,31 @@ func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, erro
 		}
 	}
 
-	// Sort sprites by height (descending) for better packing
-	// Skip sorting if PreserveFrameOrder is enabled (for imported spritesheets)
-	if !options.PreserveFrameOrder {
+	// Sort sprites for optimal packing based on PackingMode
+	// - "optimal": Full height-based sorting (best packing, ignores order)
+	// - "preserve": No sorting (preserves exact order, poor packing)
+	// - "smart": Local height grouping (good packing, mostly preserves order)
+	packingMode := "optimal" // Default
+	if options.PreserveFrameOrder {
+		packingMode = "preserve"
+	}
+	if options.PackingMode != "" {
+		packingMode = options.PackingMode
+	}
+
+	switch packingMode {
+	case "optimal":
+		// Sort by height descending for best packing efficiency
 		sort.Slice(processedSprites, func(i, j int) bool {
 			return processedSprites[i].Height > processedSprites[j].Height
 		})
+	case "smart":
+		// Smart sorting: Group nearby sprites with similar heights
+		// This preserves general order while improving packing efficiency
+		smartSort(processedSprites)
+	case "preserve":
+		// No sorting - preserve exact original order
+		// (already in OriginalIndex order)
 	}
 
 	// Determine initial sheet dimensions
@@ -1293,5 +1313,45 @@ func formatBytes(bytes int) string {
 		return fmt.Sprintf("%.1f KB", float64(bytes)/1024)
 	} else {
 		return fmt.Sprintf("%.1f MB", float64(bytes)/(1024*1024))
+	}
+}
+
+// smartSort performs smart sorting that preserves general frame order while grouping
+// sprites with similar heights for better packing efficiency. This is a compromise
+// between "optimal" (full height sorting) and "preserve" (no sorting).
+//
+// Algorithm:
+// 1. Divide sprites into chunks based on original index
+// 2. Within each chunk, sort by height descending
+// 3. This keeps frames mostly in order but allows local optimization
+//
+// Chunk size: Dynamically calculated based on total sprite count
+// - Small sets (<30): chunks of 10
+// - Medium sets (30-100): chunks of 15
+// - Large sets (>100): chunks of 20
+func smartSort(sprites []Sprite) {
+	if len(sprites) <= 1 {
+		return
+	}
+
+	// Determine chunk size based on total sprite count
+	chunkSize := 15 // Default
+	if len(sprites) < 30 {
+		chunkSize = 10
+	} else if len(sprites) > 100 {
+		chunkSize = 20
+	}
+
+	// Process sprites in chunks
+	for i := 0; i < len(sprites); i += chunkSize {
+		end := i + chunkSize
+		if end > len(sprites) {
+			end = len(sprites)
+		}
+
+		// Sort this chunk by height descending
+		sort.Slice(sprites[i:end], func(a, b int) bool {
+			return sprites[i+a].Height > sprites[i+b].Height
+		})
 	}
 }
