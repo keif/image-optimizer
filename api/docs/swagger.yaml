@@ -125,6 +125,11 @@ definitions:
         type: array
       totalSprites:
         type: integer
+      warnings:
+        description: Warnings about packing issues
+        items:
+          type: string
+        type: array
     type: object
   routes.ResizeInfo:
     properties:
@@ -665,7 +670,7 @@ paths:
         name: padding
         type: integer
       - default: false
-        description: Force power-of-2 dimensions
+        description: Force power-of-2 dimensions. Dimensions capped at maxWidth/maxHeight.
         in: query
         name: powerOfTwo
         type: boolean
@@ -675,22 +680,36 @@ paths:
         name: trimTransparency
         type: boolean
       - default: 2048
-        description: Maximum sheet width in pixels
+        description: Maximum sheet width in pixels (256-12288)
         in: query
         name: maxWidth
         type: integer
       - default: 2048
-        description: Maximum sheet height in pixels
+        description: Maximum sheet height in pixels (256-12288)
         in: query
         name: maxHeight
         type: integer
       - default: '"sparrow"'
-        description: Comma-separated list of output formats
+        description: 'Comma-separated list of output formats: json,css,csv,xml,sparrow,texturepacker,cocos2d,unity,godot'
         in: query
         name: outputFormats
         type: string
+      - default: '"spritesheet.png"'
+        description: Image filename to reference in output formats (e.g., Sparrow
+          XML imagePath attribute)
+        in: query
+        name: imagePath
+        type: string
+      - default: '"optimal"'
+        description: 'Packing algorithm mode: ''optimal'' (best efficiency), ''smart''
+          (60-80% efficiency, preserves frame order), ''preserve'' (exact order, poorest
+          efficiency). Recommended: use ''smart'' for animations.'
+        in: query
+        name: packingMode
+        type: string
       - default: true
-        description: Preserve original frame order (recommended for animations)
+        description: 'DEPRECATED: Use packingMode=''preserve'' instead. Preserve original
+          frame order (recommended for animations)'
         in: query
         name: preserveFrameOrder
         type: boolean
@@ -703,7 +722,8 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Response includes warnings array if output size exceeds input
+            or other packing issues detected
           schema:
             additionalProperties: true
             type: object
@@ -742,7 +762,8 @@ paths:
         name: padding
         type: integer
       - default: false
-        description: Force power-of-2 dimensions (256, 512, 1024, etc.)
+        description: Force power-of-2 dimensions (256, 512, 1024, etc.). Dimensions
+          capped at maxWidth/maxHeight.
         in: query
         name: powerOfTwo
         type: boolean
@@ -772,9 +793,22 @@ paths:
         in: query
         name: outputFormats
         type: string
+      - default: '"spritesheet.png"'
+        description: Image filename to reference in output formats (e.g., Sparrow
+          XML imagePath attribute)
+        in: query
+        name: imagePath
+        type: string
+      - default: '"optimal"'
+        description: 'Packing algorithm mode: ''optimal'' (best efficiency), ''smart''
+          (60-80% efficiency, preserves frame order), ''preserve'' (exact order, poorest
+          efficiency). Recommended: use ''smart'' for animations.'
+        in: query
+        name: packingMode
+        type: string
       - default: false
-        description: Preserve sprite upload order (disable height-based sorting for
-          better animation support)
+        description: 'DEPRECATED: Use packingMode=''preserve'' instead. Preserve sprite
+          upload order (disable height-based sorting for better animation support)'
         in: query
         name: preserveFrameOrder
         type: boolean
@@ -788,7 +822,8 @@ paths:
       responses:
         "200":
           description: Success response includes resizedSprites array if any sprites
-            were auto-resized
+            were auto-resized, and warnings array if output size exceeds input or
+            other issues detected
           schema:
             $ref: '#/definitions/routes.PackSpritesResponse'
         "400":

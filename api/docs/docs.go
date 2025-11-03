@@ -705,7 +705,7 @@ const docTemplate = `{
                     {
                         "type": "boolean",
                         "default": false,
-                        "description": "Force power-of-2 dimensions",
+                        "description": "Force power-of-2 dimensions. Dimensions capped at maxWidth/maxHeight.",
                         "name": "powerOfTwo",
                         "in": "query"
                     },
@@ -719,28 +719,42 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "default": 2048,
-                        "description": "Maximum sheet width in pixels",
+                        "description": "Maximum sheet width in pixels (256-12288)",
                         "name": "maxWidth",
                         "in": "query"
                     },
                     {
                         "type": "integer",
                         "default": 2048,
-                        "description": "Maximum sheet height in pixels",
+                        "description": "Maximum sheet height in pixels (256-12288)",
                         "name": "maxHeight",
                         "in": "query"
                     },
                     {
                         "type": "string",
                         "default": "\"sparrow\"",
-                        "description": "Comma-separated list of output formats",
+                        "description": "Comma-separated list of output formats: json,css,csv,xml,sparrow,texturepacker,cocos2d,unity,godot",
                         "name": "outputFormats",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "\"spritesheet.png\"",
+                        "description": "Image filename to reference in output formats (e.g., Sparrow XML imagePath attribute)",
+                        "name": "imagePath",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "\"optimal\"",
+                        "description": "Packing algorithm mode: 'optimal' (best efficiency), 'smart' (60-80% efficiency, preserves frame order), 'preserve' (exact order, poorest efficiency). Recommended: use 'smart' for animations.",
+                        "name": "packingMode",
                         "in": "query"
                     },
                     {
                         "type": "boolean",
                         "default": true,
-                        "description": "Preserve original frame order (recommended for animations)",
+                        "description": "DEPRECATED: Use packingMode='preserve' instead. Preserve original frame order (recommended for animations)",
                         "name": "preserveFrameOrder",
                         "in": "query"
                     },
@@ -754,7 +768,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Response includes warnings array if output size exceeds input or other packing issues detected",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -808,7 +822,7 @@ const docTemplate = `{
                     {
                         "type": "boolean",
                         "default": false,
-                        "description": "Force power-of-2 dimensions (256, 512, 1024, etc.)",
+                        "description": "Force power-of-2 dimensions (256, 512, 1024, etc.). Dimensions capped at maxWidth/maxHeight.",
                         "name": "powerOfTwo",
                         "in": "query"
                     },
@@ -848,9 +862,23 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "string",
+                        "default": "\"spritesheet.png\"",
+                        "description": "Image filename to reference in output formats (e.g., Sparrow XML imagePath attribute)",
+                        "name": "imagePath",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "\"optimal\"",
+                        "description": "Packing algorithm mode: 'optimal' (best efficiency), 'smart' (60-80% efficiency, preserves frame order), 'preserve' (exact order, poorest efficiency). Recommended: use 'smart' for animations.",
+                        "name": "packingMode",
+                        "in": "query"
+                    },
+                    {
                         "type": "boolean",
                         "default": false,
-                        "description": "Preserve sprite upload order (disable height-based sorting for better animation support)",
+                        "description": "DEPRECATED: Use packingMode='preserve' instead. Preserve sprite upload order (disable height-based sorting for better animation support)",
                         "name": "preserveFrameOrder",
                         "in": "query"
                     },
@@ -864,7 +892,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Success response includes resizedSprites array if any sprites were auto-resized",
+                        "description": "Success response includes resizedSprites array if any sprites were auto-resized, and warnings array if output size exceeds input or other issues detected",
                         "schema": {
                             "$ref": "#/definitions/routes.PackSpritesResponse"
                         }
@@ -1095,6 +1123,13 @@ const docTemplate = `{
                 },
                 "totalSprites": {
                     "type": "integer"
+                },
+                "warnings": {
+                    "description": "Warnings about packing issues",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

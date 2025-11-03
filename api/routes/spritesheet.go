@@ -73,15 +73,17 @@ func SetupSpritesheetRoutes(app *fiber.App) {
 // @Produce json
 // @Param images formData file true "Sprite images to pack (multiple files supported). Each sprite must be ≤12288x12288 pixels unless autoResize=true."
 // @Param padding query int false "Padding between sprites in pixels (0-32)" default(2)
-// @Param powerOfTwo query bool false "Force power-of-2 dimensions (256, 512, 1024, etc.)" default(false)
+// @Param powerOfTwo query bool false "Force power-of-2 dimensions (256, 512, 1024, etc.). Dimensions capped at maxWidth/maxHeight." default(false)
 // @Param trimTransparency query bool false "Trim transparent pixels from sprites" default(false)
 // @Param maxWidth query int false "Maximum sheet width in pixels (256-12288)" default(2048)
 // @Param maxHeight query int false "Maximum sheet height in pixels (256-12288)" default(2048)
 // @Param autoResize query bool false "Automatically resize sprites exceeding 12288x12288 to fit. Resize details returned in response." default(false)
 // @Param outputFormats query string false "Comma-separated list of output formats: json,css,csv,xml,sparrow,texturepacker,cocos2d,unity,godot" default("json")
-// @Param preserveFrameOrder query bool false "Preserve sprite upload order (disable height-based sorting for better animation support)" default(false)
+// @Param imagePath query string false "Image filename to reference in output formats (e.g., Sparrow XML imagePath attribute)" default("spritesheet.png")
+// @Param packingMode query string false "Packing algorithm mode: 'optimal' (best efficiency), 'smart' (60-80% efficiency, preserves frame order), 'preserve' (exact order, poorest efficiency). Recommended: use 'smart' for animations." default("optimal")
+// @Param preserveFrameOrder query bool false "DEPRECATED: Use packingMode='preserve' instead. Preserve sprite upload order (disable height-based sorting for better animation support)" default(false)
 // @Param compressionQuality query string false "PNG compression quality: fast, balanced, best" default("balanced")
-// @Success 200 {object} PackSpritesResponse "Success response includes resizedSprites array if any sprites were auto-resized"
+// @Success 200 {object} PackSpritesResponse "Success response includes resizedSprites array if any sprites were auto-resized, and warnings array if output size exceeds input or other issues detected"
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /pack-sprites [post]
@@ -449,14 +451,16 @@ func GetSpritesheetFormats(c *fiber.Ctx) error {
 // @Param xml formData file true "Spritesheet XML (Sparrow format)"
 // @Param deduplicate query bool false "Remove duplicate frames" default(false)
 // @Param padding query int false "Padding between sprites in pixels" default(2)
-// @Param powerOfTwo query bool false "Force power-of-2 dimensions" default(false)
+// @Param powerOfTwo query bool false "Force power-of-2 dimensions. Dimensions capped at maxWidth/maxHeight." default(false)
 // @Param trimTransparency query bool false "Trim transparent pixels from sprites" default(false)
-// @Param maxWidth query int false "Maximum sheet width in pixels" default(2048)
-// @Param maxHeight query int false "Maximum sheet height in pixels" default(2048)
-// @Param outputFormats query string false "Comma-separated list of output formats" default("sparrow")
-// @Param preserveFrameOrder query bool false "Preserve original frame order (recommended for animations)" default(true)
+// @Param maxWidth query int false "Maximum sheet width in pixels (256-12288)" default(2048)
+// @Param maxHeight query int false "Maximum sheet height in pixels (256-12288)" default(2048)
+// @Param outputFormats query string false "Comma-separated list of output formats: json,css,csv,xml,sparrow,texturepacker,cocos2d,unity,godot" default("sparrow")
+// @Param imagePath query string false "Image filename to reference in output formats (e.g., Sparrow XML imagePath attribute)" default("spritesheet.png")
+// @Param packingMode query string false "Packing algorithm mode: 'optimal' (best efficiency), 'smart' (60-80% efficiency, preserves frame order), 'preserve' (exact order, poorest efficiency). Recommended: use 'smart' for animations." default("optimal")
+// @Param preserveFrameOrder query bool false "DEPRECATED: Use packingMode='preserve' instead. Preserve original frame order (recommended for animations)" default(true)
 // @Param compressionQuality query string false "PNG compression quality: fast, balanced, best" default("balanced")
-// @Success 200 {object} map[string]interface{}
+// @Success 200 {object} map[string]interface{} "Response includes warnings array if output size exceeds input or other packing issues detected"
 // @Failure 400 {object} map[string]interface{}
 // @Failure 500 {object} map[string]interface{}
 // @Router /optimize-spritesheet [post]
