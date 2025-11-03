@@ -18,9 +18,13 @@ An API-first image optimization service built with Go and Fiber. Squish is desig
 - **Advanced Compression Options**: JPEG progressive encoding, PNG compression levels, WebP lossless, and more
 - **Batch Processing**: Optimize multiple images in a single API request
 - **Spritesheet Packer**: Pack multiple sprites into optimized spritesheets with MaxRects algorithm
-  - Multiple output formats (JSON, CSS, CSV, XML, Unity, Godot)
+  - **Smart Packing Modes**: Choose between optimal efficiency (85-95%), smart balance (60-80%), or exact frame order preservation
+  - Multiple output formats (JSON, CSS, CSV, XML, Sparrow, Unity, Godot)
+  - **Dynamic image paths** for proper asset naming in game engines
   - Automatic packing with transparency trimming and padding control
-  - Power-of-2 dimensions for GPU optimization
+  - **Transparent frame validation** prevents invalid spritesheets
+  - **Intelligent warnings** when optimization increases file size
+  - Power-of-2 dimensions for GPU optimization with smart capping
   - Multi-sheet atlas splitting for large sprite sets
 - **Interactive Before/After Comparison**: Visual slider to compare original vs optimized images
 - **Privacy First**: No server storage, in-memory processing only, zero tracking
@@ -662,19 +666,29 @@ Pack multiple sprite images into optimized spritesheets using the MaxRects bin p
   - Prevents texture bleeding in games
 - `powerOfTwo` (boolean): Force power-of-2 dimensions like 256, 512, 1024, 2048 (default: false)
   - Recommended for GPU optimization
+  - Respects maxWidth/maxHeight constraints to prevent size inflation
 - `trimTransparency` (boolean): Remove transparent borders from sprites (default: false)
   - Saves space by trimming empty pixels
   - Original dimensions are preserved in metadata
+  - Returns error if frame becomes fully transparent after trimming
 - `maxWidth` (integer): Maximum sheet width in pixels (default: 2048)
   - Range: 256-8192 pixels
 - `maxHeight` (integer): Maximum sheet height in pixels (default: 2048)
   - Range: 256-8192 pixels
 - `outputFormats` (string): Comma-separated list of output formats (default: "json")
   - Available: `json`, `css`, `csv`, `xml`, `sparrow`, `texturepacker`, `cocos2d`, `unity`, `godot`
-- `preserveFrameOrder` (boolean): Preserve sprite upload order instead of height-based sorting (default: false)
-  - **Important for animations**: Enable this to maintain frame sequences
-  - When enabled, sprites are packed in upload order
-  - When disabled, sprites are sorted by height for better packing efficiency
+- `imagePath` (string): Custom image filename for output formats (default: "spritesheet-0.png")
+  - Affects Sparrow, TexturePacker, and other format references
+  - Useful for proper asset naming in game engines
+- `packingMode` (string): Packing strategy balancing efficiency vs frame order (default: "optimal")
+  - **`optimal`**: Maximum efficiency (85-95%), height-based sorting
+  - **`smart`**: Balanced efficiency (60-80%) with frame order preservation via chunk sorting
+  - **`preserve`**: Exact frame order preservation (may sacrifice efficiency)
+  - **Important for animations**: Use `smart` or `preserve` to maintain frame sequences
+- `preserveFrameOrder` (boolean): **DEPRECATED** - Use `packingMode=preserve` instead
+  - Preserve sprite upload order instead of height-based sorting (default: false)
+  - Still functional for backward compatibility
+  - Will be removed in v2.0.0
 - `compressionQuality` (string): PNG compression quality setting (default: "balanced")
   - Options: `fast` (fastest, larger files), `balanced` (recommended), `best` (slowest, smallest files)
   - Controls PNG compression level and OxiPNG optimization level
@@ -717,16 +731,25 @@ curl -X POST "http://localhost:8080/pack-sprites?maxWidth=4096&maxHeight=4096&pa
   -F "images=@*.png"
 ```
 
-**5. Pack animation frames with frame order preservation:**
+**5. Pack animation frames with smart packing (recommended for animations):**
 
 ```bash
-curl -X POST "http://localhost:8080/pack-sprites?preserveFrameOrder=true&outputFormats=sparrow" \
+curl -X POST "http://localhost:8080/pack-sprites?packingMode=smart&outputFormats=sparrow&imagePath=character-idle.png" \
   -F "images=@frame001.png" \
   -F "images=@frame002.png" \
   -F "images=@frame003.png"
 ```
 
-**6. Pack with best compression quality:**
+**6. Pack animation with exact frame order preservation:**
+
+```bash
+curl -X POST "http://localhost:8080/pack-sprites?packingMode=preserve&outputFormats=sparrow" \
+  -F "images=@frame001.png" \
+  -F "images=@frame002.png" \
+  -F "images=@frame003.png"
+```
+
+**7. Pack with best compression quality:**
 
 ```bash
 curl -X POST "http://localhost:8080/pack-sprites?compressionQuality=best" \
@@ -734,10 +757,10 @@ curl -X POST "http://localhost:8080/pack-sprites?compressionQuality=best" \
   -F "images=@sprite2.png"
 ```
 
-**7. Pack animation with frame order and compression:**
+**8. Pack animation with smart packing and custom image path:**
 
 ```bash
-curl -X POST "http://localhost:8080/pack-sprites?preserveFrameOrder=true&compressionQuality=balanced&outputFormats=sparrow,json" \
+curl -X POST "http://localhost:8080/pack-sprites?packingMode=smart&compressionQuality=balanced&outputFormats=sparrow,json&imagePath=player-walk.png" \
   -F "images=@*.png"
 ```
 
@@ -1481,6 +1504,34 @@ View the workflow at `.github/workflows/test.yml`
 - [x] Test fixtures and sample images
 - [x] Test coverage reporting
 - [x] GitHub Actions CI/CD pipeline
+
+### Phase 4.5: Spritesheet Optimizer Enhancements ✅ COMPLETED
+
+- [x] Smart Packing Mode (optimal/smart/preserve)
+  - Balances efficiency (60-80%) with frame order preservation
+  - Ideal for animations requiring specific frame sequences
+  - Configurable via `packingMode` parameter
+- [x] Dynamic Image Path Parameter
+  - Customize output image filename via `imagePath` parameter
+  - Fixes hardcoded "spritesheet-0.png" references
+  - Affects all output formats (Sparrow, TexturePacker, etc.)
+- [x] Compression Size Warnings
+  - Warns when output size exceeds input size
+  - Shows percentage difference in warnings array
+  - Helps users optimize settings
+- [x] PowerOfTwo Dimension Capping
+  - Respects maxWidth/maxHeight when rounding to power-of-two
+  - Prevents 51% size inflation scenarios
+  - Improves predictability of output dimensions
+- [x] Transparent Frame Validation
+  - Detects fully transparent frames during trimming
+  - Returns descriptive error with frame name and remediation
+  - Prevents silent failures that create invalid spritesheets
+- [x] Comprehensive Swagger Documentation
+  - Interactive API docs at `/swagger/index.html`
+  - All parameters documented with examples
+  - Deprecation warnings for old parameters
+- [x] Enhanced test coverage (76 total tests, 100% passing)
 
 ### Phase 5: API Enhancement ✅ COMPLETED
 
