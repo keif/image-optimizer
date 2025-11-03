@@ -111,6 +111,12 @@ func PackSprites(c *fiber.Ctx) error {
 		compressionQuality = "balanced"
 	}
 
+	// Check if deprecated preserveFrameOrder parameter was used
+	deprecationWarnings := make([]string, 0)
+	if c.Query("preserveFrameOrder") != "" {
+		deprecationWarnings = append(deprecationWarnings, "DEPRECATION: 'preserveFrameOrder' parameter is deprecated and will be removed in v2.0.0. Use 'packingMode=preserve' instead for exact frame order preservation, or 'packingMode=smart' for balanced efficiency with frame order preservation.")
+	}
+
 	options := services.PackingOptions{
 		Padding:            parseInt(c.Query("padding", "2")),
 		PowerOfTwo:         parseBool(c.Query("powerOfTwo", "false")),
@@ -315,6 +321,9 @@ func PackSprites(c *fiber.Ctx) error {
 		}
 	}
 
+	// Combine deprecation warnings with packing warnings
+	allWarnings := append(deprecationWarnings, result.Warnings...)
+
 	// Prepare response
 	response := PackSpritesResponse{
 		Sheets:         sheetData,
@@ -322,7 +331,7 @@ func PackSprites(c *fiber.Ctx) error {
 		OutputFiles:    outputFiles,
 		TotalSprites:   len(sprites),
 		ResizedSprites: resizedSprites,
-		Warnings:       result.Warnings,
+		Warnings:       allWarnings,
 	}
 
 	return c.JSON(response)
@@ -568,6 +577,12 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 	preserveFrameOrder := c.Query("preserveFrameOrder", "true")
 	compressionQuality := c.Query("compressionQuality", "balanced")
 
+	// Check if deprecated preserveFrameOrder parameter was used
+	deprecationWarnings := make([]string, 0)
+	if c.Query("preserveFrameOrder") != "" {
+		deprecationWarnings = append(deprecationWarnings, "DEPRECATION: 'preserveFrameOrder' parameter is deprecated and will be removed in v2.0.0. Use 'packingMode=preserve' instead for exact frame order preservation, or 'packingMode=smart' for balanced efficiency with frame order preservation.")
+	}
+
 	// Validate compression quality
 	if compressionQuality != "fast" && compressionQuality != "balanced" && compressionQuality != "best" {
 		compressionQuality = "balanced"
@@ -638,9 +653,10 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 		response["nameMapping"] = nameMapping
 	}
 
-	// Add warnings if any
-	if len(result.Warnings) > 0 {
-		response["warnings"] = result.Warnings
+	// Combine deprecation warnings with packing warnings
+	allWarnings := append(deprecationWarnings, result.Warnings...)
+	if len(allWarnings) > 0 {
+		response["warnings"] = allWarnings
 	}
 
 	return c.JSON(response)
