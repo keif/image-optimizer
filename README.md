@@ -671,20 +671,22 @@ Pack multiple sprite images into optimized spritesheets using the MaxRects bin p
   - Saves space by trimming empty pixels
   - Original dimensions are preserved in metadata
   - Returns error if frame becomes fully transparent after trimming
-- `maxWidth` (integer): Maximum sheet width in pixels (default: 2048)
-  - Range: 256-8192 pixels
-- `maxHeight` (integer): Maximum sheet height in pixels (default: 2048)
-  - Range: 256-8192 pixels
+- `maxWidth` (integer): Maximum sheet width in pixels (default: 4096)
+  - Range: 256-12288 pixels
+  - Industry standard, optimal for most game engines
+- `maxHeight` (integer): Maximum sheet height in pixels (default: 4096)
+  - Range: 256-12288 pixels
+  - Industry standard, optimal for most game engines
 - `outputFormats` (string): Comma-separated list of output formats (default: "json")
   - Available: `json`, `css`, `csv`, `xml`, `sparrow`, `texturepacker`, `cocos2d`, `unity`, `godot`
 - `imagePath` (string): Custom image filename for output formats (default: "spritesheet-0.png")
   - Affects Sparrow, TexturePacker, and other format references
   - Useful for proper asset naming in game engines
-- `packingMode` (string): Packing strategy balancing efficiency vs frame order (default: "optimal")
+- `packingMode` (string): Packing strategy balancing efficiency vs frame order (default: "smart")
+  - **`smart`** (recommended): Balanced efficiency (60-80%) with frame order preservation via chunk sorting
   - **`optimal`**: Maximum efficiency (85-95%), height-based sorting
-  - **`smart`**: Balanced efficiency (60-80%) with frame order preservation via chunk sorting
   - **`preserve`**: Exact frame order preservation (may sacrifice efficiency)
-  - **Important for animations**: Use `smart` or `preserve` to maintain frame sequences
+  - **Important for animations**: Use `smart` (default) or `preserve` to maintain frame sequences
 - `preserveFrameOrder` (boolean): **DEPRECATED** - Use `packingMode=preserve` instead
   - Preserve sprite upload order instead of height-based sorting (default: false)
   - Still functional for backward compatibility
@@ -874,6 +876,51 @@ Understanding the trade-offs between packing modes helps you choose the right st
 
 **Performance Tip:** Start with `smart` mode - it provides 95% of optimal's efficiency while maintaining frame order in 90% of cases.
 
+### Performance & Recommended Settings
+
+Based on comprehensive benchmarking across different dataset sizes and dimension limits, we've identified optimal default settings that provide the best balance of file size, compatibility, and performance.
+
+**Recommended Defaults (v2.0):**
+
+- `maxWidth=4096, maxHeight=4096` (industry standard)
+- `packingMode=smart` (balanced efficiency + frame order)
+
+**Why 4096x4096?**
+
+Extensive benchmarking revealed that dimension limits have a **greater impact than packing mode selection**:
+
+- **4096 limit**: Industry standard, produces optimal results
+  - Medium dataset: 10-20% compression
+  - Large dataset: 50-70% compression
+  - Compatible with Unity, Unreal, Godot, and most game engines
+
+- **8192 limit**: Too aggressive, causes size inflation
+  - Medium dataset: +80-270% expansion (worse than no optimization!)
+  - Creates excessive padding at dimension boundaries
+  - **Not recommended** unless you specifically need 8K textures
+
+**Results: 3-4x better compression with 4096 vs 8192 limits**
+
+**Mode Selection by Dataset Size:**
+
+| Dataset Size | Recommended Mode | Typical Compression | Processing Time |
+|--------------|------------------|---------------------|-----------------|
+| Small (<50 frames) | `smart` or `preserve` | 40-60% | <1 second (10x faster than optimal) |
+| Medium (50-150 frames) | `preserve` | 20% compression | 24 seconds |
+| Large (150+ frames) | `optimal` | 70% compression | 69 seconds |
+
+**Key Findings:**
+
+- Small datasets: All modes produce identical output, smart/preserve are 10x faster
+- Medium datasets: `preserve` mode surprisingly outperforms `optimal` (20% vs +10% expansion)
+- Large datasets: `optimal` mode achieves maximum 70% compression
+- Dimension limits matter more than packing algorithm choice
+
+**For detailed benchmark results, see:**
+
+- [4096 Benchmark Results](docs/benchmarks/benchmark-results-4096.md) - Recommended settings
+- [8192 Benchmark Results](docs/benchmarks/benchmark-results-8192.md) - Why 8192 is problematic
+
 ### Optimize Existing Spritesheet
 
 ```bash
@@ -901,8 +948,8 @@ Import and re-optimize an existing spritesheet. Extracts frames from a spriteshe
 - `padding` (integer): Padding between sprites in pixels (default: 2)
 - `powerOfTwo` (boolean): Force power-of-2 dimensions (default: false)
 - `trimTransparency` (boolean): Trim transparent pixels (default: false)
-- `maxWidth` (integer): Maximum sheet width in pixels (default: 2048)
-- `maxHeight` (integer): Maximum sheet height in pixels (default: 2048)
+- `maxWidth` (integer): Maximum sheet width in pixels (default: 4096)
+- `maxHeight` (integer): Maximum sheet height in pixels (default: 4096)
 - `outputFormats` (string): Comma-separated list of output formats (default: "sparrow")
 
 **Examples:**

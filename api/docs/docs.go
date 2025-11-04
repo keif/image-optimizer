@@ -718,14 +718,14 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "default": 2048,
+                        "default": 4096,
                         "description": "Maximum sheet width in pixels (256-12288)",
                         "name": "maxWidth",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "default": 2048,
+                        "default": 4096,
                         "description": "Maximum sheet height in pixels (256-12288)",
                         "name": "maxHeight",
                         "in": "query"
@@ -746,7 +746,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "default": "\"optimal\"",
+                        "default": "\"smart\"",
                         "description": "Packing algorithm mode: 'optimal' (best efficiency), 'smart' (60-80% efficiency, preserves frame order), 'preserve' (exact order, poorest efficiency). Recommended: use 'smart' for animations.",
                         "name": "packingMode",
                         "in": "query"
@@ -835,14 +835,14 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "default": 2048,
+                        "default": 4096,
                         "description": "Maximum sheet width in pixels (256-12288)",
                         "name": "maxWidth",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "default": 2048,
+                        "default": 4096,
                         "description": "Maximum sheet height in pixels (256-12288)",
                         "name": "maxHeight",
                         "in": "query"
@@ -870,7 +870,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "default": "\"optimal\"",
+                        "default": "\"smart\"",
                         "description": "Packing algorithm mode: 'optimal' (best efficiency), 'smart' (60-80% efficiency, preserves frame order), 'preserve' (exact order, poorest efficiency). Recommended: use 'smart' for animations.",
                         "name": "packingMode",
                         "in": "query"

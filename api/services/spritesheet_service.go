@@ -373,7 +373,7 @@ func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, erro
 	// - "optimal": Full height-based sorting (best packing, ignores order)
 	// - "preserve": No sorting (preserves exact order, poor packing)
 	// - "smart": Local height grouping (good packing, mostly preserves order)
-	packingMode := "optimal" // Default
+	packingMode := "smart" // Default (best balance of compression + frame order)
 	if options.PreserveFrameOrder {
 		packingMode = "preserve"
 	}

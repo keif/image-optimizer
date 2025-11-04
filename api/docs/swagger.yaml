@@ -679,12 +679,12 @@ paths:
         in: query
         name: trimTransparency
         type: boolean
-      - default: 2048
+      - default: 4096
         description: Maximum sheet width in pixels (256-12288)
         in: query
         name: maxWidth
         type: integer
-      - default: 2048
+      - default: 4096
         description: Maximum sheet height in pixels (256-12288)
         in: query
         name: maxHeight
@@ -700,7 +700,7 @@ paths:
         in: query
         name: imagePath
         type: string
-      - default: '"optimal"'
+      - default: '"smart"'
         description: 'Packing algorithm mode: ''optimal'' (best efficiency), ''smart''
           (60-80% efficiency, preserves frame order), ''preserve'' (exact order, poorest
           efficiency). Recommended: use ''smart'' for animations.'
@@ -772,12 +772,12 @@ paths:
         in: query
         name: trimTransparency
         type: boolean
-      - default: 2048
+      - default: 4096
         description: Maximum sheet width in pixels (256-12288)
         in: query
         name: maxWidth
         type: integer
-      - default: 2048
+      - default: 4096
         description: Maximum sheet height in pixels (256-12288)
         in: query
         name: maxHeight
@@ -799,7 +799,7 @@ paths:
         in: query
         name: imagePath
         type: string
-      - default: '"optimal"'
+      - default: '"smart"'
         description: 'Packing algorithm mode: ''optimal'' (best efficiency), ''smart''
           (60-80% efficiency, preserves frame order), ''preserve'' (exact order, poorest
           efficiency). Recommended: use ''smart'' for animations.'
