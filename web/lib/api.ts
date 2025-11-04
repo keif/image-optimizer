@@ -279,6 +279,12 @@ class ApiClient {
     params.append('padding', options.padding.toString());
     params.append('powerOfTwo', options.powerOfTwo.toString());
     params.append('trimTransparency', options.trimTransparency.toString());
+    if (options.trimOnly) {
+      params.append('trimOnly', options.trimOnly);
+    }
+    if (options.trimExcept) {
+      params.append('trimExcept', options.trimExcept);
+    }
     params.append('maxWidth', options.maxWidth.toString());
     params.append('maxHeight', options.maxHeight.toString());
     params.append('outputFormats', options.outputFormats.join(','));
@@ -340,6 +346,12 @@ class ApiClient {
     params.append('padding', options.padding.toString());
     params.append('powerOfTwo', options.powerOfTwo.toString());
     params.append('trimTransparency', options.trimTransparency.toString());
+    if (options.trimOnly) {
+      params.append('trimOnly', options.trimOnly);
+    }
+    if (options.trimExcept) {
+      params.append('trimExcept', options.trimExcept);
+    }
     params.append('maxWidth', options.maxWidth.toString());
     params.append('maxHeight', options.maxHeight.toString());
     params.append('outputFormats', options.outputFormats.join(','));

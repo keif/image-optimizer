@@ -73,6 +73,8 @@ export interface PackingOptions {
   padding: number;
   powerOfTwo: boolean;
   trimTransparency: boolean;
+  trimOnly?: string;        // Comma-separated glob patterns: only trim matching frames
+  trimExcept?: string;      // Comma-separated glob patterns: trim all except matching frames
   maxWidth: number;
   maxHeight: number;
   outputFormats: string[];
