@@ -923,7 +923,7 @@ Extensive benchmarking revealed that dimension limits have a **greater impact th
   - Creates excessive padding at dimension boundaries
   - **Not recommended** unless you specifically need 8K textures
 
-**Results: 3-4x better compression with 4096 vs 8192 limits**
+#### Results: 3-4x better compression with 4096 vs 8192 limits
 
 **Mode Selection by Dataset Size:**
 

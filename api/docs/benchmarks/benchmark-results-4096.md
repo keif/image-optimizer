@@ -105,7 +105,7 @@
 
 ### Game Development (Unity, Unreal, Godot)
 
-```
+```yaml
 maxWidth: 4096
 maxHeight: 4096
 packingMode: optimal (for large datasets), smart (for animations)
@@ -115,7 +115,7 @@ packingMode: optimal (for large datasets), smart (for animations)
 
 ### Web/Mobile Games
 
-```
+```yaml
 maxWidth: 2048
 maxHeight: 2048
 packingMode: smart
@@ -125,7 +125,7 @@ packingMode: smart
 
 ### Friday Night Funkin' (Funkin Packer Replacement)
 
-```
+```yaml
 maxWidth: 4096
 maxHeight: 4096
 packingMode: preserve
@@ -136,7 +136,7 @@ trimTransparency: true
 
 ### Static UI Assets
 
-```
+```yaml
 maxWidth: 4096
 maxHeight: 4096
 packingMode: optimal
@@ -249,7 +249,7 @@ API_URL=http://localhost:8080 MAX_WIDTH=8192 MAX_HEIGHT=8192 ./benchmark-packing
 
 **For most use cases, recommend:**
 
-```
+```yaml
 maxWidth=4096
 maxHeight=4096
 packingMode=smart
