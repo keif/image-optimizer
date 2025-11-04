@@ -625,7 +625,7 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 		PreserveFrameOrder: parseBool(preserveFrameOrder),
 		CompressionQuality: compressionQuality,
 		ImagePath:          c.Query("imagePath", "spritesheet.png"),
-		OriginalSize:       len(sheetData),             // For compression warnings
+		OriginalSize:       len(sheetData),                  // For compression warnings
 		PackingMode:        c.Query("packingMode", "smart"), // "optimal", "smart", "preserve"
 	}
 

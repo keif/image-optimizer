@@ -13,6 +13,14 @@ fi
 STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '^api/.*\.go$' || true)
 if [ -n "$STAGED_GO_FILES" ]; then
   echo "Linting Go files..."
+
+  # Auto-fix formatting with gofmt
+  cd api && gofmt -w . && cd ..
+
+  # Re-stage formatted files
+  git add $STAGED_GO_FILES
+
+  # Run golangci-lint for additional checks
   cd api && golangci-lint run ./...
 fi
 

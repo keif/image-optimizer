@@ -21,11 +21,6 @@ linters:
         - name: exported
           disabled: true
 
-formatters:
-  enable:
-    - gofmt
-    - goimports
-
 run:
   timeout: 5m
   tests: true
