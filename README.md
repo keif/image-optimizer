@@ -671,6 +671,15 @@ Pack multiple sprite images into optimized spritesheets using the MaxRects bin p
   - Saves space by trimming empty pixels
   - Original dimensions are preserved in metadata
   - Returns error if frame becomes fully transparent after trimming
+- `trimOnly` (string): Comma-separated glob patterns to selectively trim frames
+  - Only frames matching these patterns will be trimmed
+  - Example: `*walk*,*run*` trims only walk and run animations
+  - Takes precedence over `trimExcept`
+  - Requires `trimTransparency=true`
+- `trimExcept` (string): Comma-separated glob patterns to exclude from trimming
+  - Trims all frames EXCEPT those matching these patterns
+  - Example: `*idle*,*attack*` trims everything except idle and attack
+  - Requires `trimTransparency=true`
 - `maxWidth` (integer): Maximum sheet width in pixels (default: 4096)
   - Range: 256-12288 pixels
   - Industry standard, optimal for most game engines
@@ -726,14 +735,29 @@ curl -X POST "http://localhost:8080/pack-sprites?trimTransparency=true&outputFor
   -F "images=@sprite2.png"
 ```
 
-**4. Pack large sprite set with custom dimensions:**
+**4. Pack with selective frame trimming (trim only specific animations):**
+
+```bash
+# Only trim walk and run animations (useful when other animations have large hitboxes)
+curl -X POST "http://localhost:8080/pack-sprites?trimTransparency=true&trimOnly=*walk*,*run*" \
+  -F "images=@character-walk-001.png" \
+  -F "images=@character-walk-002.png" \
+  -F "images=@character-idle-001.png" \
+  -F "images=@character-idle-002.png"
+
+# Alternatively, trim everything EXCEPT idle and attack animations
+curl -X POST "http://localhost:8080/pack-sprites?trimTransparency=true&trimExcept=*idle*,*attack*" \
+  -F "images=@*.png"
+```
+
+**5. Pack large sprite set with custom dimensions:**
 
 ```bash
 curl -X POST "http://localhost:8080/pack-sprites?maxWidth=4096&maxHeight=4096&padding=8" \
   -F "images=@*.png"
 ```
 
-**5. Pack animation frames with smart packing (recommended for animations):**
+**6. Pack animation frames with smart packing (recommended for animations):**
 
 ```bash
 curl -X POST "http://localhost:8080/pack-sprites?packingMode=smart&outputFormats=sparrow&imagePath=character-idle.png" \
@@ -742,7 +766,7 @@ curl -X POST "http://localhost:8080/pack-sprites?packingMode=smart&outputFormats
   -F "images=@frame003.png"
 ```
 
-**6. Pack animation with exact frame order preservation:**
+**7. Pack animation with exact frame order preservation:**
 
 ```bash
 curl -X POST "http://localhost:8080/pack-sprites?packingMode=preserve&outputFormats=sparrow" \
@@ -751,7 +775,7 @@ curl -X POST "http://localhost:8080/pack-sprites?packingMode=preserve&outputForm
   -F "images=@frame003.png"
 ```
 
-**7. Pack with best compression quality:**
+**8. Pack with best compression quality:**
 
 ```bash
 curl -X POST "http://localhost:8080/pack-sprites?compressionQuality=best" \

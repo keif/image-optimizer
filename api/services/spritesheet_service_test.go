@@ -648,3 +648,316 @@ func TestPackSprites_TransparentFrameNoTrim(t *testing.T) {
 		t.Errorf("Expected 3 sprites in result, got %d", totalSprites)
 	}
 }
+
+// createTransparentBorderedSprite creates a sprite with transparent borders
+// This allows us to test trimming behavior
+func createTransparentBorderedSprite(name string, contentWidth, contentHeight, borderSize int, fillColor color.RGBA) Sprite {
+	totalWidth := contentWidth + (borderSize * 2)
+	totalHeight := contentHeight + (borderSize * 2)
+	img := image.NewRGBA(image.Rect(0, 0, totalWidth, totalHeight))
+
+	// Fill with transparent
+	transparent := color.RGBA{0, 0, 0, 0}
+	for y := 0; y < totalHeight; y++ {
+		for x := 0; x < totalWidth; x++ {
+			img.Set(x, y, transparent)
+		}
+	}
+
+	// Fill content area with color
+	for y := borderSize; y < borderSize+contentHeight; y++ {
+		for x := borderSize; x < borderSize+contentWidth; x++ {
+			img.Set(x, y, fillColor)
+		}
+	}
+
+	// Encode to PNG buffer
+	var buf bytes.Buffer
+	encoder := &png.Encoder{CompressionLevel: png.BestSpeed}
+	_ = encoder.Encode(&buf, img)
+
+	return Sprite{
+		Name:   name,
+		Image:  img,
+		Buffer: buf.Bytes(),
+		Width:  totalWidth,
+		Height: totalHeight,
+	}
+}
+
+// TestSimpleGlobMatch tests the glob pattern matching function
+func TestSimpleGlobMatch(t *testing.T) {
+	tests := []struct {
+		name     string
+		pattern  string
+		testName string
+		expected bool
+	}{
+		{"exact match", "sprite.png", "sprite.png", true},
+		{"no match", "sprite.png", "other.png", false},
+		{"wildcard prefix", "*walk*", "sprite-walk-001.png", true},
+		{"wildcard suffix", "idle*", "idle-001.png", true},
+		{"wildcard both sides", "*run*", "character-run-001.png", true},
+		{"multiple wildcards", "*-walk-*.png", "sprite-walk-001.png", true},
+		{"wildcard no match", "*walk*", "sprite-idle-001.png", false},
+		{"empty pattern", "", "sprite.png", false},
+		{"wildcard only", "*", "anything.png", true},
+		{"pattern longer than name", "*verylongpattern*", "short.png", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := simpleGlobMatch(tt.testName, tt.pattern)
+			if result != tt.expected {
+				t.Errorf("simpleGlobMatch(%q, %q) = %v, expected %v", tt.testName, tt.pattern, result, tt.expected)
+			}
+		})
+	}
+}
+
+// TestMatchesPattern tests the pattern matching with multiple patterns
+func TestMatchesPattern(t *testing.T) {
+	tests := []struct {
+		name     string
+		patterns []string
+		testName string
+		expected bool
+	}{
+		{"match first pattern", []string{"*walk*", "*run*"}, "sprite-walk-001.png", true},
+		{"match second pattern", []string{"*walk*", "*run*"}, "sprite-run-001.png", true},
+		{"no match", []string{"*walk*", "*run*"}, "sprite-idle-001.png", false},
+		{"empty patterns", []string{}, "sprite.png", false},
+		{"single pattern match", []string{"*idle*"}, "character-idle-001.png", true},
+		{"single pattern no match", []string{"*idle*"}, "character-walk-001.png", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := matchesPattern(tt.testName, tt.patterns)
+			if result != tt.expected {
+				t.Errorf("matchesPattern(%q, %v) = %v, expected %v", tt.testName, tt.patterns, result, tt.expected)
+			}
+		})
+	}
+}
+
+// TestShouldTrimSprite tests the trim decision logic
+func TestShouldTrimSprite(t *testing.T) {
+	tests := []struct {
+		name       string
+		spriteName string
+		options    PackingOptions
+		expected   bool
+	}{
+		{
+			name:       "trim disabled",
+			spriteName: "sprite-walk-001.png",
+			options: PackingOptions{
+				TrimTransparency: false,
+			},
+			expected: false,
+		},
+		{
+			name:       "trim all by default",
+			spriteName: "sprite-walk-001.png",
+			options: PackingOptions{
+				TrimTransparency: true,
+			},
+			expected: true,
+		},
+		{
+			name:       "trim only matching pattern",
+			spriteName: "sprite-walk-001.png",
+			options: PackingOptions{
+				TrimTransparency: true,
+				TrimOnly:         []string{"*walk*", "*run*"},
+			},
+			expected: true,
+		},
+		{
+			name:       "trim only not matching",
+			spriteName: "sprite-idle-001.png",
+			options: PackingOptions{
+				TrimTransparency: true,
+				TrimOnly:         []string{"*walk*", "*run*"},
+			},
+			expected: false,
+		},
+		{
+			name:       "trim except matching pattern",
+			spriteName: "sprite-idle-001.png",
+			options: PackingOptions{
+				TrimTransparency: true,
+				TrimExcept:       []string{"*idle*", "*attack*"},
+			},
+			expected: false,
+		},
+		{
+			name:       "trim except not matching",
+			spriteName: "sprite-walk-001.png",
+			options: PackingOptions{
+				TrimTransparency: true,
+				TrimExcept:       []string{"*idle*", "*attack*"},
+			},
+			expected: true,
+		},
+		{
+			name:       "trim only takes precedence over trim except",
+			spriteName: "sprite-walk-001.png",
+			options: PackingOptions{
+				TrimTransparency: true,
+				TrimOnly:         []string{"*walk*"},
+				TrimExcept:       []string{"*walk*"}, // This should be ignored
+			},
+			expected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := shouldTrimSprite(tt.spriteName, tt.options)
+			if result != tt.expected {
+				t.Errorf("shouldTrimSprite(%q, options) = %v, expected %v", tt.spriteName, result, tt.expected)
+			}
+		})
+	}
+}
+
+// TestSelectiveTrimming tests the actual selective trimming behavior
+func TestSelectiveTrimming(t *testing.T) {
+	// Create test sprites with transparent borders
+	sprites := []Sprite{
+		createTransparentBorderedSprite("sprite-walk-001.png", 50, 50, 10, color.RGBA{255, 0, 0, 255}),
+		createTransparentBorderedSprite("sprite-walk-002.png", 50, 50, 10, color.RGBA{255, 0, 0, 255}),
+		createTransparentBorderedSprite("sprite-idle-001.png", 50, 50, 10, color.RGBA{0, 255, 0, 255}),
+		createTransparentBorderedSprite("sprite-idle-002.png", 50, 50, 10, color.RGBA{0, 255, 0, 255}),
+	}
+
+	t.Run("trim only walk sprites", func(t *testing.T) {
+		options := PackingOptions{
+			Padding:          2,
+			PowerOfTwo:       false,
+			TrimTransparency: true,
+			TrimOnly:         []string{"*walk*"},
+			MaxWidth:         4096,
+			MaxHeight:        4096,
+			OutputFormats:    []string{"json"},
+			PackingMode:      "optimal",
+		}
+
+		result, err := PackSprites(sprites, options)
+		if err != nil {
+			t.Fatalf("PackSprites failed: %v", err)
+		}
+
+		// Check that walk sprites were trimmed
+		for _, sheet := range result.Sheets {
+			for _, sprite := range sheet.Sprites {
+				if strings.Contains(sprite.Name, "walk") {
+					if !sprite.Trimmed {
+						t.Errorf("Expected sprite %s to be trimmed, but it wasn't", sprite.Name)
+					}
+					if sprite.Width != 50 || sprite.Height != 50 {
+						t.Errorf("Expected trimmed sprite %s to be 50x50, got %dx%d", sprite.Name, sprite.Width, sprite.Height)
+					}
+					if sprite.OriginalW != 70 || sprite.OriginalH != 70 {
+						t.Errorf("Expected original dimensions to be 70x70, got %dx%d", sprite.OriginalW, sprite.OriginalH)
+					}
+				} else if strings.Contains(sprite.Name, "idle") {
+					if sprite.Trimmed {
+						t.Errorf("Expected sprite %s to NOT be trimmed, but it was", sprite.Name)
+					}
+					if sprite.Width != 70 || sprite.Height != 70 {
+						t.Errorf("Expected untrimmed sprite %s to be 70x70, got %dx%d", sprite.Name, sprite.Width, sprite.Height)
+					}
+				}
+			}
+		}
+	})
+
+	t.Run("trim except idle sprites", func(t *testing.T) {
+		options := PackingOptions{
+			Padding:          2,
+			PowerOfTwo:       false,
+			TrimTransparency: true,
+			TrimExcept:       []string{"*idle*"},
+			MaxWidth:         4096,
+			MaxHeight:        4096,
+			OutputFormats:    []string{"json"},
+			PackingMode:      "optimal",
+		}
+
+		result, err := PackSprites(sprites, options)
+		if err != nil {
+			t.Fatalf("PackSprites failed: %v", err)
+		}
+
+		// Check that idle sprites were NOT trimmed, others were trimmed
+		for _, sheet := range result.Sheets {
+			for _, sprite := range sheet.Sprites {
+				if strings.Contains(sprite.Name, "idle") {
+					if sprite.Trimmed {
+						t.Errorf("Expected sprite %s to NOT be trimmed, but it was", sprite.Name)
+					}
+				} else if strings.Contains(sprite.Name, "walk") {
+					if !sprite.Trimmed {
+						t.Errorf("Expected sprite %s to be trimmed, but it wasn't", sprite.Name)
+					}
+				}
+			}
+		}
+	})
+
+	t.Run("trim all when no patterns specified", func(t *testing.T) {
+		options := PackingOptions{
+			Padding:          2,
+			PowerOfTwo:       false,
+			TrimTransparency: true,
+			MaxWidth:         4096,
+			MaxHeight:        4096,
+			OutputFormats:    []string{"json"},
+			PackingMode:      "optimal",
+		}
+
+		result, err := PackSprites(sprites, options)
+		if err != nil {
+			t.Fatalf("PackSprites failed: %v", err)
+		}
+
+		// Check that all sprites were trimmed
+		for _, sheet := range result.Sheets {
+			for _, sprite := range sheet.Sprites {
+				if !sprite.Trimmed {
+					t.Errorf("Expected sprite %s to be trimmed, but it wasn't", sprite.Name)
+				}
+			}
+		}
+	})
+
+	t.Run("trim none when disabled", func(t *testing.T) {
+		options := PackingOptions{
+			Padding:          2,
+			PowerOfTwo:       false,
+			TrimTransparency: false,
+			TrimOnly:         []string{"*walk*"}, // Should be ignored
+			MaxWidth:         4096,
+			MaxHeight:        4096,
+			OutputFormats:    []string{"json"},
+			PackingMode:      "optimal",
+		}
+
+		result, err := PackSprites(sprites, options)
+		if err != nil {
+			t.Fatalf("PackSprites failed: %v", err)
+		}
+
+		// Check that no sprites were trimmed
+		for _, sheet := range result.Sheets {
+			for _, sprite := range sheet.Sprites {
+				if sprite.Trimmed {
+					t.Errorf("Expected sprite %s to NOT be trimmed, but it was", sprite.Name)
+				}
+			}
+		}
+	})
+}

@@ -43,6 +43,8 @@ type PackingOptions struct {
 	Padding               int               // Padding between sprites (pixels)
 	PowerOfTwo            bool              // Force output dimensions to power of 2
 	TrimTransparency      bool              // Trim transparent borders from sprites
+	TrimOnly              []string          // Glob patterns: only trim frames matching these patterns (takes precedence over TrimExcept)
+	TrimExcept            []string          // Glob patterns: trim all frames except those matching these patterns
 	MaxWidth              int               // Maximum sheet width (0 = unlimited)
 	MaxHeight             int               // Maximum sheet height (0 = unlimited)
 	OutputFormats         []string          // Desired output formats (json, css, csv, xml, sparrow, texturepacker, cocos2d, unity, godot)
@@ -282,6 +284,82 @@ func nextPowerOfTwo(n int) int {
 	return n
 }
 
+// matchesPattern checks if a sprite name matches any of the glob patterns
+// Supports simple wildcards: * matches any sequence of characters
+func matchesPattern(name string, patterns []string) bool {
+	if len(patterns) == 0 {
+		return false
+	}
+
+	for _, pattern := range patterns {
+		if simpleGlobMatch(name, pattern) {
+			return true
+		}
+	}
+	return false
+}
+
+// simpleGlobMatch performs simple glob pattern matching with * wildcard
+// Examples:
+//   - "*walk*" matches "sprite-walk-001.png"
+//   - "idle*" matches "idle-001.png", "idle-002.png"
+//   - "*-run-*" matches "character-run-001.png"
+func simpleGlobMatch(name, pattern string) bool {
+	// Split pattern by wildcards
+	parts := strings.Split(pattern, "*")
+
+	// If no wildcards, must be exact match
+	if len(parts) == 1 {
+		return name == pattern
+	}
+
+	// Check if name starts with first part (if not empty)
+	if parts[0] != "" && !strings.HasPrefix(name, parts[0]) {
+		return false
+	}
+
+	// Check if name ends with last part (if not empty)
+	if parts[len(parts)-1] != "" && !strings.HasSuffix(name, parts[len(parts)-1]) {
+		return false
+	}
+
+	// Check middle parts in order
+	pos := len(parts[0]) // Start after first part
+	for i := 1; i < len(parts)-1; i++ {
+		if parts[i] == "" {
+			continue // Skip empty parts (consecutive wildcards)
+		}
+		idx := strings.Index(name[pos:], parts[i])
+		if idx == -1 {
+			return false // Part not found
+		}
+		pos += idx + len(parts[i])
+	}
+
+	return true
+}
+
+// shouldTrimSprite determines if a sprite should be trimmed based on options
+func shouldTrimSprite(spriteName string, options PackingOptions) bool {
+	// If trimTransparency is false, don't trim anything
+	if !options.TrimTransparency {
+		return false
+	}
+
+	// If TrimOnly is specified, only trim sprites matching those patterns
+	if len(options.TrimOnly) > 0 {
+		return matchesPattern(spriteName, options.TrimOnly)
+	}
+
+	// If TrimExcept is specified, trim everything except those patterns
+	if len(options.TrimExcept) > 0 {
+		return !matchesPattern(spriteName, options.TrimExcept)
+	}
+
+	// Default: trim all sprites when trimTransparency=true (backward compatible)
+	return true
+}
+
 // TrimTransparency trims transparent borders from an image
 func TrimTransparency(img image.Image) (image.Image, int, int, int, int, error) {
 	bounds := img.Bounds()
@@ -345,14 +423,15 @@ func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, erro
 		return nil, fmt.Errorf("no sprites provided")
 	}
 
-	// Process sprites (trim transparency if requested)
+	// Process sprites (trim transparency if requested, with selective trim support)
 	processedSprites := make([]Sprite, len(sprites))
 	for i, sprite := range sprites {
 		processedSprites[i] = sprite
 		// Preserve original index for frame order preservation
 		processedSprites[i].OriginalIndex = i
 
-		if options.TrimTransparency {
+		// Check if this specific sprite should be trimmed based on patterns
+		if shouldTrimSprite(sprite.Name, options) {
 			trimmed, trimX, trimY, origW, origH, err := TrimTransparency(sprite.Image)
 			if err != nil {
 				return nil, fmt.Errorf("frame '%s' is fully transparent after trimming. Disable trimTransparency or check source image", sprite.Name)

@@ -715,6 +715,18 @@
                         "in": "query"
                     },
                     {
+                        "type": "string",
+                        "description": "Comma-separated glob patterns: only trim frames matching these patterns (e.g., '*walk*,*run*'). Takes precedence over trimExcept.",
+                        "name": "trimOnly",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated glob patterns: trim all frames EXCEPT those matching these patterns (e.g., '*idle*,*attack*')",
+                        "name": "trimExcept",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "default": 4096,
                         "description": "Maximum sheet width in pixels (256-12288)",
@@ -829,6 +841,18 @@
                         "default": false,
                         "description": "Trim transparent pixels from sprites",
                         "name": "trimTransparency",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated glob patterns: only trim frames matching these patterns (e.g., '*walk*,*run*'). Takes precedence over trimExcept.",
+                        "name": "trimOnly",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated glob patterns: trim all frames EXCEPT those matching these patterns (e.g., '*idle*,*attack*')",
+                        "name": "trimExcept",
                         "in": "query"
                     },
                     {

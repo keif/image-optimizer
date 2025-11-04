@@ -679,6 +679,16 @@ paths:
         in: query
         name: trimTransparency
         type: boolean
+      - description: 'Comma-separated glob patterns: only trim frames matching these
+          patterns (e.g., ''*walk*,*run*''). Takes precedence over trimExcept.'
+        in: query
+        name: trimOnly
+        type: string
+      - description: 'Comma-separated glob patterns: trim all frames EXCEPT those
+          matching these patterns (e.g., ''*idle*,*attack*'')'
+        in: query
+        name: trimExcept
+        type: string
       - default: 4096
         description: Maximum sheet width in pixels (256-12288)
         in: query
@@ -772,6 +782,16 @@ paths:
         in: query
         name: trimTransparency
         type: boolean
+      - description: 'Comma-separated glob patterns: only trim frames matching these
+          patterns (e.g., ''*walk*,*run*''). Takes precedence over trimExcept.'
+        in: query
+        name: trimOnly
+        type: string
+      - description: 'Comma-separated glob patterns: trim all frames EXCEPT those
+          matching these patterns (e.g., ''*idle*,*attack*'')'
+        in: query
+        name: trimExcept
+        type: string
       - default: 4096
         description: Maximum sheet width in pixels (256-12288)
         in: query

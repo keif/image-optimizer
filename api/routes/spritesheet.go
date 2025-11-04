@@ -75,6 +75,8 @@ func SetupSpritesheetRoutes(app *fiber.App) {
 // @Param padding query int false "Padding between sprites in pixels (0-32)" default(2)
 // @Param powerOfTwo query bool false "Force power-of-2 dimensions (256, 512, 1024, etc.). Dimensions capped at maxWidth/maxHeight." default(false)
 // @Param trimTransparency query bool false "Trim transparent pixels from sprites" default(false)
+// @Param trimOnly query string false "Comma-separated glob patterns: only trim frames matching these patterns (e.g., '*walk*,*run*'). Takes precedence over trimExcept."
+// @Param trimExcept query string false "Comma-separated glob patterns: trim all frames EXCEPT those matching these patterns (e.g., '*idle*,*attack*')"
 // @Param maxWidth query int false "Maximum sheet width in pixels (256-12288)" default(4096)
 // @Param maxHeight query int false "Maximum sheet height in pixels (256-12288)" default(4096)
 // @Param autoResize query bool false "Automatically resize sprites exceeding 12288x12288 to fit. Resize details returned in response." default(false)
@@ -121,6 +123,8 @@ func PackSprites(c *fiber.Ctx) error {
 		Padding:            parseInt(c.Query("padding", "2")),
 		PowerOfTwo:         parseBool(c.Query("powerOfTwo", "false")),
 		TrimTransparency:   parseBool(c.Query("trimTransparency", "false")),
+		TrimOnly:           parsePatterns(c.Query("trimOnly")),
+		TrimExcept:         parsePatterns(c.Query("trimExcept")),
 		MaxWidth:           parseInt(c.Query("maxWidth", "4096")),
 		MaxHeight:          parseInt(c.Query("maxHeight", "4096")),
 		OutputFormats:      parseOutputFormats(c.Query("outputFormats", "json")),
@@ -384,6 +388,24 @@ func parseOutputFormats(s string) []string {
 	return formats
 }
 
+func parsePatterns(s string) []string {
+	if s == "" {
+		return []string{}
+	}
+
+	parts := strings.Split(s, ",")
+	patterns := make([]string, 0, len(parts))
+
+	for _, part := range parts {
+		pattern := strings.TrimSpace(part)
+		if pattern != "" {
+			patterns = append(patterns, pattern)
+		}
+	}
+
+	return patterns
+}
+
 // getFormatMetadata returns the file extension and MIME type for a given output format
 func getFormatMetadata(format string) (string, string) {
 	switch format {
@@ -462,6 +484,8 @@ func GetSpritesheetFormats(c *fiber.Ctx) error {
 // @Param padding query int false "Padding between sprites in pixels" default(2)
 // @Param powerOfTwo query bool false "Force power-of-2 dimensions. Dimensions capped at maxWidth/maxHeight." default(false)
 // @Param trimTransparency query bool false "Trim transparent pixels from sprites" default(false)
+// @Param trimOnly query string false "Comma-separated glob patterns: only trim frames matching these patterns (e.g., '*walk*,*run*'). Takes precedence over trimExcept."
+// @Param trimExcept query string false "Comma-separated glob patterns: trim all frames EXCEPT those matching these patterns (e.g., '*idle*,*attack*')"
 // @Param maxWidth query int false "Maximum sheet width in pixels (256-12288)" default(4096)
 // @Param maxHeight query int false "Maximum sheet height in pixels (256-12288)" default(4096)
 // @Param outputFormats query string false "Comma-separated list of output formats: json,css,csv,xml,sparrow,texturepacker,cocos2d,unity,godot" default("sparrow")
@@ -592,6 +616,8 @@ func OptimizeSpritesheet(c *fiber.Ctx) error {
 		Padding:            parseInt(c.Query("padding", "2")),
 		PowerOfTwo:         parseBool(c.Query("powerOfTwo", "false")),
 		TrimTransparency:   parseBool(c.Query("trimTransparency", "false")),
+		TrimOnly:           parsePatterns(c.Query("trimOnly")),
+		TrimExcept:         parsePatterns(c.Query("trimExcept")),
 		MaxWidth:           parseInt(c.Query("maxWidth", "4096")),
 		MaxHeight:          parseInt(c.Query("maxHeight", "4096")),
 		OutputFormats:      parseOutputFormats(c.Query("outputFormats", "sparrow")),
