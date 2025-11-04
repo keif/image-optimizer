@@ -42,6 +42,18 @@ Thumbs.db
 **/coverage.out
 **/coverage.html
 
+# Scripts and tools (don't trigger rebuilds)
+**/*benchmark*.sh
+**/*test*.sh
+**/feature-requests.md
+
+# Temporary files from editors and tools
+**/*.tmp
+**/*.tmp.*
+**/*~
+**/.*.swp
+**/.*.swo
+
 # Environment
 .env
 .env.*
