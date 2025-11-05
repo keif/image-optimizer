@@ -1,5 +1,5 @@
 import { Download, FileText, Image as ImageIcon, Layers } from 'lucide-react';
-import { PackingResult } from '@/lib/types';
+import { PackingResult, OutputFileInfo } from '@/lib/types';
 
 interface SpritesheetResultsProps {
   result: PackingResult;
@@ -25,21 +25,12 @@ export default function SpritesheetResults({ result }: SpritesheetResultsProps) 
     });
   };
 
-  const downloadFormat = (formatName: string, content: string) => {
-    const extensions: { [key: string]: string } = {
-      json: 'json',
-      css: 'css',
-      csv: 'csv',
-      xml: 'xml',
-      unity: 'meta',
-      godot: 'tres',
-    };
-
-    const blob = new Blob([content], { type: 'text/plain' });
+  const downloadFormat = (formatName: string, fileInfo: OutputFileInfo) => {
+    const blob = new Blob([fileInfo.content], { type: fileInfo.mimeType || 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `spritesheet.${extensions[formatName] || 'txt'}`;
+    a.download = `spritesheet.${fileInfo.extension}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -47,8 +38,10 @@ export default function SpritesheetResults({ result }: SpritesheetResultsProps) 
   };
 
   const downloadAllFormats = () => {
-    Object.entries(result.outputFiles).forEach(([format, content], index) => {
-      setTimeout(() => downloadFormat(format, content), index * 100);
+    Object.entries(result.outputFiles).forEach(([format, fileInfo], index) => {
+      if (fileInfo && fileInfo.content) {
+        setTimeout(() => downloadFormat(format, fileInfo), index * 100);
+      }
     });
   };
 
@@ -215,34 +208,36 @@ export default function SpritesheetResults({ result }: SpritesheetResultsProps) 
         </div>
 
         <div className="space-y-3">
-          {Object.entries(result.outputFiles).map(([format, content]) => (
-            <div
-              key={format}
-              className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <h4 className="font-medium uppercase">{format}</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {content.length.toLocaleString()} characters
-                  </p>
+          {Object.entries(result.outputFiles)
+            .filter(([, fileInfo]) => fileInfo != null && fileInfo.content != null)
+            .map(([format, fileInfo]) => (
+              <div
+                key={format}
+                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <h4 className="font-medium uppercase">{format}</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {fileInfo.content.length.toLocaleString()} characters
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => downloadFormat(format, fileInfo)}
+                    className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center gap-1 text-sm"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download
+                  </button>
                 </div>
-                <button
-                  onClick={() => downloadFormat(format, content)}
-                  className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center gap-1 text-sm"
-                >
-                  <Download className="w-4 h-4" />
-                  Download
-                </button>
-              </div>
 
-              {/* Preview (truncated) */}
-              <pre className="text-xs bg-gray-100 dark:bg-gray-900 p-3 rounded-md overflow-x-auto max-h-32 overflow-y-auto">
-                {content.substring(0, 500)}
-                {content.length > 500 && '\n...'}
-              </pre>
-            </div>
-          ))}
+                {/* Preview (truncated) */}
+                <pre className="text-xs bg-gray-100 dark:bg-gray-900 p-3 rounded-md overflow-x-auto max-h-32 overflow-y-auto">
+                  {fileInfo.content.substring(0, 500)}
+                  {fileInfo.content.length > 500 && '\n...'}
+                </pre>
+              </div>
+            ))}
         </div>
       </div>
     </div>

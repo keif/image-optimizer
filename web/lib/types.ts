@@ -99,10 +99,16 @@ export interface SheetMetadata {
   efficiency: number;
 }
 
+export interface OutputFileInfo {
+  content: string;
+  extension: string;
+  mimeType: string;
+}
+
 export interface PackingResult {
   sheets: string[];         // Base64-encoded PNG images
   metadata: SheetMetadata[];
-  outputFiles: { [key: string]: string };  // Format name -> file content
+  outputFiles: { [key: string]: OutputFileInfo };  // Format name -> file info
   totalSprites: number;
   resizedSprites?: ResizeInfo[];  // Info about auto-resized sprites
   originalCount?: number;         // For optimize-spritesheet: original sprite count
