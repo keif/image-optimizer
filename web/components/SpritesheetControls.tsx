@@ -14,7 +14,7 @@ export default function SpritesheetControls({ options, onChange }: SpritesheetCo
     { value: 'css', label: 'CSS', description: 'CSS sprite classes' },
     { value: 'csv', label: 'CSV', description: 'Comma-separated values' },
     { value: 'xml', label: 'XML', description: 'Generic XML format' },
-    { value: 'sparrow', label: 'Sparrow', description: 'Sparrow/Starling (HaxeFlixel, FNF)' },
+    { value: 'sparrow', label: 'Sparrow', description: 'Sparrow/Starling (HaxeFlixel)' },
     { value: 'texturepacker', label: 'TexturePacker', description: 'TexturePacker Generic XML' },
     { value: 'cocos2d', label: 'Cocos2d', description: 'Cocos2d plist format' },
     { value: 'unity', label: 'Unity', description: 'Unity TextureImporter' },
