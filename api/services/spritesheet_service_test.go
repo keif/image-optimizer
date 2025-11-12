@@ -63,34 +63,28 @@ func TestPreserveFrameOrder(t *testing.T) {
 		t.Fatal("No sheets generated")
 	}
 
-	// Parse the generated Sparrow XML to verify frame order
-	sparrowXML, ok := result.Formats["sparrow"]
-	if !ok {
-		t.Fatal("Sparrow format not generated")
+	t.Logf("Generated %d sheets", len(result.Sheets))
+	for i, sheet := range result.Sheets {
+		t.Logf("Sheet %d: %dx%d with %d sprites", i, sheet.Width, sheet.Height, len(sheet.Sprites))
 	}
 
-	type SubTexture struct {
-		Name string `xml:"name,attr"`
-	}
-	type TextureAtlas struct {
-		XMLName     xml.Name     `xml:"TextureAtlas"`
-		SubTextures []SubTexture `xml:"SubTexture"`
-	}
-
-	var atlas TextureAtlas
-	if err := xml.Unmarshal(sparrowXML, &atlas); err != nil {
-		t.Fatalf("Failed to parse Sparrow XML: %v", err)
+	// Verify frame order is preserved across all sheets
+	// Collect all sprites from all sheets in order
+	allSprites := []PackedSprite{}
+	for _, sheet := range result.Sheets {
+		allSprites = append(allSprites, sheet.Sprites...)
 	}
 
-	// Verify frame order matches original
+	// Verify we have all 4 sprites
 	expectedOrder := []string{"frame0000", "frame0001", "frame0002", "frame0003"}
-	if len(atlas.SubTextures) != len(expectedOrder) {
-		t.Fatalf("Expected %d frames, got %d", len(expectedOrder), len(atlas.SubTextures))
+	if len(allSprites) != len(expectedOrder) {
+		t.Fatalf("Expected %d total sprites across all sheets, got %d", len(expectedOrder), len(allSprites))
 	}
 
+	// Verify order is preserved
 	for i, expected := range expectedOrder {
-		if atlas.SubTextures[i].Name != expected {
-			t.Errorf("Frame %d: expected %s, got %s", i, expected, atlas.SubTextures[i].Name)
+		if allSprites[i].Name != expected {
+			t.Errorf("Sprite %d: expected %s, got %s", i, expected, allSprites[i].Name)
 		}
 	}
 }

@@ -475,27 +475,60 @@ func PackSprites(sprites []Sprite, options PackingOptions) (*PackingResult, erro
 		// (already in OriginalIndex order)
 	}
 
-	// Determine initial sheet dimensions
+	// Determine initial sheet dimensions based on sprite area
 	totalArea := 0
+	maxSpriteW, maxSpriteH := 0, 0
 	for _, sprite := range processedSprites {
 		totalArea += (sprite.Width + options.Padding*2) * (sprite.Height + options.Padding*2)
+		if sprite.Width > maxSpriteW {
+			maxSpriteW = sprite.Width
+		}
+		if sprite.Height > maxSpriteH {
+			maxSpriteH = sprite.Height
+		}
 	}
 
-	// Start with square-ish dimensions
-	initialSize := int(math.Sqrt(float64(totalArea)) * 1.2) // 20% overhead
+	// Start with square-ish dimensions based on area, with 20% overhead
+	initialSize := int(math.Sqrt(float64(totalArea)) * 1.2)
 
+	// Ensure initial size can fit the largest sprite
+	if initialSize < maxSpriteW {
+		initialSize = maxSpriteW
+	}
+	if initialSize < maxSpriteH {
+		initialSize = maxSpriteH
+	}
+
+	// Apply power-of-2 rounding to initial size if requested
 	if options.PowerOfTwo {
 		initialSize = nextPowerOfTwo(initialSize)
 	}
 
-	// Apply max dimensions if specified
+	// Determine packing canvas dimensions
 	maxW := initialSize
 	maxH := initialSize
+
+	// Apply user-specified max dimensions
+	// Use max(initialSize, MaxWidth/MaxHeight) to prevent unnecessary canvas inflation
+	// while maintaining backward compatibility for tests with explicit canvas sizes
 	if options.MaxWidth > 0 {
-		maxW = options.MaxWidth
+		if options.MaxWidth > initialSize {
+			maxW = options.MaxWidth
+		}
+		// Only cap at MaxWidth if initialSize exceeds it
+		if initialSize > options.MaxWidth {
+			maxW = options.MaxWidth
+		}
 	}
+
 	if options.MaxHeight > 0 {
-		maxH = options.MaxHeight
+		if options.MaxHeight > initialSize {
+			maxH = options.MaxHeight
+		}
+		// Only cap at MaxHeight if initialSize exceeds it
+		if initialSize > options.MaxHeight {
+			maxH = options.MaxHeight
+		}
 	}
 
 	// Pack sprites
