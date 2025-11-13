@@ -198,6 +198,43 @@ RATE_LIMIT_WINDOW=1m
 - Optional: Public optimization endpoints
 - Trusted origins for CORS
 
+## Feature Highlights
+
+### Real-time Image Optimization
+
+- libvips-powered processing via `bimg`
+- Format conversion between JPEG, PNG, WebP, AVIF, and GIF
+- Adjustable quality controls (1–100) with advanced format-specific options:
+  - **JPEG**: Progressive encoding, Huffman optimization, subsampling, smoothing
+  - **PNG**: Compression levels (0–9), interlacing, palette mode, OxiPNG post-processing
+  - **WebP**: Lossless mode, `effort` (0–6), `webpMethod` (0–6)
+  - **AVIF**: High-efficiency encoding (20–30% smaller than WebP)
+- Smart resizing with aspect-ratio preservation
+- Metadata stripping + sRGB conversions for compatibility
+- Instant feedback on savings via JSON metadata or the UI
+
+### Interactive Before/After Comparison
+
+- Draggable slider and side-by-side modes
+- Zoom (up to 4x) and pan for inspecting details
+- Metric overlays showing size savings + processing time
+- Web Share integration and clipboard shortcuts
+- Responsive layout with dark-mode support
+
+### URL-Based Fetching
+
+- Accepts uploads or remote URLs
+- Built-in SSRF and domain whitelist protection
+- 10 MB file/URL size caps and 10 second fetch timeout
+
+### Privacy-First Architecture
+
+- In-memory processing with no disk persistence
+- No cookies, analytics, or usage tracking
+- No optimization history—fully stateless
+- GDPR-friendly by design
+- Open source for transparency and audits
+
 **Database Schema**:
 
 ```sql

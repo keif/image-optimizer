@@ -8,6 +8,78 @@ Quick reference guide for managing and monitoring usage metrics in production.
 - [Monitoring Commands](#monitoring-commands)
 - [Troubleshooting](#troubleshooting)
 - [Maintenance Tasks](#maintenance-tasks)
+- [Emergency Procedures](#emergency-procedures)
+- [Quick Reference](#quick-reference)
+
+---
+
+## API Overview
+
+All metrics endpoints live on the API server and require authentication when API keys are enabled.
+
+### Summary
+
+```
+GET /metrics/summary?days=30
+```
+
+Returns hour-aggregated totals:
+
+```json
+{
+  "time_range": { "start_time": "...", "end_time": "...", "days": 30 },
+  "metrics": {
+    "total_requests": 15420,
+    "successful_requests": 15180,
+    "failed_requests": 240,
+    "total_bytes_original": 1024000000,
+    "total_bytes_optimized": 614400000,
+    "total_bytes_saved": 409600000,
+    "average_savings_percent": 40.0,
+    "avg_processing_time_ms": 127.5
+  }
+}
+```
+
+### Format Conversions
+
+```
+GET /metrics/formats?days=30
+```
+
+Sample payload:
+
+```json
+{
+  "conversions": [
+    {
+      "input_format": "jpeg",
+      "output_format": "webp",
+      "conversion_count": 8520,
+      "total_bytes_original": 680000000,
+      "total_bytes_optimized": 408000000,
+      "total_bytes_saved": 272000000,
+      "average_savings_percent": 40.0
+    }
+  ]
+}
+```
+
+### Timeline
+
+```
+GET /metrics/timeline?days=7&interval=hour
+```
+
+Each entry includes counts plus bytes+processing-time stats so you can graph trends.
+
+### Cleanup
+
+```
+POST /admin/cleanup-metrics?days=30
+```
+
+Use the bundled `cleanup-metrics.sh` script (with an API key) or call the endpoint directly. Default retention is 30 days, but you can pass a different `days` value for manual purges.
 
 ---
 
