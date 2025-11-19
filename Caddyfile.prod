@@ -55,9 +55,9 @@ www.sosquishy.io {
 
 # API subdomain
 api.sosquishy.io {
-    # Increase request body size limit for large images (20MB)
+    # Increase request body size limit for large images (500MB)
     request_body {
-        max_size 20MB
+        max_size 500MB
     }
 
     # Reverse proxy to Go API Docker container

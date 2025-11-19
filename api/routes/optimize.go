@@ -23,7 +23,7 @@ import (
 
 // Security configuration
 const (
-	maxImageSize     = 10 << 20         // 10 MB
+	maxImageSize     = 500 << 20        // 500 MB - generous limit while preventing abuse
 	fetchTimeout     = 10 * time.Second // 10 seconds
 	maxDecodedPixels = 121_000_000      // 121 megapixels (11000x11000) - protection against decompression bombs
 )
@@ -416,7 +416,7 @@ func handleOptimize(c *fiber.Ctx) error {
 		// Check if we hit the size limit
 		if len(imgData) >= int(maxImageSize) {
 			return c.Status(fiber.StatusRequestEntityTooLarge).JSON(fiber.Map{
-				"error": "Uploaded file exceeds maximum size of 10MB.",
+				"error": "Uploaded file exceeds maximum size of 500MB.",
 			})
 		}
 	} else {
@@ -481,7 +481,7 @@ func handleOptimize(c *fiber.Ctx) error {
 		// Check if we hit the size limit
 		if len(imgData) >= int(maxImageSize) {
 			return c.Status(fiber.StatusRequestEntityTooLarge).JSON(fiber.Map{
-				"error": "Image from URL exceeds maximum size of 10MB.",
+				"error": "Image from URL exceeds maximum size of 500MB.",
 			})
 		}
 	}
@@ -624,7 +624,7 @@ func processSingleImage(file *multipart.FileHeader, options services.OptimizeOpt
 	// Check size limit
 	if len(imgData) >= int(maxImageSize) {
 		result.Success = false
-		result.Error = "File exceeds maximum size of 10MB"
+		result.Error = "File exceeds maximum size of 500MB"
 		return result
 	}
 

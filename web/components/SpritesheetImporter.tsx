@@ -1,11 +1,13 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { Upload, FileImage, FileCode } from 'lucide-react';
+import { Upload, FileImage, FileCode, AlertCircle } from 'lucide-react';
 
 interface SpritesheetImporterProps {
   onFilesSelected: (spritesheetFile: File | null, xmlFile: File | null) => void;
 }
+
+const LARGE_FILE_THRESHOLD = 10 * 1024 * 1024; // 10MB
 
 export default function SpritesheetImporter({ onFilesSelected }: SpritesheetImporterProps) {
   const [spritesheetFile, setSpritesheetFile] = useState<File | null>(null);
@@ -139,6 +141,16 @@ export default function SpritesheetImporter({ onFilesSelected }: SpritesheetImpo
           deduplicate identical sprites, and repack optimally.
         </p>
       </div>
+
+      {/* Large file warning */}
+      {spritesheetFile && spritesheetFile.size > LARGE_FILE_THRESHOLD && (
+        <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+          <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-800 dark:text-amber-300">
+            Larger images may take longer to process
+          </p>
+        </div>
+      )}
     </div>
   );
 }

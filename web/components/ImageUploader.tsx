@@ -1,18 +1,24 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, Image as ImageIcon } from 'lucide-react';
+import { Upload, Image as ImageIcon, AlertCircle } from 'lucide-react';
 
 interface ImageUploaderProps {
   onImageSelected: (file: File) => void;
   disabled?: boolean;
 }
 
+const LARGE_FILE_THRESHOLD = 10 * 1024 * 1024; // 10MB
+
 export default function ImageUploader({ onImageSelected, disabled }: ImageUploaderProps) {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
-      onImageSelected(acceptedFiles[0]);
+      const file = acceptedFiles[0];
+      setSelectedFile(file);
+      onImageSelected(file);
     }
   }, [onImageSelected]);
 
@@ -58,12 +64,22 @@ export default function ImageUploader({ onImageSelected, disabled }: ImageUpload
                 Drag & drop an image here, or click to select
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                Supports: JPEG, PNG, WebP, GIF (max 10MB)
+                Supports: JPEG, PNG, WebP, GIF
               </p>
             </div>
           </>
         )}
       </div>
+
+      {/* Large file warning */}
+      {selectedFile && selectedFile.size > LARGE_FILE_THRESHOLD && (
+        <div className="mt-3 flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+          <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-800 dark:text-amber-300">
+            Larger images may take longer to process
+          </p>
+        </div>
+      )}
     </div>
   );
 }
