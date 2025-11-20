@@ -4,7 +4,7 @@ Squish exposes a small REST surface area. Use this guide for quick reminders, an
 
 ## Health Check
 
-```
+```http
 GET /health
 ```
 
@@ -12,7 +12,7 @@ Returns `{ "status": "ok" }` plus version/build metadata when available. Useful 
 
 ## Optimize a Single Image
 
-```
+```http
 POST /optimize
 Content-Type: multipart/form-data
 ```
@@ -42,7 +42,7 @@ curl -X POST "http://localhost:8080/optimize?format=webp&quality=85" \
 
 ## Batch Optimize
 
-```
+```http
 POST /batch-optimize
 Content-Type: multipart/form-data
 ```
@@ -51,7 +51,7 @@ Accepts multiple `images=@file` or URLs with the same query parameters as `/opti
 
 ## Sprite Packing
 
-```
+```http
 POST /pack-sprites
 Content-Type: multipart/form-data
 ```
@@ -74,7 +74,7 @@ Response includes base64-encoded PNG sheets plus metadata and requested coordina
 
 ## Optimize Existing Spritesheet
 
-```
+```http
 POST /optimize-spritesheet
 Content-Type: multipart/form-data
 ```

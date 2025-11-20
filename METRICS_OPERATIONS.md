@@ -19,7 +19,7 @@ All metrics endpoints live on the API server and require authentication when API
 
 ### Summary
 
-```
+```http
 GET /metrics/summary?days=30
 ```
 
@@ -43,7 +43,7 @@ Returns hour-aggregated totals:
 
 ### Format Conversions
 
-```
+```http
 GET /metrics/formats?days=30
 ```
 
@@ -67,7 +67,7 @@ Sample payload:
 
 ### Timeline
 
-```
+```http
 GET /metrics/timeline?days=7&interval=hour
 ```
 
@@ -75,7 +75,7 @@ Each entry includes counts plus bytes+processing-time stats so you can graph tre
 
 ### Cleanup
 
-```
+```http
 POST /admin/cleanup-metrics?days=30
 ```
 
