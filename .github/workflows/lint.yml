@@ -27,7 +27,7 @@ jobs:
               - 'api/**/*.go'
               - 'api/go.mod'
               - 'api/go.sum'
-              - '.golangci.yml'
+              - '**/.golangci.yml'
               - '.github/workflows/lint.yml'
             frontend:
               - 'web/**'
