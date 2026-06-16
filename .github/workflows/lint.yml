@@ -7,8 +7,41 @@ on:
     branches: [ master, main, develop ]
 
 jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.filter.outputs.go }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      markdown: ${{ steps.filter.outputs.markdown }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect changed file groups
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            go:
+              - 'api/**/*.go'
+              - 'api/go.mod'
+              - 'api/go.sum'
+              - '.golangci.yml'
+              - '.github/workflows/lint.yml'
+            frontend:
+              - 'web/**'
+              - '.github/workflows/lint.yml'
+            markdown:
+              - '**/*.md'
+              - '.markdownlint.json'
+              - '.markdownlintignore'
+              - '.github/workflows/lint.yml'
+
   golangci-lint:
     name: Go Lint
+    needs: changes
+    if: needs.changes.outputs.go == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -46,6 +79,8 @@ jobs:
 
   frontend-lint:
     name: Frontend Lint
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -76,6 +111,8 @@ jobs:
 
   markdown-lint:
     name: Markdown Lint
+    needs: changes
+    if: needs.changes.outputs.markdown == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
