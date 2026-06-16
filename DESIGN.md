@@ -19,7 +19,7 @@ No marketing jargon (`leverage`, `robust`, `comprehensive`, `solutions`). No hap
 
 ## Color Tokens
 
-```
+```text
 cream         #fffaf3   base background
 cream-100     #fff4e6   secondary surface (nav-link hover, format chip bg)
 mint          #88e6b8   primary brand color
@@ -41,7 +41,7 @@ Background uses **radial gradients** of mint at 15% 20% (0.18 opacity) and peach
 
 Display scale (clamp for responsive):
 
-```
+```text
 hero h1     clamp(2.75rem, 6vw, 4.75rem)    weight 800
 section h2  1.75rem                          weight 800 (rarely used)
 card title  22px                             weight 700
@@ -55,7 +55,7 @@ Spacing follows an 8px grid (`8, 16, 24, 32, 48, 64, 96`). Padding inside the he
 
 Border radius scale — Squish is intentionally round, almost over-round:
 
-```
+```text
 sm   10px   icon blocks inside trust cards
 md   12px   logo mark
 lg   16px   buttons, badges
