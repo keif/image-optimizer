@@ -4,6 +4,7 @@ package main
 import (
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -93,7 +94,7 @@ func main() {
 	if allowedOrigins == "" {
 		allowedOrigins = "http://localhost:3000,http://localhost:8080"
 	}
-	log.Printf("CORS Origins: %s", allowedOrigins)
+	log.Printf("CORS Origins: %s", strconv.Quote(allowedOrigins))
 
 	// Custom CORS middleware that ALWAYS adds headers (even on errors)
 	app.Use(func(c *fiber.Ctx) error {
@@ -137,7 +138,7 @@ func main() {
 		port = "8080"
 	}
 
-	log.Printf("Starting server on port %s", port)
+	log.Printf("Starting server on port %s", strconv.Quote(port))
 	if err := app.Listen(":" + port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}

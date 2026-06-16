@@ -863,18 +863,18 @@ func generateCSS(sheets []Spritesheet, _ map[string]string) ([]byte, error) {
 	for sheetIdx, sheet := range sheets {
 		sheetName := fmt.Sprintf("spritesheet-%d.png", sheetIdx)
 
-		buf.WriteString(fmt.Sprintf("/* Spritesheet %d - %dx%d - %.2f%% efficient */\n\n",
-			sheetIdx, sheet.Width, sheet.Height, sheet.Efficiency*100))
+		fmt.Fprintf(&buf, "/* Spritesheet %d - %dx%d - %.2f%% efficient */\n\n",
+			sheetIdx, sheet.Width, sheet.Height, sheet.Efficiency*100)
 
 		for _, sprite := range sheet.Sprites {
 			className := strings.ReplaceAll(sprite.Name, ".", "-")
 			className = strings.ReplaceAll(className, " ", "-")
 
-			buf.WriteString(fmt.Sprintf(".sprite-%s {\n", className))
-			buf.WriteString(fmt.Sprintf("  background-image: url('%s');\n", sheetName))
-			buf.WriteString(fmt.Sprintf("  background-position: -%dpx -%dpx;\n", sprite.X, sprite.Y))
-			buf.WriteString(fmt.Sprintf("  width: %dpx;\n", sprite.Width))
-			buf.WriteString(fmt.Sprintf("  height: %dpx;\n", sprite.Height))
+			fmt.Fprintf(&buf, ".sprite-%s {\n", className)
+			fmt.Fprintf(&buf, "  background-image: url('%s');\n", sheetName)
+			fmt.Fprintf(&buf, "  background-position: -%dpx -%dpx;\n", sprite.X, sprite.Y)
+			fmt.Fprintf(&buf, "  width: %dpx;\n", sprite.Width)
+			fmt.Fprintf(&buf, "  height: %dpx;\n", sprite.Height)
 			buf.WriteString("}\n\n")
 		}
 	}
@@ -1020,13 +1020,13 @@ func generateGodot(sheets []Spritesheet, _ map[string]string) ([]byte, error) {
 
 	for sheetIdx, sheet := range sheets {
 		buf.WriteString("[gd_resource type=\"AtlasTexture\" format=2]\n\n")
-		buf.WriteString(fmt.Sprintf("[ext_resource path=\"res://spritesheet-%d.png\" type=\"Texture\" id=1]\n\n", sheetIdx))
+		fmt.Fprintf(&buf, "[ext_resource path=\"res://spritesheet-%d.png\" type=\"Texture\" id=1]\n\n", sheetIdx)
 
 		for i, sprite := range sheet.Sprites {
-			buf.WriteString(fmt.Sprintf("[sub_resource type=\"AtlasTexture\" id=%d]\n", i+1))
+			fmt.Fprintf(&buf, "[sub_resource type=\"AtlasTexture\" id=%d]\n", i+1)
 			buf.WriteString("atlas = ExtResource( 1 )\n")
-			buf.WriteString(fmt.Sprintf("region = Rect2( %d, %d, %d, %d )\n\n",
-				sprite.X, sprite.Y, sprite.Width, sprite.Height))
+			fmt.Fprintf(&buf, "region = Rect2( %d, %d, %d, %d )\n\n",
+				sprite.X, sprite.Y, sprite.Width, sprite.Height)
 		}
 	}
 
@@ -1216,20 +1216,20 @@ func generateCocos2d(sheets []Spritesheet, _ map[string]string) ([]byte, error) 
 	sheet := sheets[0]
 
 	for _, sprite := range sheet.Sprites {
-		buf.WriteString(fmt.Sprintf("\t\t<key>%s</key>\n", sprite.Name))
+		fmt.Fprintf(&buf, "\t\t<key>%s</key>\n", sprite.Name)
 		buf.WriteString("\t\t<dict>\n")
 
 		// Frame: {{x,y},{w,h}}
 		buf.WriteString("\t\t\t<key>frame</key>\n")
-		buf.WriteString(fmt.Sprintf("\t\t\t<string>{{%d,%d},{%d,%d}}</string>\n",
-			sprite.X, sprite.Y, sprite.Width, sprite.Height))
+		fmt.Fprintf(&buf, "\t\t\t<string>{{%d,%d},{%d,%d}}</string>\n",
+			sprite.X, sprite.Y, sprite.Width, sprite.Height)
 
 		// Offset: {offsetX, offsetY} - center offset if trimmed
 		if sprite.Trimmed {
 			offsetX := (sprite.OriginalW - sprite.Width) / 2
 			offsetY := (sprite.OriginalH - sprite.Height) / 2
 			buf.WriteString("\t\t\t<key>offset</key>\n")
-			buf.WriteString(fmt.Sprintf("\t\t\t<string>{%d,%d}</string>\n", offsetX, offsetY))
+			fmt.Fprintf(&buf, "\t\t\t<string>{%d,%d}</string>\n", offsetX, offsetY)
 		} else {
 			buf.WriteString("\t\t\t<key>offset</key>\n")
 			buf.WriteString("\t\t\t<string>{0,0}</string>\n")
@@ -1243,7 +1243,7 @@ func generateCocos2d(sheets []Spritesheet, _ map[string]string) ([]byte, error) 
 			origH = sprite.OriginalH
 		}
 		buf.WriteString("\t\t\t<key>sourceSize</key>\n")
-		buf.WriteString(fmt.Sprintf("\t\t\t<string>{%d,%d}</string>\n", origW, origH))
+		fmt.Fprintf(&buf, "\t\t\t<string>{%d,%d}</string>\n", origW, origH)
 
 		buf.WriteString("\t\t</dict>\n")
 	}
@@ -1256,7 +1256,7 @@ func generateCocos2d(sheets []Spritesheet, _ map[string]string) ([]byte, error) 
 	buf.WriteString("\t\t<key>textureFileName</key>\n")
 	buf.WriteString("\t\t<string>spritesheet-0.png</string>\n")
 	buf.WriteString("\t\t<key>size</key>\n")
-	buf.WriteString(fmt.Sprintf("\t\t<string>{%d,%d}</string>\n", sheet.Width, sheet.Height))
+	fmt.Fprintf(&buf, "\t\t<string>{%d,%d}</string>\n", sheet.Width, sheet.Height)
 	buf.WriteString("\t</dict>\n")
 	buf.WriteString("</dict>\n</plist>\n")
 
