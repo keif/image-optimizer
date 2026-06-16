@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -184,7 +185,7 @@ func TestOptimizeImage_QualitySettings(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run("Quality"+string(rune(tt.quality)), func(t *testing.T) {
+		t.Run(fmt.Sprintf("Quality%d", tt.quality), func(t *testing.T) {
 			options := OptimizeOptions{
 				Quality: tt.quality,
 			}

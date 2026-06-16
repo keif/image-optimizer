@@ -19,9 +19,11 @@ func Initialize() error {
 	if dbPath == "" {
 		dbPath = "./data/api_keys.db"
 	}
+	dbPath = filepath.Clean(dbPath)
 
 	// Ensure directory exists
 	dir := filepath.Dir(dbPath)
+	// #nosec G703 -- DB_PATH is operator-controlled config, not user input; path is cleaned above
 	if err := os.MkdirAll(dir, 0750); err != nil {
 		return fmt.Errorf("failed to create database directory: %w", err)
 	}
