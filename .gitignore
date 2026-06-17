@@ -70,3 +70,6 @@ out/
 
 # notes
 _notes/
+
+# gstack /browse skill scratch (per-session browser audit/console/network logs)
+.gstack/
