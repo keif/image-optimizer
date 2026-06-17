@@ -77,10 +77,10 @@ jobs:
               echo ":warning: **Codex CLI exited non-zero (\`$EXIT_CODE\`)** — review output may be incomplete."
               echo ""
             fi
-            if grep -q '\[P1\]' .codex-review/output.md; then
-              echo ":x: **Gate: FAIL** — \`[P1]\` critical findings present."
+            if grep -qE '\[P[01]\]' .codex-review/output.md; then
+              echo ":x: **Gate: FAIL** — critical findings present (\`[P0]\` or \`[P1]\`)."
             elif grep -q '\[P2\]' .codex-review/output.md; then
-              echo ":warning: **Gate: PASS with advisories** — \`[P2]\` findings present, no \`[P1]\`."
+              echo ":warning: **Gate: PASS with advisories** — \`[P2]\` findings present, no critical."
             else
               echo ":white_check_mark: **Gate: PASS** — no findings."
             fi
@@ -106,8 +106,8 @@ jobs:
         env:
           EXIT_CODE: ${{ steps.review.outputs.exit_code }}
         run: |
-          if grep -q '\[P1\]' .codex-review/output.md; then
-            echo "Codex flagged [P1] critical findings — failing the check."
+          if grep -qE '\[P[01]\]' .codex-review/output.md; then
+            echo "Codex flagged critical findings ([P0] or [P1]) — failing the check."
             exit 1
           fi
           if [ "$EXIT_CODE" != "0" ]; then
