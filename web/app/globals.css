@@ -28,14 +28,6 @@
   animation: float 3s ease-in-out infinite;
 }
 
-@utility delay-500 {
-  animation-delay: 500ms;
-}
-
-@utility delay-1000 {
-  animation-delay: 1000ms;
-}
-
 @layer utilities {
   :root {
     --background: #ffffff;

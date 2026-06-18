@@ -19,8 +19,8 @@ export default function LearnPage() {
       {/* Floating Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-40 h-40 bg-purple-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute bottom-20 left-1/4 w-36 h-36 bg-blue-300/15 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute top-40 right-20 w-40 h-40 bg-purple-300/20 rounded-full blur-3xl animate-pulse [animation-delay:1000ms]"></div>
+        <div className="absolute bottom-20 left-1/4 w-36 h-36 bg-blue-300/15 rounded-full blur-3xl animate-pulse [animation-delay:500ms]"></div>
       </div>
 
       {/* Hero Section */}
