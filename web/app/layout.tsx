@@ -139,6 +139,13 @@ export default function RootLayout({
           src="//gc.zgo.at/count.js"
           strategy="afterInteractive"
         />
+        <Script
+          id="adsbygoogle-loader"
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2266405283226544"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

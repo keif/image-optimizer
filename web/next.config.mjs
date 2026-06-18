@@ -17,18 +17,18 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              // Allow scripts from self and analytics
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://gc.zgo.at https://goatcounter.com https://baker.goatcounter.com",
+              // Allow scripts from self, analytics, and Google AdSense (loader + creatives + tag services)
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://gc.zgo.at https://goatcounter.com https://baker.goatcounter.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.googletagservices.com https://*.googleadservices.com https://adservice.google.com",
               // Allow styles from self and inline
               "style-src 'self' 'unsafe-inline'",
-              // Allow images from self and common CDNs
+              // Allow images from self and common CDNs (https: catch-all covers AdSense image creatives)
               "img-src 'self' data: blob: https:",
               // Allow fonts from self and data URLs
               "font-src 'self' data:",
-              // Allow connections to API and analytics
-              "connect-src 'self' https://gc.zgo.at https://goatcounter.com https://baker.goatcounter.com https://api.sosquishy.io http://localhost:8080",
-              // Allow frames from self
-              "frame-src 'self'",
+              // Allow connections to API, analytics, and AdSense telemetry
+              "connect-src 'self' https://gc.zgo.at https://goatcounter.com https://baker.goatcounter.com https://api.sosquishy.io http://localhost:8080 https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://*.googleadservices.com",
+              // Allow frames from self and AdSense ad iframes (creatives render in iframes from doubleclick + googlesyndication)
+              "frame-src 'self' https://googleads.g.doubleclick.net https://*.doubleclick.net https://*.googlesyndication.com",
               // Disallow objects
               "object-src 'none'",
               // Base URI restriction
