@@ -48,7 +48,7 @@ export default function SpritesheetResults({ result }: SpritesheetResultsProps) 
   return (
     <div className="space-y-6">
       {/* Summary Card */}
-      <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-6 border border-purple-200 dark:border-purple-800">
+      <div className="bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-6 border border-purple-200 dark:border-purple-800">
         <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
           <Layers className="w-6 h-6 text-purple-600" />
           {result.duplicatesRemoved !== undefined ? 'Optimization Complete' : 'Packing Complete'}

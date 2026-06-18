@@ -87,7 +87,7 @@ export default function FeedbackPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-8">
@@ -222,7 +222,7 @@ export default function FeedbackPage() {
                 >
                   <div className="flex items-start gap-4">
                     {/* Icon */}
-                    <div className={`p-2 rounded-lg flex-shrink-0 ${
+                    <div className={`p-2 rounded-lg shrink-0 ${
                       isBug
                         ? 'bg-red-100 dark:bg-red-900/30'
                         : 'bg-purple-100 dark:bg-purple-900/30'
@@ -240,7 +240,7 @@ export default function FeedbackPage() {
                         <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                           {issue.title}
                         </h3>
-                        <ExternalLink className="w-4 h-4 text-gray-400 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <ExternalLink className="w-4 h-4 text-gray-400 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
 
                       {/* Meta Info */}
@@ -284,7 +284,7 @@ export default function FeedbackPage() {
         )}
 
         {/* Footer CTA */}
-        <div className="mt-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-8 text-center text-white">
+        <div className="mt-12 bg-linear-to-r from-purple-600 to-pink-600 rounded-xl p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-2">Want to contribute?</h2>
           <p className="text-purple-100 mb-6">
             Check out open issues on GitHub and join the discussion

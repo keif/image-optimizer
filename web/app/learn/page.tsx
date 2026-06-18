@@ -15,12 +15,12 @@ export const metadata: Metadata = {
 
 export default function LearnPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-teal-300 via-sky-400 to-indigo-400 overflow-hidden">
+    <main className="min-h-screen bg-linear-to-br from-teal-300 via-sky-400 to-indigo-400 overflow-hidden">
       {/* Floating Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-40 h-40 bg-purple-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute bottom-20 left-1/4 w-36 h-36 bg-blue-300/15 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute top-40 right-20 w-40 h-40 bg-purple-300/20 rounded-full blur-3xl animate-pulse [animation-delay:1000ms]"></div>
+        <div className="absolute bottom-20 left-1/4 w-36 h-36 bg-blue-300/15 rounded-full blur-3xl animate-pulse [animation-delay:500ms]"></div>
       </div>
 
       {/* Hero Section */}
@@ -39,7 +39,7 @@ export default function LearnPage() {
             {/* Mascot Image - Floating Animation */}
             <div className="flex justify-center lg:justify-end">
               <div className="relative animate-float">
-                <div className="w-64 h-64 sm:w-80 sm:h-80 bg-gradient-to-br from-blue-400 to-cyan-300 rounded-full shadow-2xl shadow-blue-500/50 flex items-center justify-center overflow-hidden">
+                <div className="w-64 h-64 sm:w-80 sm:h-80 bg-linear-to-br from-blue-400 to-cyan-300 rounded-full shadow-2xl shadow-blue-500/50 flex items-center justify-center overflow-hidden">
                   <Image
                     src="/images/so-squishy-squish.png"
                     alt="Squish - The SoSquishy Mascot"
@@ -50,7 +50,7 @@ export default function LearnPage() {
                   />
                 </div>
                 {/* Glow effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-300 to-cyan-200 rounded-full blur-2xl opacity-30 -z-10"></div>
+                <div className="absolute inset-0 bg-linear-to-br from-blue-300 to-cyan-200 rounded-full blur-2xl opacity-30 -z-10"></div>
               </div>
             </div>
           </div>
@@ -60,8 +60,8 @@ export default function LearnPage() {
       {/* Story Section */}
       <section className="relative py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-sky-300/30 p-8 sm:p-12 transform hover:scale-[1.02] transition-transform duration-300">
-            <h2 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6 text-center">
+          <div className="bg-white/95 backdrop-blur-xs rounded-3xl shadow-2xl shadow-sky-300/30 p-8 sm:p-12 transform hover:scale-[1.02] transition-transform duration-300">
+            <h2 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-purple-600 mb-6 text-center">
               How It All Began
             </h2>
             <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
@@ -98,9 +98,9 @@ export default function LearnPage() {
           {/* Three Philosophy Cards */}
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             {/* Smart Compression */}
-            <div className="group relative bg-gradient-to-b from-slate-50 to-white dark:from-slate-800/60 dark:to-slate-900/70 backdrop-blur-sm rounded-2xl shadow-md hover:shadow-xl border border-white/20 p-8 transition-all duration-300 hover:-translate-y-1">
+            <div className="group relative bg-linear-to-b from-slate-50 to-white dark:from-slate-800/60 dark:to-slate-900/70 backdrop-blur-xs rounded-2xl shadow-md hover:shadow-xl border border-white/20 p-8 transition-all duration-300 hover:-translate-y-1">
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 group-hover:from-blue-600 group-hover:to-cyan-600 transition-all duration-300 group-hover:scale-110">
+                <div className="p-3 rounded-xl bg-linear-to-br from-blue-500 to-cyan-500 group-hover:from-blue-600 group-hover:to-cyan-600 transition-all duration-300 group-hover:scale-110">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -113,9 +113,9 @@ export default function LearnPage() {
             </div>
 
             {/* Performance First */}
-            <div className="group relative bg-gradient-to-b from-slate-50 to-white dark:from-slate-800/60 dark:to-slate-900/70 backdrop-blur-sm rounded-2xl shadow-md hover:shadow-xl border border-white/20 p-8 transition-all duration-300 hover:-translate-y-1">
+            <div className="group relative bg-linear-to-b from-slate-50 to-white dark:from-slate-800/60 dark:to-slate-900/70 backdrop-blur-xs rounded-2xl shadow-md hover:shadow-xl border border-white/20 p-8 transition-all duration-300 hover:-translate-y-1">
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 group-hover:from-purple-600 group-hover:to-pink-600 transition-all duration-300 group-hover:scale-110">
+                <div className="p-3 rounded-xl bg-linear-to-br from-purple-500 to-pink-500 group-hover:from-purple-600 group-hover:to-pink-600 transition-all duration-300 group-hover:scale-110">
                   <Gauge className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -128,9 +128,9 @@ export default function LearnPage() {
             </div>
 
             {/* Designed for Developers */}
-            <div className="group relative bg-gradient-to-b from-slate-50 to-white dark:from-slate-800/60 dark:to-slate-900/70 backdrop-blur-sm rounded-2xl shadow-md hover:shadow-xl border border-white/20 p-8 transition-all duration-300 hover:-translate-y-1">
+            <div className="group relative bg-linear-to-b from-slate-50 to-white dark:from-slate-800/60 dark:to-slate-900/70 backdrop-blur-xs rounded-2xl shadow-md hover:shadow-xl border border-white/20 p-8 transition-all duration-300 hover:-translate-y-1">
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 group-hover:from-emerald-600 group-hover:to-teal-600 transition-all duration-300 group-hover:scale-110">
+                <div className="p-3 rounded-xl bg-linear-to-br from-emerald-500 to-teal-500 group-hover:from-emerald-600 group-hover:to-teal-600 transition-all duration-300 group-hover:scale-110">
                   <Code2 className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -159,9 +159,9 @@ export default function LearnPage() {
       {/* Sparkle Divider */}
       <div className="relative py-8 px-4">
         <div className="max-w-4xl mx-auto flex items-center justify-center space-x-4">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-white/50 to-transparent"></div>
           <Sparkles className="w-8 h-8 text-white/80 animate-pulse" />
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
+          <div className="h-px flex-1 bg-linear-to-r from-transparent via-white/50 to-transparent"></div>
         </div>
       </div>
 
@@ -171,14 +171,14 @@ export default function LearnPage() {
           <h2 className="text-4xl sm:text-5xl font-bold text-white drop-shadow-lg mb-6">
             What&apos;s Next for SoSquishy?
           </h2>
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl shadow-sky-300/30 p-8 sm:p-12">
+          <div className="bg-white/90 backdrop-blur-xs rounded-3xl shadow-2xl shadow-sky-300/30 p-8 sm:p-12">
             <p className="text-xl text-gray-700 leading-relaxed mb-6">
               We&apos;re building smarter optimization tools that adapt to your needs, whether you&apos;re working on web projects or game assets.
             </p>
             <p className="text-xl text-gray-700 leading-relaxed mb-6">
               Expect enhanced compression algorithms, seamless export options, and integrations designed to keep your workflows fast and simple.
             </p>
-            <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+            <p className="text-2xl font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-purple-600">
               Stay tuned for a faster, lighter, and more playful web. 💙
             </p>
           </div>

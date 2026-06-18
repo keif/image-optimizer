@@ -520,7 +520,7 @@ export default function BestPracticesGuide() {
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Quick Reference Checklist</h2>
 
-        <div className="not-prose my-8 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 border border-blue-200 dark:border-gray-700">
+        <div className="not-prose my-8 bg-linear-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6 border border-blue-200 dark:border-gray-700">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
             Essential Image Optimization Checklist
           </h3>
@@ -636,7 +636,7 @@ export default function BestPracticesGuide() {
           </div>
         </div>
 
-        <div className="not-prose mt-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white text-center">
+        <div className="not-prose mt-12 bg-linear-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white text-center">
           <h3 className="text-2xl font-bold mb-4">
             Start Optimizing Your Images Today
           </h3>

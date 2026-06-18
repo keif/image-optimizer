@@ -30,7 +30,7 @@ export default function PrivacyPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <Lock className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+            <Lock className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
             <div>
               <h3 className="font-medium text-green-900 dark:text-green-200">
                 No Storage
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
 
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <Trash2 className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+            <Trash2 className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
             <div>
               <h3 className="font-medium text-green-900 dark:text-green-200">
                 Auto-Deletion
@@ -58,7 +58,7 @@ export default function PrivacyPage() {
 
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <Shield className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+            <Shield className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
             <div>
               <h3 className="font-medium text-green-900 dark:text-green-200">
                 Privacy-First Analytics
@@ -72,7 +72,7 @@ export default function PrivacyPage() {
 
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <Clock className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+            <Clock className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
             <div>
               <h3 className="font-medium text-green-900 dark:text-green-200">
                 Ephemeral Processing
@@ -239,7 +239,7 @@ export default function PrivacyPage() {
 
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
             <div>
               <h3 className="text-lg font-medium text-blue-900 dark:text-blue-200 mb-2">
                 Questions or Concerns?

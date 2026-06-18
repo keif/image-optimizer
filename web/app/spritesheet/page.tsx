@@ -164,7 +164,7 @@ export default function SpritesheetPage() {
       <div className="text-center mb-12">
         <div className="flex items-center justify-center gap-3 mb-4">
           <Package className="w-10 h-10 text-purple-600" />
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Spritesheet Tools
           </h1>
         </div>
@@ -179,7 +179,7 @@ export default function SpritesheetPage() {
             onClick={() => handleModeChange('pack')}
             className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
               mode === 'pack'
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                ? 'bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
             }`}
           >
@@ -190,7 +190,7 @@ export default function SpritesheetPage() {
             onClick={() => handleModeChange('import')}
             className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
               mode === 'import'
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                ? 'bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-lg'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
             }`}
           >
@@ -240,7 +240,7 @@ export default function SpritesheetPage() {
                     type="checkbox"
                     checked={deduplicate}
                     onChange={(e) => setDeduplicate(e.target.checked)}
-                    className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                   />
                   <div>
                     <div className="text-sm font-medium text-purple-900 dark:text-purple-100">
@@ -265,7 +265,7 @@ export default function SpritesheetPage() {
                   (mode === 'import' && (!spritesheetFile || !xmlFile)) ||
                   isProcessing
                 }
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-6 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                className="w-full bg-linear-to-r from-purple-500 to-pink-500 text-white py-3 px-6 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
               >
                 {isProcessing ? (
                   <>
@@ -303,7 +303,7 @@ export default function SpritesheetPage() {
           {error && (
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                 <div>
                   <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
                     Packing Failed
@@ -351,25 +351,25 @@ export default function SpritesheetPage() {
 
       {/* Info Section */}
       <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h3 className="font-semibold mb-2">MaxRects Algorithm</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Uses the industry-standard MaxRects bin packing algorithm with Best Short Side Fit heuristic for optimal space efficiency (85-95%).
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h3 className="font-semibold mb-2">Sprite Deduplication</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Pixel-perfect duplicate detection removes identical frames from existing spritesheets, achieving 70-75% reduction on typical game sprites.
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h3 className="font-semibold mb-2">Multiple Formats</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Export sprite coordinates in JSON, Sparrow XML, CSS, Unity, Godot, Cocos2d formats - all from a single operation.
           </p>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
           <h3 className="font-semibold mb-2">Atlas Splitting</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Automatically splits large sprite sets into multiple sheets when they exceed max dimensions, with full metadata support.

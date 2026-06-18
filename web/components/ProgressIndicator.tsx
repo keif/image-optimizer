@@ -36,7 +36,7 @@ export default function ProgressIndicator({
           </div>
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500 ease-out"
+              className="h-full bg-linear-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -61,11 +61,11 @@ export default function ProgressIndicator({
                 }`}
               >
                 {isComplete ? (
-                  <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
                 ) : isCurrent ? (
-                  <Loader2 className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5 animate-spin" />
+                  <Loader2 className="w-5 h-5 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5 animate-spin" />
                 ) : (
-                  <div className="w-5 h-5 rounded-full border-2 border-gray-300 dark:border-gray-600 flex-shrink-0 mt-0.5" />
+                  <div className="w-5 h-5 rounded-full border-2 border-gray-300 dark:border-gray-600 shrink-0 mt-0.5" />
                 )}
                 <div className="flex-1 min-w-0">
                   <p

@@ -166,7 +166,7 @@ export default function ResultsDisplay({
         {optimizedBlob && onDownload && (
           <button
             onClick={onDownload}
-            className="w-full mt-6 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-lg transition-all shadow-lg"
+            className="w-full mt-6 flex items-center justify-center gap-2 px-4 py-3 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-lg transition-all shadow-lg"
           >
             <Download className="w-5 h-5" />
             Download Optimized Image

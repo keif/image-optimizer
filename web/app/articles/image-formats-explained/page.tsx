@@ -501,7 +501,7 @@ export default function ImageFormatsGuide() {
         </div>
 
         {/* CTA */}
-        <div className="not-prose mt-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white text-center">
+        <div className="not-prose mt-12 bg-linear-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white text-center">
           <h3 className="text-2xl font-bold mb-4">
             Ready to Optimize Your Images?
           </h3>
