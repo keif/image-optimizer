@@ -121,7 +121,7 @@ export default function BlogPage() {
       </div>
 
       {/* Why Image Optimization Matters Section */}
-      <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-8 mb-12 border border-blue-200 dark:border-gray-700">
+      <div className="bg-linear-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-8 mb-12 border border-blue-200 dark:border-gray-700">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
           Why Image Optimization Matters
         </h2>
@@ -219,7 +219,7 @@ export default function BlogPage() {
       </div>
 
       {/* CTA Section */}
-      <div className="mt-12 text-center bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white">
+      <div className="mt-12 text-center bg-linear-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-white">
         <h2 className="text-3xl font-bold mb-4">
           Ready to Optimize Your Images?
         </h2>

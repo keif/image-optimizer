@@ -70,7 +70,7 @@ export default function BeforeAfterComparison({
               flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all
               ${
                 viewMode === 'slider'
-                  ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
+                  ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-xs'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }
             `}
@@ -84,7 +84,7 @@ export default function BeforeAfterComparison({
               flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all
               ${
                 viewMode === 'side-by-side'
-                  ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
+                  ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-xs'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }
             `}
@@ -105,7 +105,7 @@ export default function BeforeAfterComparison({
 
       {/* Metrics Overlay */}
       {showMetrics && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-linear-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
           <div className="flex items-start gap-3">
             <div className={`p-2 rounded-lg ${isLarger ? 'bg-red-100 dark:bg-red-900/20' : 'bg-green-100 dark:bg-green-900/20'}`}>
               <TrendingDown className={`w-5 h-5 ${isLarger ? 'text-red-600 dark:text-red-400 rotate-180' : savingsColor}`} />

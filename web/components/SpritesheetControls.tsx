@@ -139,7 +139,7 @@ export default function SpritesheetControls({ options, onChange }: SpritesheetCo
       {options.padding > 0 && (
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-3">
           <div className="flex items-start gap-2">
-            <svg className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div className="flex-1 text-xs">
@@ -198,7 +198,7 @@ export default function SpritesheetControls({ options, onChange }: SpritesheetCo
       {options.trimTransparency && (
         <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 space-y-3">
           <div className="flex items-start gap-2">
-            <svg className="w-4 h-4 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-purple-600 dark:text-purple-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div className="flex-1">
@@ -223,7 +223,7 @@ export default function SpritesheetControls({ options, onChange }: SpritesheetCo
               className="w-full px-3 py-2 text-sm border border-purple-300 dark:border-purple-700 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
             />
             <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
-              Only trim frames matching these patterns (e.g., <code className="bg-purple-100 dark:bg-purple-900 px-1 rounded">*walk*,*run*</code>)
+              Only trim frames matching these patterns (e.g., <code className="bg-purple-100 dark:bg-purple-900 px-1 rounded-sm">*walk*,*run*</code>)
             </p>
           </div>
 
@@ -240,12 +240,12 @@ export default function SpritesheetControls({ options, onChange }: SpritesheetCo
               className="w-full px-3 py-2 text-sm border border-purple-300 dark:border-purple-700 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
-              Trim all frames EXCEPT those matching these patterns (e.g., <code className="bg-purple-100 dark:bg-purple-900 px-1 rounded">*idle*,*attack*</code>)
+              Trim all frames EXCEPT those matching these patterns (e.g., <code className="bg-purple-100 dark:bg-purple-900 px-1 rounded-sm">*idle*,*attack*</code>)
               {options.trimOnly && <span className="block mt-1 text-orange-600 dark:text-orange-400">⚠️ Disabled when "Trim Only" is specified</span>}
             </p>
           </div>
 
-          <div className="bg-purple-100 dark:bg-purple-900/40 rounded p-2">
+          <div className="bg-purple-100 dark:bg-purple-900/40 rounded-sm p-2">
             <p className="text-xs text-purple-800 dark:text-purple-200">
               <strong>Example use case:</strong> Some animations use frameY offsets (benefit from trimming), while others have large hitboxes without frameY (should not be trimmed).
             </p>

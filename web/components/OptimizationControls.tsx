@@ -137,7 +137,7 @@ export default function OptimizationControls({
               onChange({ ...options, losslessMode: e.target.checked })
             }
             disabled={disabled}
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
           />
           <div className="flex-1">
             <div className="text-sm font-medium text-gray-900 dark:text-white">
@@ -167,7 +167,7 @@ export default function OptimizationControls({
               onChange({ ...options, forceSRGB: e.target.checked })
             }
             disabled={disabled}
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
           />
           <div className="flex-1">
             <div className="text-sm font-medium text-gray-900 dark:text-white">
@@ -247,7 +247,7 @@ export default function OptimizationControls({
                         onChange({ ...options, progressive: e.target.checked })
                       }
                       disabled={disabled}
-                      className="mt-0.5 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      className="mt-0.5 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500"
                     />
                     <div className="flex-1">
                       <div className="text-sm text-gray-900 dark:text-gray-200">
@@ -267,7 +267,7 @@ export default function OptimizationControls({
                         onChange({ ...options, optimizeCoding: e.target.checked })
                       }
                       disabled={disabled}
-                      className="mt-0.5 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                      className="mt-0.5 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500"
                     />
                     <div className="flex-1">
                       <div className="text-sm text-gray-900 dark:text-gray-200">
@@ -362,7 +362,7 @@ export default function OptimizationControls({
                         onChange({ ...options, interlace: e.target.checked })
                       }
                       disabled={disabled}
-                      className="mt-0.5 w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500"
+                      className="mt-0.5 w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-purple-500"
                     />
                     <div className="flex-1">
                       <div className="text-sm text-gray-900 dark:text-gray-200">
@@ -382,7 +382,7 @@ export default function OptimizationControls({
                         onChange({ ...options, palette: e.target.checked })
                       }
                       disabled={disabled}
-                      className="mt-0.5 w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500"
+                      className="mt-0.5 w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-purple-500"
                     />
                     <div className="flex-1">
                       <div className="text-sm text-gray-900 dark:text-gray-200">
@@ -435,7 +435,7 @@ export default function OptimizationControls({
                         onChange({ ...options, lossless: e.target.checked })
                       }
                       disabled={disabled}
-                      className="mt-0.5 w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500"
+                      className="mt-0.5 w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-green-500"
                     />
                     <div className="flex-1">
                       <div className="text-sm text-gray-900 dark:text-gray-200">
