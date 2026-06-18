@@ -14,7 +14,8 @@ type AdFormat = 'auto' | 'fluid' | 'rectangle' | 'horizontal' | 'vertical';
 interface AdSlotProps {
   /** 10-digit slot ID from the AdSense dashboard. */
   slot: string;
-  /** AdSense ad format. Defaults to 'auto' (responsive). */
+  /** AdSense ad format. Defaults to 'fluid' when layout='in-article'
+   *  (required by AdSense for in-article units) and 'auto' otherwise. */
   format?: AdFormat;
   /** Whether to allow full-width responsive sizing. Defaults to true. */
   responsive?: boolean;
@@ -36,12 +37,16 @@ interface AdSlotProps {
  */
 export function AdSlot({
   slot,
-  format = 'auto',
+  format,
   responsive = true,
   layout,
   className,
   style,
 }: AdSlotProps) {
+  // AdSense in-article units require data-ad-format='fluid' paired with
+  // data-ad-layout='in-article'. Auto-pick the right format when caller
+  // didn't specify one.
+  const effectiveFormat: AdFormat = format ?? (layout === 'in-article' ? 'fluid' : 'auto');
   const pushed = useRef(false);
 
   useEffect(() => {
@@ -60,7 +65,7 @@ export function AdSlot({
       style={{ display: 'block', minHeight: 280, ...style }}
       data-ad-client={ADSENSE_PUBLISHER_ID}
       data-ad-slot={slot}
-      data-ad-format={format}
+      data-ad-format={effectiveFormat}
       data-ad-layout={layout}
       data-full-width-responsive={responsive ? 'true' : 'false'}
     />
