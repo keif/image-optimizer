@@ -28,10 +28,6 @@ export default function FeedbackPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'enhancement' | 'bug'>('all');
 
-  useEffect(() => {
-    fetchIssues();
-  }, []);
-
   const fetchIssues = async () => {
     try {
       // Fetch open issues from GitHub API (public, no auth needed)
@@ -56,6 +52,13 @@ export default function FeedbackPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Canonical fetch-on-mount pattern. The newer react-hooks/set-state-in-effect
+    // lint wants a Suspense/`use()` rewrite, which is a separate refactor.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchIssues();
+  }, []);
 
   const filteredIssues = issues.filter(issue => {
     if (filter === 'all') return true;
