@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { AdSlot } from "@/components/AdSlot";
+import { ADSENSE_SLOTS } from "@/lib/adsense";
 
 export const metadata: Metadata = {
   title: "How Image Optimization Improves Website Performance",
@@ -258,6 +260,11 @@ export default function WebPerformanceGuide() {
         </ol>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+
+        <div className="not-prose my-8">
+          <AdSlot slot={ADSENSE_SLOTS.articleMidContent} layout="in-article" />
+        </div>
+
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">How to Measure the Wins</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           Don’t just optimize and hope for the best. Here’s how to know you’re making a real difference—on both the technical and business sides.

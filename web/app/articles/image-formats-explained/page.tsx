@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { AdSlot } from "@/components/AdSlot";
+import { ADSENSE_SLOTS } from "@/lib/adsense";
 
 export const metadata: Metadata = {
   title: "Image Formats Explained: JPEG, PNG, WebP, AVIF & GIF",
@@ -248,6 +250,11 @@ export default function ImageFormatsGuide() {
         </p>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+
+        <div className="not-prose my-8">
+          <AdSlot slot={ADSENSE_SLOTS.articleMidContent} layout="in-article" />
+        </div>
+
         {/* Finally, let’s look at GIF—still hanging on after all these years. */}
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">GIF: The Animated Veteran</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">

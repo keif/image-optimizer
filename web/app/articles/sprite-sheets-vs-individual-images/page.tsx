@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { AdSlot } from "@/components/AdSlot";
+import { ADSENSE_SLOTS } from "@/lib/adsense";
 export const metadata: Metadata = {
   title: "Sprite Sheets vs Individual Images: Performance Analysis",
   description: "Performance comparison of sprite sheets vs individual images for web and game development. Includes benchmarks, memory analysis, and HTTP/2 considerations.",
@@ -262,6 +264,11 @@ export default function SpriteSheetVsIndividualImages() {
           Sprite sheets are non-negotiable for performant Canvas/WebGL games.
         </p>
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+
+        <div className="not-prose my-8">
+          <AdSlot slot={ADSENSE_SLOTS.articleMidContent} layout="in-article" />
+        </div>
+
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Workflow & Maintenance: The Developer Experience</h2>
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Individual Images: Simpler Workflow</h3>
         <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-600 dark:text-gray-400 my-6">

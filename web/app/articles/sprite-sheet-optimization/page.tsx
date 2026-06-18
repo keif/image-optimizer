@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { AdSlot } from "@/components/AdSlot";
+import { ADSENSE_SLOTS } from "@/lib/adsense";
 
 export const metadata: Metadata = {
   title: "Sprite Sheet Optimization: Best Practices for Web & Game Performance",
@@ -73,6 +75,10 @@ export default function SpriteSheetOptimization() {
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           One more thing: stick to power-of-two dimensions whenever possible (256×256, 512×512, 1024×1024, etc.). GPUs are optimized for these sizes, and many older graphics cards straight-up require them. If your sheet is 1000×1000, you're forcing the GPU to pad it to 1024×1024 anyway, wasting memory. Just size it right from the start and save everyone the headache.
         </p>
+
+        <div className="not-prose my-8">
+          <AdSlot slot={ADSENSE_SLOTS.articleMidContent} layout="in-article" />
+        </div>
 
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Compression: Squeezing Every Byte</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
