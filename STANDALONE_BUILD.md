@@ -84,7 +84,7 @@ The API server runs on the same port as the frontend:
 ### Prerequisites
 
 - Go 1.24+ (with CGO enabled)
-- Node.js 18+ with pnpm
+- Node.js 20.9+ with pnpm (Next.js 16 minimum)
 - System libraries: libvips, SQLite
 
 ### Build Process
