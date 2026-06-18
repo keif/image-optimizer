@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { AdSlot } from "@/components/AdSlot";
+import { ADSENSE_SLOTS } from "@/lib/adsense";
 
 export const metadata: Metadata = {
   title: "What Are Sprite Sheets? Guide for Web & Game Developers",
@@ -209,6 +211,11 @@ export default function WhatAreSpriteSheets() {
         </p>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+
+        <div className="not-prose my-8">
+          <AdSlot slot={ADSENSE_SLOTS.articleMidContent} layout="in-article" />
+        </div>
+
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Sprite Sheets in Games</h2>
 
         <h3 className="text-2xl font-semibold mt-8 mb-3 text-gray-800 dark:text-gray-200">Character Animations</h3>

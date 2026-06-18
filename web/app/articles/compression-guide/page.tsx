@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Metadata } from "next";
+import { AdSlot } from "@/components/AdSlot";
+import { ADSENSE_SLOTS } from "@/lib/adsense";
 
 export const metadata: Metadata = {
   title: "Understanding Lossy vs Lossless Compression",
@@ -242,6 +244,11 @@ export default function CompressionGuide() {
         </ul>
 
         <hr className="my-12 border-t border-gray-300 dark:border-gray-700" />
+
+        <div className="not-prose my-8">
+          <AdSlot slot={ADSENSE_SLOTS.articleMidContent} layout="in-article" />
+        </div>
+
         <h2 className="text-3xl font-bold mt-12 mb-4 text-gray-900 dark:text-white">Finding the Sweet Spot: Quality vs. File Size</h2>
         <p className="leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
           The big question with lossy compression: “What quality setting should I pick?” The answer depends on your needs, but these research-backed guidelines will help you decide:

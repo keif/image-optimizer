@@ -5,7 +5,9 @@ import Image from 'next/image';
 import ImageUploader from '@/components/ImageUploader';
 import OptimizationControls from '@/components/OptimizationControls';
 import ResultsDisplay from '@/components/ResultsDisplay';
+import { AdSlot } from '@/components/AdSlot';
 import { apiClient } from '@/lib/api';
+import { ADSENSE_SLOTS } from '@/lib/adsense';
 import { OptimizationOptions, OptimizationResult } from '@/lib/types';
 import { Loader2, AlertCircle } from 'lucide-react';
 
@@ -217,6 +219,11 @@ export default function Home() {
             </ul>
           </div>
         </div>
+      </div>
+
+      {/* AdSense slot below the optimizer tool */}
+      <div className="mt-12 max-w-3xl mx-auto">
+        <AdSlot slot={ADSENSE_SLOTS.homepageBottom} />
       </div>
     </div>
   );
