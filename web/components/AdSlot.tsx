@@ -62,7 +62,14 @@ export function AdSlot({
   return (
     <ins
       className={`adsbygoogle ${className ?? ''}`.trim()}
-      style={{ display: 'block', minHeight: 280, ...style }}
+      style={{
+        display: 'block',
+        minHeight: 280,
+        // In-article units are centered in their container per Google's
+        // recommended snippet for that format.
+        ...(layout === 'in-article' ? { textAlign: 'center' } : null),
+        ...style,
+      }}
       data-ad-client={ADSENSE_PUBLISHER_ID}
       data-ad-slot={slot}
       data-ad-format={effectiveFormat}
