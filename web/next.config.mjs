@@ -29,8 +29,11 @@ const nextConfig = {
               // adtrafficquality.google is AdSense's SODAR anti-fraud reporting
               // endpoint — required for ad serving.
               "connect-src 'self' https://gc.zgo.at https://goatcounter.com https://baker.goatcounter.com https://api.sosquishy.io http://localhost:8080 https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://adservice.google.com https://*.googleadservices.com https://*.adtrafficquality.google",
-              // Allow frames from self and AdSense ad iframes (creatives render in iframes from doubleclick + googlesyndication; SODAR uses a hidden iframe for fraud detection)
-              "frame-src 'self' https://googleads.g.doubleclick.net https://*.doubleclick.net https://*.googlesyndication.com https://*.adtrafficquality.google",
+              // Allow frames from self and AdSense ad iframes (creatives render in
+              // iframes from doubleclick + googlesyndication; SODAR uses a hidden
+              // iframe for fraud detection and nests a www.google.com iframe inside
+              // it for identity / fingerprinting).
+              "frame-src 'self' https://googleads.g.doubleclick.net https://*.doubleclick.net https://*.googlesyndication.com https://*.adtrafficquality.google https://www.google.com",
               // Disallow objects
               "object-src 'none'",
               // Base URI restriction
