@@ -25,8 +25,10 @@ const nextConfig = {
               "img-src 'self' data: blob: https:",
               // Allow fonts from self and data URLs
               "font-src 'self' data:",
-              // Allow connections to API, analytics, and AdSense telemetry
-              "connect-src 'self' https://gc.zgo.at https://goatcounter.com https://baker.goatcounter.com https://api.sosquishy.io http://localhost:8080 https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://adservice.google.com https://*.googleadservices.com",
+              // Allow connections to API, analytics, and AdSense telemetry.
+              // adtrafficquality.google is AdSense's SODAR anti-fraud reporting
+              // endpoint — required for ad serving.
+              "connect-src 'self' https://gc.zgo.at https://goatcounter.com https://baker.goatcounter.com https://api.sosquishy.io http://localhost:8080 https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://adservice.google.com https://*.googleadservices.com https://*.adtrafficquality.google",
               // Allow frames from self and AdSense ad iframes (creatives render in iframes from doubleclick + googlesyndication)
               "frame-src 'self' https://googleads.g.doubleclick.net https://*.doubleclick.net https://*.googlesyndication.com",
               // Disallow objects
