@@ -5,11 +5,11 @@ go 1.25.0
 require (
 	github.com/gofiber/fiber/v2 v2.52.13
 	github.com/h2non/bimg v1.1.9
-	github.com/mattn/go-sqlite3 v1.14.45
+	github.com/mattn/go-sqlite3 v1.14.47
 	github.com/stretchr/testify v1.11.1
 	github.com/swaggo/fiber-swagger v1.3.0
 	github.com/swaggo/swag v1.16.6
-	golang.org/x/image v0.42.0
+	golang.org/x/image v0.43.0
 )
 
 require (
