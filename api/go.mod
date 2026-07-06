@@ -3,7 +3,7 @@ module github.com/keif/image-optimizer
 go 1.25.0
 
 require (
-	github.com/gofiber/fiber/v2 v2.52.13
+	github.com/gofiber/fiber/v2 v2.52.14
 	github.com/h2non/bimg v1.1.9
 	github.com/mattn/go-sqlite3 v1.14.47
 	github.com/stretchr/testify v1.11.1
